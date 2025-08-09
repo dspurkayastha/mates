@@ -84,7 +84,7 @@ export function HeroSection() {
 
             {/* Dynamic tagline */}
             <h1 className="text-5xl lg:text-7xl font-extrabold leading-tight mb-6">
-              <span className="text-gray-900">Let's </span>
+              <span className="text-gray-900">Lets </span>
               
               {/* Animated prefix with fixed width container */}
               <span 
