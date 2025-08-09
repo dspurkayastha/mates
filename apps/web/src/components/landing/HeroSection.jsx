@@ -1,236 +1,57 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  CreditCard,
-  CheckCircle2,
-  Download,
-  ArrowRight,
-  Star,
-  Play,
-} from "lucide-react";
-import * as THREE from "three";
-import { useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import {
-  RoundedBox,
-  ContactShadows,
-  Environment,
-  Html,
-} from "@react-three/drei";
+import React, { useEffect, useState, useRef, Suspense, lazy } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle2, Download, ArrowRight, Star, Play } from 'lucide-react';
 
-const prefixes = ["Room", "Flat", "House", "Soul"]; // prefix changes; "mates" stays static
+// Lazy load the PhoneMockup component
+const PhoneMockup = lazy(() => import('./PhoneMockup'));
 
-/* --------------------------- PHONE MOCKUP --------------------------- */
-function Phone() {
-  const group = useRef(null);
-  const [target, setTarget] = useState({ rx: 0.1, ry: 0.25 });
+// Fallback component for loading state
+const PhoneMockupFallback = () => (
+  <div className="relative w-full max-w-[280px] h-[560px] mx-auto bg-gradient-to-br from-purple-50 to-pink-50 rounded-[32px] border-8 border-gray-900 overflow-hidden shadow-2xl" />
+);
 
-  useFrame((_, dt) => {
-    if (!group.current) return;
-    group.current.rotation.x = THREE.MathUtils.damp(
-      group.current.rotation.x,
-      target.rx,
-      6,
-      dt
-    );
-    group.current.rotation.y = THREE.MathUtils.damp(
-      group.current.rotation.y,
-      target.ry,
-      6,
-      dt
-    );
-  });
+const prefixes = ['Room', 'Flat', 'House', 'Soul']; // prefix changes; "mates" stays static
 
-  const onMove = (e) => {
-    const p = e.pointer || { x: 0, y: 0 }; // normalized -1..1
-    const ry = THREE.MathUtils.clamp(p.x, -0.9, 0.9) * 0.35;
-    const rx = THREE.MathUtils.clamp(-p.y, -0.9, 0.9) * 0.25;
-    setTarget({ rx, ry });
-  };
+// Animation variants for the tagline
+const taglineVariants = {
+  hidden: { y: '100%', opacity: 0 },
+  visible: { y: 0, opacity: 1 },
+  exit: { y: '-100%', opacity: 0 }
+};
 
-  const onLeave = () => setTarget({ rx: 0.1, ry: 0.25 });
+// Calculate the width of the widest prefix for consistent layout
+const getMaxPrefixWidth = () => {
+  if (typeof window === 'undefined') return 'auto';
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return 'auto';
+  
+  ctx.font = 'bold 72px Inter, system-ui, sans-serif';
+  const widths = prefixes.map(text => ctx.measureText(text).width);
+  return `${Math.max(...widths) / 16}ch`; // Convert to ch units
+};
 
-  return (
-    <group
-      ref={group}
-      position={[0, 0.25, 0]}
-      onPointerMove={onMove}
-      onPointerLeave={onLeave}
-    >
-      {/* Body */}
-      <RoundedBox
-        args={[1.6, 3.2, 0.12]}
-        radius={0.18}
-        smoothness={8}
-        castShadow
-        receiveShadow
-      >
-        <meshPhysicalMaterial
-          color="#0f172a"
-          metalness={0.85}
-          roughness={0.25}
-          clearcoat={0.8}
-          clearcoatRoughness={0.05}
-        />
-      </RoundedBox>
-
-      {/* Side rim hint */}
-      <RoundedBox args={[1.58, 3.18, 0.121]} radius={0.17} smoothness={8}>
-        <meshStandardMaterial color="#1f2937" metalness={0.9} roughness={0.2} />
-      </RoundedBox>
-
-      {/* Glass */}
-      <RoundedBox
-        args={[1.42, 2.98, 0.004]}
-        radius={0.14}
-        smoothness={8}
-        position={[0, 0, 0.061]}
-      >
-        <meshPhysicalMaterial
-          color="#ffffff"
-          metalness={0}
-          roughness={0.15}
-          transmission={0.25}
-          transparent
-        />
-      </RoundedBox>
-
-      {/* UI plate under glass */}
-      <RoundedBox
-        args={[1.42, 2.98, 0.004]}
-        radius={0.14}
-        smoothness={8}
-        position={[0, 0, 0.058]}
-      >
-        <meshStandardMaterial color="#ffffff" map={makeUITexture()} />
-      </RoundedBox>
-
-      {/* Notch */}
-      <RoundedBox
-        args={[0.32, 0.08, 0.06]}
-        radius={0.03}
-        position={[0, 1.45, 0.055]}
-      >
-        <meshStandardMaterial color="#0b0b0b" roughness={0.4} metalness={0.2} />
-      </RoundedBox>
-
-      {/* Status LED */}
-      <mesh position={[0.74, 1.52, 0.058]}>
-        <circleGeometry args={[0.012, 24]} />
-        <meshBasicMaterial color="#60e0ff" />
-      </mesh>
-
-      {/* Floating chips */}
-      <Html transform position={[-0.9, 0.9, 0.07]}>
-        <div className="bg-white/95 backdrop-blur-md border border-white/60 shadow-lg px-3 py-2 rounded-xl text-xs">
-          <div className="font-semibold">Dishes done!</div>
-          <div className="text-gray-500">Great job, Alex</div>
-        </div>
-      </Html>
-      <Html transform position={[0.95, -0.3, 0.07]}>
-        <div className="bg-white/95 backdrop-blur-md border border-white/60 shadow-lg px-3 py-2 rounded-xl text-xs">
-          <div className="font-semibold">Bill split</div>
-          <div className="text-gray-500">$47.50 each</div>
-        </div>
-      </Html>
-    </group>
-  );
-}
-
-// Simple pastel UI as a CanvasTexture (pure JS)
-function makeUITexture() {
-  const c = document.createElement("canvas");
-  c.width = 512;
-  c.height = 1024;
-  const g = c.getContext("2d");
-  if (!g) return null;
-
-  // bg
-  const grd = g.createLinearGradient(0, 0, 0, c.height);
-  grd.addColorStop(0, "#f9f5ff");
-  grd.addColorStop(1, "#ffe4f3");
-  g.fillStyle = grd;
-  g.fillRect(0, 0, c.width, c.height);
-
-  // cards
-  g.fillStyle = "rgba(255,255,255,0.9)";
-  g.strokeStyle = "rgba(255,255,255,0.8)";
-  g.lineWidth = 4;
-  const card = (y) => {
-    g.beginPath();
-    const r = 18,
-      x = 40,
-      w = 432,
-      h = 88;
-    g.moveTo(x + r, y);
-    g.lineTo(x + w - r, y);
-    g.quadraticCurveTo(x + w, y, x + w, y + r);
-    g.lineTo(x + w, y + h - r);
-    g.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    g.lineTo(x + r, y + h);
-    g.quadraticCurveTo(x, y + h, x, y + h - r);
-    g.lineTo(x, y + r);
-    g.quadraticCurveTo(x, y, x + r, y);
-    g.fill();
-    g.stroke();
-  };
-  card(120);
-  card(230);
-  card(340);
-  card(450);
-
-  // stats
-  g.fillStyle = "#7c3aed";
-  g.font = "bold 64px Inter, system-ui, sans-serif";
-  g.fillText("8", 70, 90);
-  g.fillStyle = "#ec4899";
-  g.fillText("$24", 360, 90);
-
-  const tex = new THREE.CanvasTexture(c);
-  tex.anisotropy = 4;
-  return tex;
-}
-
-function AppMockup() {
-  return (
-    <div className="relative w-full max-w-[520px]">
-      <Canvas
-        shadows
-        dpr={[1, 2]}
-        camera={{ position: [0, 0.9, 3.6], fov: 35 }}
-      >
-        <ambientLight intensity={0.7} />
-        <directionalLight position={[2, 3, 2]} intensity={1.2} castShadow />
-        <Environment preset="city" />
-        <Phone />
-        <ContactShadows
-          position={[0, -0.01, 0]}
-          opacity={0.35}
-          scale={6}
-          blur={2.4}
-          far={4}
-        />
-      </Canvas>
-    </div>
-  );
-}
-
-/* --------------------------- HERO SECTION --------------------------- */
+// Main Hero Section Component
 export function HeroSection() {
   const [currentPrefixIndex, setPrefixIndex] = useState(0);
+  const [maxPrefixWidth] = useState(getMaxPrefixWidth());
+  const containerRef = useRef(null);
 
+  // Animation interval for the prefix rotation
   useEffect(() => {
-    const id = setInterval(
-      () => setPrefixIndex((p) => (p + 1) % prefixes.length),
-      2000
-    );
+    const id = setInterval(() => {
+      setPrefixIndex(prev => (prev + 1) % prefixes.length);
+    }, 2000);
     return () => clearInterval(id);
   }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <section 
+      ref={containerRef}
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-purple-50"
+    >
       {/* Glassmorphic Background Card */}
       <div className="absolute inset-4 rounded-3xl bg-white/20 backdrop-blur-xl border border-white/30 shadow-2xl" />
 
@@ -241,9 +62,9 @@ export function HeroSection() {
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply blur-xl opacity-30 animate-blob animation-delay-4000" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left */}
+          {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -257,30 +78,35 @@ export function HeroSection() {
               transition={{ delay: 0.2 }}
               className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 text-sm font-medium mb-8 border border-purple-200/50"
             >
-              <CheckCircle2 className="w-4 h-4 mr-2" />
-              Beta now live • Join 15,000+ households
+              <CheckCircle2 className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span>Beta now live • Join 15,000+ households</span>
             </motion.div>
 
-            {/* Dynamic tagline EXACT: “Let’s …mates really be Mates.” */}
+            {/* Dynamic tagline */}
             <h1 className="text-5xl lg:text-7xl font-extrabold leading-tight mb-6">
-              <span className="text-gray-900">Let’s </span>
-
-              {/* Reserve space + clip while animating */}
-              <span className="relative inline-flex align-baseline h-[1em] w-[9ch] overflow-hidden">
+              <span className="text-gray-900">Let's </span>
+              
+              {/* Animated prefix with fixed width container */}
+              <span 
+                className="relative inline-block align-middle overflow-visible"
+                style={{ width: maxPrefixWidth, height: '1.2em' }}
+              >
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={currentPrefixIndex}
-                    initial={{ opacity: 0, y: "100%" }}
-                    animate={{ opacity: 1, y: "0%" }}
-                    exit={{ opacity: 0, y: "-100%" }}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    variants={taglineVariants}
                     transition={{ duration: 0.45, ease: [0.2, 0.65, 0.2, 1] }}
-                    className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600"
+                    className="absolute left-0 right-0 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600"
                     aria-live="polite"
                   >
                     {prefixes[currentPrefixIndex]}
                   </motion.span>
                 </AnimatePresence>
               </span>
+              
               <span className="text-gray-900">mates</span>
               <br />
               <span className="text-gray-900">really be Mates.</span>
@@ -353,7 +179,11 @@ export function HeroSection() {
           </motion.div>
 
           {/* Right: Phone Mockup */}
-          <AppMockup />
+          <div className="flex justify-center lg:justify-end">
+            <Suspense fallback={<PhoneMockupFallback />}>
+              <PhoneMockup />
+            </Suspense>
+          </div>
         </div>
       </div>
 
@@ -373,6 +203,29 @@ export function HeroSection() {
   );
 }
 
+// Only export the Page component as default
 export default function Page() {
-  return <HeroSection />;
+  return (
+    <>
+      <HeroSection />
+      <style jsx global>{`
+        @keyframes blob {
+          0% { transform: translate(0,0) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.08); }
+          66% { transform: translate(-20px, 20px) scale(0.95); }
+          100% { transform: translate(0,0) scale(1); }
+        }
+        .animate-blob { 
+          animation: blob 7s infinite ease-in-out;
+          transform-origin: center;
+        }
+        .animation-delay-2000 { 
+          animation-delay: 2s; 
+        }
+        .animation-delay-4000 { 
+          animation-delay: 4s; 
+        }
+      `}</style>
+    </>
+  );
 }
