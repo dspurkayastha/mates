@@ -1,0 +1,41 @@
+# Node modules and package managers
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+.pnpm-store
+
+# Build outputs
+dist
+build
+web-build
+ios/build
+android/app/build
+
+# Expo
+.expo
+.expo-shared
+.expo/*
+expo-env.d.ts
+
+# Environment variables
+.env*
+
+# Cache and temporary files
+.cache
+.turbo
+.parcel-cache
+.swc
+.react-router
+coverage
+
+# IDE and editor files
+.idea
+.vscode
+
+# macOS specific
+.DS_Store
+
+# Deployment
+.vercel
