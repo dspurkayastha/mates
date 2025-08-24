@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthModal } from '@/utils/auth/useAuthModal';
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient({
@@ -38,6 +39,8 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView style={{ flex: 1 }}>
+        {/* Global auth modal – can be triggered from anywhere via useAuthModal */}
+        <AuthModal />
         <Stack screenOptions={{ headerShown: false }} initialRouteName="index">
           <Stack.Screen name="index" />
         </Stack>
