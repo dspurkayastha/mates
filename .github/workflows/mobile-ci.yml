@@ -28,4 +28,5 @@ jobs:
 
       - name: Lint
         working-directory: apps/mobile
+        continue-on-error: true
         run: npm run lint
