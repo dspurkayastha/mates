@@ -1,10 +1,6 @@
-import { router } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
-import { useCallback, useEffect, useMemo } from 'react';
-import { create } from 'zustand';
-import { Modal, View } from 'react-native';
-import { useAuthModal, useAuthStore, authKey } from './store';
-
+import { useCallback, useEffect } from 'react';
+import { useAuthModal, useAuthStore } from './store';
+import { supabase } from '@/lib/supabase';
 
 /**
  * This hook provides authentication functionality.
@@ -17,15 +13,28 @@ export const useAuth = () => {
   const { isOpen, close, open } = useAuthModal();
 
   const initiate = useCallback(() => {
-    SecureStore.getItemAsync(authKey).then((auth) => {
+    // Fetch existing session (if any) from Supabase (persisted in AsyncStorage)
+    const init = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       useAuthStore.setState({
-        auth: auth ? JSON.parse(auth) : null,
+        auth: session?.user ?? null,
         isReady: true,
       });
-    });
+    };
+    init();
   }, []);
 
-  useEffect(() => {}, []);
+  // Subscribe to auth state changes so UI stays in sync
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      useAuthStore.setState({ auth: session?.user ?? null });
+    });
+    return () => subscription?.unsubscribe();
+  }, []);
 
   const signIn = useCallback(() => {
     open({ mode: 'signin' });
@@ -35,8 +44,10 @@ export const useAuth = () => {
   }, [open]);
 
   const signOut = useCallback(() => {
-    setAuth(null);
-    close();
+    supabase.auth.signOut().finally(() => {
+      setAuth(null);
+      close();
+    });
   }, [close]);
 
   return {
