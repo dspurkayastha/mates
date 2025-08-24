@@ -5,11 +5,13 @@ import { View, Text } from 'react-native';
 // Simple emoji tab icons
 function TabBarIcon({ focused, color, emoji }) {
   return (
-    <View style={{ 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      opacity: focused ? 1 : 0.7
-    }}>
+    <View
+      style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        opacity: focused ? 1 : 0.7,
+      }}
+    >
       <Text style={{ fontSize: 20, color }}>{emoji}</Text>
     </View>
   );

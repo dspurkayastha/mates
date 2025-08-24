@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
   Alert,
   SafeAreaView,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 
 // Chore item component
@@ -15,7 +15,7 @@ const ChoreItem = ({ icon, name, assignedTo, dueTime, isCompleted, onToggleCompl
     <View style={styles.choreIconContainer}>
       <Text style={styles.choreIcon}>{icon}</Text>
     </View>
-    
+
     <View style={styles.choreDetails}>
       <Text style={styles.choreName}>{name}</Text>
       <View style={styles.choreSubDetails}>
@@ -27,18 +27,12 @@ const ChoreItem = ({ icon, name, assignedTo, dueTime, isCompleted, onToggleCompl
         </Text>
       </View>
     </View>
-    
-    <TouchableOpacity 
-      style={[
-        styles.completeButton, 
-        isCompleted ? styles.completedButton : {}
-      ]}
+
+    <TouchableOpacity
+      style={[styles.completeButton, isCompleted ? styles.completedButton : {}]}
       onPress={onToggleComplete}
     >
-      <Text style={[
-        styles.completeButtonText,
-        isCompleted ? styles.completedButtonText : {}
-      ]}>
+      <Text style={[styles.completeButtonText, isCompleted ? styles.completedButtonText : {}]}>
         {isCompleted ? '✓ Done' : 'Mark Done'}
       </Text>
     </TouchableOpacity>
@@ -51,14 +45,12 @@ const LeaderboardItem = ({ rank, name, completedCount, streak }) => (
     <View style={styles.rankContainer}>
       <Text style={styles.rankText}>{rank}</Text>
     </View>
-    
+
     <View style={styles.leaderDetails}>
       <Text style={styles.leaderName}>{name}</Text>
-      <Text style={styles.leaderStats}>
-        {completedCount} chores completed this week
-      </Text>
+      <Text style={styles.leaderStats}>{completedCount} chores completed this week</Text>
     </View>
-    
+
     <View style={styles.streakContainer}>
       <Text style={styles.streakText}>{streak}</Text>
       <Text style={styles.streakLabel}>day streak</Text>
@@ -68,21 +60,70 @@ const LeaderboardItem = ({ rank, name, completedCount, streak }) => (
 
 export default function ChoresScreen() {
   const [activeTab, setActiveTab] = useState('today');
-  
+
   // Placeholder chores data
   const todayChores = [
-    { id: '1', icon: '🧹', name: 'Sweep Living Room', assignedTo: 'You', dueTime: 'Today, 6 PM', isCompleted: false },
-    { id: '2', icon: '🍽️', name: 'Wash Dishes', assignedTo: 'You', dueTime: 'Today, 9 PM', isCompleted: true },
-    { id: '3', icon: '🗑️', name: 'Take Out Trash', assignedTo: 'Roommate', dueTime: 'Today, 8 PM', isCompleted: false },
+    {
+      id: '1',
+      icon: '🧹',
+      name: 'Sweep Living Room',
+      assignedTo: 'You',
+      dueTime: 'Today, 6 PM',
+      isCompleted: false,
+    },
+    {
+      id: '2',
+      icon: '🍽️',
+      name: 'Wash Dishes',
+      assignedTo: 'You',
+      dueTime: 'Today, 9 PM',
+      isCompleted: true,
+    },
+    {
+      id: '3',
+      icon: '🗑️',
+      name: 'Take Out Trash',
+      assignedTo: 'Roommate',
+      dueTime: 'Today, 8 PM',
+      isCompleted: false,
+    },
   ];
-  
+
   const weekChores = [
-    { id: '4', icon: '🧼', name: 'Clean Bathroom', assignedTo: 'You', dueTime: 'Tomorrow, 11 AM', isCompleted: false },
-    { id: '5', icon: '👕', name: 'Do Laundry', assignedTo: 'Roommate', dueTime: 'Wednesday, 5 PM', isCompleted: false },
-    { id: '6', icon: '🧽', name: 'Clean Kitchen', assignedTo: 'Roommate', dueTime: 'Thursday, 7 PM', isCompleted: false },
-    { id: '7', icon: '🧺', name: 'Fold Clothes', assignedTo: 'You', dueTime: 'Friday, 6 PM', isCompleted: false },
+    {
+      id: '4',
+      icon: '🧼',
+      name: 'Clean Bathroom',
+      assignedTo: 'You',
+      dueTime: 'Tomorrow, 11 AM',
+      isCompleted: false,
+    },
+    {
+      id: '5',
+      icon: '👕',
+      name: 'Do Laundry',
+      assignedTo: 'Roommate',
+      dueTime: 'Wednesday, 5 PM',
+      isCompleted: false,
+    },
+    {
+      id: '6',
+      icon: '🧽',
+      name: 'Clean Kitchen',
+      assignedTo: 'Roommate',
+      dueTime: 'Thursday, 7 PM',
+      isCompleted: false,
+    },
+    {
+      id: '7',
+      icon: '🧺',
+      name: 'Fold Clothes',
+      assignedTo: 'You',
+      dueTime: 'Friday, 6 PM',
+      isCompleted: false,
+    },
   ];
-  
+
   // Placeholder leaderboard data
   const leaderboard = [
     { id: '1', name: 'Roommate', completedCount: 8, streak: 5 },
@@ -92,26 +133,20 @@ export default function ChoresScreen() {
   ];
 
   const handleToggleComplete = (id) => {
-    Alert.alert(
-      'Complete Chore',
-      'This would mark the chore as completed in a real app',
-      [{ text: 'OK' }]
-    );
+    Alert.alert('Complete Chore', 'This would mark the chore as completed in a real app', [
+      { text: 'OK' },
+    ]);
   };
-  
+
   const handleAddChore = () => {
-    Alert.alert(
-      'Add Chore',
-      'This would open a form to add a new chore with:',
-      [
-        { text: 'Select Icon' },
-        { text: 'Enter Task Name' },
-        { text: 'Assign To' },
-        { text: 'Set Due Date/Time' },
-        { text: 'Set Frequency' },
-        { text: 'Cancel', style: 'cancel' }
-      ]
-    );
+    Alert.alert('Add Chore', 'This would open a form to add a new chore with:', [
+      { text: 'Select Icon' },
+      { text: 'Enter Task Name' },
+      { text: 'Assign To' },
+      { text: 'Set Due Date/Time' },
+      { text: 'Set Frequency' },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
   };
 
   return (
@@ -122,54 +157,42 @@ export default function ChoresScreen() {
           <Text style={styles.emoji}>🧹</Text>
           <Text style={styles.title}>Chores</Text>
         </View>
-        
+
         {/* Tabs */}
         <View style={styles.tabContainer}>
-          <TouchableOpacity 
-            style={[
-              styles.tab, 
-              activeTab === 'today' && styles.activeTab
-            ]}
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'today' && styles.activeTab]}
             onPress={() => setActiveTab('today')}
           >
-            <Text style={[
-              styles.tabText,
-              activeTab === 'today' && styles.activeTabText
-            ]}>Today</Text>
+            <Text style={[styles.tabText, activeTab === 'today' && styles.activeTabText]}>
+              Today
+            </Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[
-              styles.tab, 
-              activeTab === 'week' && styles.activeTab
-            ]}
+
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'week' && styles.activeTab]}
             onPress={() => setActiveTab('week')}
           >
-            <Text style={[
-              styles.tabText,
-              activeTab === 'week' && styles.activeTabText
-            ]}>This Week</Text>
+            <Text style={[styles.tabText, activeTab === 'week' && styles.activeTabText]}>
+              This Week
+            </Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[
-              styles.tab, 
-              activeTab === 'leaderboard' && styles.activeTab
-            ]}
+
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'leaderboard' && styles.activeTab]}
             onPress={() => setActiveTab('leaderboard')}
           >
-            <Text style={[
-              styles.tabText,
-              activeTab === 'leaderboard' && styles.activeTabText
-            ]}>Leaderboard</Text>
+            <Text style={[styles.tabText, activeTab === 'leaderboard' && styles.activeTabText]}>
+              Leaderboard
+            </Text>
           </TouchableOpacity>
         </View>
-        
+
         {/* Today's Chores */}
         {activeTab === 'today' && (
           <View style={styles.choresList}>
             <Text style={styles.sectionTitle}>Today's Chores</Text>
-            {todayChores.map(chore => (
+            {todayChores.map((chore) => (
               <ChoreItem
                 key={chore.id}
                 icon={chore.icon}
@@ -182,12 +205,12 @@ export default function ChoresScreen() {
             ))}
           </View>
         )}
-        
+
         {/* This Week's Chores */}
         {activeTab === 'week' && (
           <View style={styles.choresList}>
             <Text style={styles.sectionTitle}>This Week's Chores</Text>
-            {weekChores.map(chore => (
+            {weekChores.map((chore) => (
               <ChoreItem
                 key={chore.id}
                 icon={chore.icon}
@@ -200,7 +223,7 @@ export default function ChoresScreen() {
             ))}
           </View>
         )}
-        
+
         {/* Leaderboard */}
         {activeTab === 'leaderboard' && (
           <View style={styles.leaderboardList}>
@@ -216,15 +239,12 @@ export default function ChoresScreen() {
             ))}
           </View>
         )}
-        
+
         {/* Add Chore Button */}
-        <TouchableOpacity 
-          style={styles.addButton}
-          onPress={handleAddChore}
-        >
+        <TouchableOpacity style={styles.addButton} onPress={handleAddChore}>
           <Text style={styles.addButtonText}>Add Chore</Text>
         </TouchableOpacity>
-        
+
         {/* Spacer for bottom tabs */}
         <View style={{ height: 80 }} />
       </ScrollView>

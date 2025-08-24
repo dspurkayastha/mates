@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
   Alert,
   SafeAreaView,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 
 // Card component for dashboard items
@@ -19,19 +19,15 @@ const StatusCard = ({ title, children, color = '#E8F0FE' }) => (
 
 export default function HomeScreen() {
   const [houseName] = useState('Our House'); // This would come from API/store in a real app
-  
+
   const handleFabPress = () => {
-    Alert.alert(
-      'Quick Actions',
-      'What would you like to add?',
-      [
-        { text: 'Add Expense', onPress: () => console.log('Add expense') },
-        { text: 'Add Grocery Item', onPress: () => console.log('Add grocery') },
-        { text: 'Create Poll', onPress: () => console.log('Create poll') },
-        { text: 'Add Chore', onPress: () => console.log('Add chore') },
-        { text: 'Cancel', style: 'cancel' }
-      ]
-    );
+    Alert.alert('Quick Actions', 'What would you like to add?', [
+      { text: 'Add Expense', onPress: () => console.log('Add expense') },
+      { text: 'Add Grocery Item', onPress: () => console.log('Add grocery') },
+      { text: 'Create Poll', onPress: () => console.log('Create poll') },
+      { text: 'Add Chore', onPress: () => console.log('Add chore') },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
   };
 
   return (
@@ -42,14 +38,12 @@ export default function HomeScreen() {
           <Text style={styles.emoji}>🏠</Text>
           <Text style={styles.houseName}>{houseName}</Text>
         </View>
-        
+
         {/* Active Poll Banner (if exists) */}
         <TouchableOpacity style={styles.pollBanner}>
-          <Text style={styles.pollBannerText}>
-            Poll: Dinner tonight? — Vote Now!
-          </Text>
+          <Text style={styles.pollBannerText}>Poll: Dinner tonight? — Vote Now!</Text>
         </TouchableOpacity>
-        
+
         {/* Status Cards */}
         <StatusCard title="Next Rent Due" color="#FFE8E8">
           <View style={styles.cardContent}>
@@ -60,7 +54,7 @@ export default function HomeScreen() {
             </View>
           </View>
         </StatusCard>
-        
+
         <StatusCard title="Groceries" color="#E8F8E8">
           <View style={styles.cardContent}>
             <Text style={styles.cardSubtext}>Current status:</Text>
@@ -70,7 +64,7 @@ export default function HomeScreen() {
             </View>
           </View>
         </StatusCard>
-        
+
         <StatusCard title="Today's Chores" color="#F0E8FE">
           <View style={styles.cardContent}>
             <Text style={styles.cardSubtext}>Your tasks:</Text>
@@ -80,7 +74,7 @@ export default function HomeScreen() {
             </View>
           </View>
         </StatusCard>
-        
+
         <StatusCard title="Who Owes What" color="#FEF8E8">
           <View style={styles.cardContent}>
             <Text style={styles.cardSubtext}>This month:</Text>
@@ -90,7 +84,7 @@ export default function HomeScreen() {
             </View>
           </View>
         </StatusCard>
-        
+
         <StatusCard title="House Rules" color="#E8F0FE">
           <View style={styles.cardContent}>
             <Text style={styles.cardSubtext}>Pinned rules:</Text>
@@ -101,16 +95,13 @@ export default function HomeScreen() {
             </View>
           </View>
         </StatusCard>
-        
+
         {/* Spacer for FAB */}
         <View style={{ height: 80 }} />
       </ScrollView>
-      
+
       {/* Floating Action Button */}
-      <TouchableOpacity 
-        style={styles.fab}
-        onPress={handleFabPress}
-      >
+      <TouchableOpacity style={styles.fab} onPress={handleFabPress}>
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
     </SafeAreaView>

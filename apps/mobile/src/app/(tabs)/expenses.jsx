@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
   Alert,
   SafeAreaView,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 
 // Transaction card component
@@ -14,21 +14,20 @@ const TransactionCard = ({ title, date, paidBy, sharedWith, amount, status }) =>
   <View style={styles.transactionCard}>
     <View style={styles.transactionHeader}>
       <Text style={styles.transactionTitle}>{title}</Text>
-      <View style={[
-        styles.statusBadge, 
-        { backgroundColor: status === 'SETTLED' ? '#E8F8E8' : '#FFE8E8' }
-      ]}>
-        <Text style={[
-          styles.statusText, 
-          { color: status === 'SETTLED' ? '#4CAF50' : '#F44336' }
-        ]}>
+      <View
+        style={[
+          styles.statusBadge,
+          { backgroundColor: status === 'SETTLED' ? '#E8F8E8' : '#FFE8E8' },
+        ]}
+      >
+        <Text style={[styles.statusText, { color: status === 'SETTLED' ? '#4CAF50' : '#F44336' }]}>
           {status}
         </Text>
       </View>
     </View>
-    
+
     <Text style={styles.transactionDate}>{date}</Text>
-    
+
     <View style={styles.transactionDetails}>
       <View style={styles.detailRow}>
         <Text style={styles.detailLabel}>Paid by:</Text>
@@ -48,7 +47,7 @@ const TransactionCard = ({ title, date, paidBy, sharedWith, amount, status }) =>
 
 export default function ExpensesScreen() {
   const [activeTab, setActiveTab] = useState('all');
-  
+
   // Placeholder transactions
   const transactions = [
     {
@@ -58,7 +57,7 @@ export default function ExpensesScreen() {
       paidBy: 'You',
       sharedWith: 'All roommates',
       amount: '2,450',
-      status: 'PENDING'
+      status: 'PENDING',
     },
     {
       id: '2',
@@ -67,7 +66,7 @@ export default function ExpensesScreen() {
       paidBy: 'Roommate',
       sharedWith: 'All roommates',
       amount: '1,800',
-      status: 'SETTLED'
+      status: 'SETTLED',
     },
     {
       id: '3',
@@ -76,7 +75,7 @@ export default function ExpensesScreen() {
       paidBy: 'You',
       sharedWith: 'All roommates',
       amount: '1,200',
-      status: 'SETTLED'
+      status: 'SETTLED',
     },
     {
       id: '4',
@@ -85,19 +84,19 @@ export default function ExpensesScreen() {
       paidBy: 'Roommate',
       sharedWith: 'You, Roommate',
       amount: '850',
-      status: 'PENDING'
-    }
+      status: 'PENDING',
+    },
   ];
 
   const handleTabPress = (tab) => {
     setActiveTab(tab);
     // In a real app, this would filter the transactions
   };
-  
+
   const handleSettleUp = () => {
     Alert.alert('Settle Up', 'This would open UPI/payment options');
   };
-  
+
   const handleAddExpense = () => {
     Alert.alert('Add Expense', 'This would open the expense form');
   };
@@ -110,53 +109,39 @@ export default function ExpensesScreen() {
           <Text style={styles.emoji}>💸</Text>
           <Text style={styles.title}>Expenses</Text>
         </View>
-        
+
         {/* Tabs */}
         <View style={styles.tabContainer}>
-          <TouchableOpacity 
-            style={[
-              styles.tab, 
-              activeTab === 'all' && styles.activeTab
-            ]}
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'all' && styles.activeTab]}
             onPress={() => handleTabPress('all')}
           >
-            <Text style={[
-              styles.tabText,
-              activeTab === 'all' && styles.activeTabText
-            ]}>All</Text>
+            <Text style={[styles.tabText, activeTab === 'all' && styles.activeTabText]}>All</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[
-              styles.tab, 
-              activeTab === 'settled' && styles.activeTab
-            ]}
+
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'settled' && styles.activeTab]}
             onPress={() => handleTabPress('settled')}
           >
-            <Text style={[
-              styles.tabText,
-              activeTab === 'settled' && styles.activeTabText
-            ]}>Settled</Text>
+            <Text style={[styles.tabText, activeTab === 'settled' && styles.activeTabText]}>
+              Settled
+            </Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[
-              styles.tab, 
-              activeTab === 'owe' && styles.activeTab
-            ]}
+
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'owe' && styles.activeTab]}
             onPress={() => handleTabPress('owe')}
           >
-            <Text style={[
-              styles.tabText,
-              activeTab === 'owe' && styles.activeTabText
-            ]}>Owe/Owed</Text>
+            <Text style={[styles.tabText, activeTab === 'owe' && styles.activeTabText]}>
+              Owe/Owed
+            </Text>
           </TouchableOpacity>
         </View>
-        
+
         {/* Transaction List */}
         <View style={styles.transactionList}>
-          {transactions.map(transaction => (
-            <TransactionCard 
+          {transactions.map((transaction) => (
+            <TransactionCard
               key={transaction.id}
               title={transaction.title}
               date={transaction.date}
@@ -167,31 +152,31 @@ export default function ExpensesScreen() {
             />
           ))}
         </View>
-        
+
         {/* Summary Section */}
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>August Summary</Text>
-          
+
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Total Expenses:</Text>
             <Text style={styles.summaryValue}>₹6,300</Text>
           </View>
-          
+
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>You paid:</Text>
             <Text style={styles.summaryValue}>₹3,650</Text>
           </View>
-          
+
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>You owe:</Text>
             <Text style={styles.summaryValue}>₹400</Text>
           </View>
-          
+
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>You are owed:</Text>
             <Text style={styles.summaryValue}>₹850</Text>
           </View>
-          
+
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Net balance:</Text>
             <Text style={[styles.summaryValue, { color: '#4CAF50', fontWeight: 'bold' }]}>
@@ -199,24 +184,24 @@ export default function ExpensesScreen() {
             </Text>
           </View>
         </View>
-        
+
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
-          <TouchableOpacity 
-            style={[styles.actionButton, styles.settleButton]} 
+          <TouchableOpacity
+            style={[styles.actionButton, styles.settleButton]}
             onPress={handleSettleUp}
           >
             <Text style={styles.actionButtonText}>Settle Up</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.actionButton, styles.addButton]} 
+
+          <TouchableOpacity
+            style={[styles.actionButton, styles.addButton]}
             onPress={handleAddExpense}
           >
             <Text style={styles.actionButtonText}>Add Expense</Text>
           </TouchableOpacity>
         </View>
-        
+
         {/* Spacer for bottom tabs */}
         <View style={{ height: 80 }} />
       </ScrollView>

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TextInput, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
   Alert,
   SafeAreaView,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../utils/auth/useAuth';
@@ -17,7 +17,7 @@ export default function WelcomeScreen() {
   const router = useRouter();
   const { isAuthenticated, signIn, signUp } = useAuth();
   const { open: openAuthModal } = useAuthModal();
-  
+
   const [groupCode, setGroupCode] = useState('');
   const [houseName, setHouseName] = useState('');
   const [nickname, setNickname] = useState('');
@@ -48,9 +48,9 @@ export default function WelcomeScreen() {
       Alert.alert('Missing Information', 'Please enter a house name.');
       return;
     }
-    
+
     Alert.alert('Success', 'Moving to your dashboard...', [
-      { text: 'OK', onPress: () => router.replace('/(tabs)') }
+      { text: 'OK', onPress: () => router.replace('/(tabs)') },
     ]);
     // In a real app, this would save preferences and navigate to the main app
   };
@@ -70,26 +70,18 @@ export default function WelcomeScreen() {
           <View style={styles.emojiContainer}>
             <Text style={styles.emoji}>🏠</Text>
           </View>
-          
+
           <Text style={styles.title}>Mates</Text>
           <Text style={styles.subtitle}>Your Roommate Management App</Text>
-          
+
           <View style={styles.card}>
-            <Text style={styles.cardText}>
-              Please sign in or create an account to continue
-            </Text>
-            
-            <TouchableOpacity 
-              style={styles.primaryButton} 
-              onPress={handleSignIn}
-            >
+            <Text style={styles.cardText}>Please sign in or create an account to continue</Text>
+
+            <TouchableOpacity style={styles.primaryButton} onPress={handleSignIn}>
               <Text style={styles.primaryButtonText}>Sign In</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.secondaryButton} 
-              onPress={handleSignUp}
-            >
+
+            <TouchableOpacity style={styles.secondaryButton} onPress={handleSignUp}>
               <Text style={styles.secondaryButtonText}>Sign Up</Text>
             </TouchableOpacity>
           </View>
@@ -104,10 +96,10 @@ export default function WelcomeScreen() {
         <View style={styles.emojiContainer}>
           <Text style={styles.emoji}>🏠</Text>
         </View>
-        
+
         <Text style={styles.title}>Mates</Text>
         <Text style={styles.subtitle}>Join your house group</Text>
-        
+
         <View style={styles.card}>
           {!isCreatingGroup ? (
             <>
@@ -117,18 +109,12 @@ export default function WelcomeScreen() {
                 value={groupCode}
                 onChangeText={setGroupCode}
               />
-              
-              <TouchableOpacity 
-                style={styles.primaryButton} 
-                onPress={handleJoinGroup}
-              >
+
+              <TouchableOpacity style={styles.primaryButton} onPress={handleJoinGroup}>
                 <Text style={styles.primaryButtonText}>Join Group</Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.secondaryButton} 
-                onPress={handleCreateGroup}
-              >
+
+              <TouchableOpacity style={styles.secondaryButton} onPress={handleCreateGroup}>
                 <Text style={styles.secondaryButtonText}>Create New Group</Text>
               </TouchableOpacity>
             </>
@@ -140,28 +126,22 @@ export default function WelcomeScreen() {
                 value={houseName}
                 onChangeText={setHouseName}
               />
-              
+
               <TextInput
                 style={styles.input}
                 placeholder="Your Nickname"
                 value={nickname}
                 onChangeText={setNickname}
               />
-              
-              <TouchableOpacity 
-                style={styles.tertiaryButton} 
-                onPress={handleInvite}
-              >
+
+              <TouchableOpacity style={styles.tertiaryButton} onPress={handleInvite}>
                 <Text style={styles.tertiaryButtonText}>Invite via WhatsApp</Text>
               </TouchableOpacity>
             </>
           )}
         </View>
-        
-        <TouchableOpacity 
-          style={styles.continueButton} 
-          onPress={handleContinue}
-        >
+
+        <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
           <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
       </ScrollView>

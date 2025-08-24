@@ -1,54 +1,63 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
   Alert,
   SafeAreaView,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 
 // Grocery item component
 const GroceryItem = ({ name, status, addedBy, notes, onMarkBought }) => (
-  <TouchableOpacity 
+  <TouchableOpacity
     style={styles.groceryItem}
     onLongPress={() => Alert.alert('Hint', 'Swipe right to mark as bought, left to change status')}
   >
     <View style={styles.itemContent}>
       <View style={styles.itemHeader}>
         <Text style={styles.itemName}>{name}</Text>
-        <View style={[
-          styles.statusPill, 
-          { 
-            backgroundColor: 
-              status === 'out' ? '#FFE8E8' : 
-              status === 'low' ? '#FEF8E8' : 
-              status === 'needed' ? '#E8F0FE' : '#E8F8E8'
-          }
-        ]}>
-          <Text style={[
-            styles.statusText, 
-            { 
-              color: 
-                status === 'out' ? '#F44336' : 
-                status === 'low' ? '#FF9800' : 
-                status === 'needed' ? '#4A80F0' : '#4CAF50'
-            }
-          ]}>
+        <View
+          style={[
+            styles.statusPill,
+            {
+              backgroundColor:
+                status === 'out'
+                  ? '#FFE8E8'
+                  : status === 'low'
+                    ? '#FEF8E8'
+                    : status === 'needed'
+                      ? '#E8F0FE'
+                      : '#E8F8E8',
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.statusText,
+              {
+                color:
+                  status === 'out'
+                    ? '#F44336'
+                    : status === 'low'
+                      ? '#FF9800'
+                      : status === 'needed'
+                        ? '#4A80F0'
+                        : '#4CAF50',
+              },
+            ]}
+          >
             {status.toUpperCase()}
           </Text>
         </View>
       </View>
-      
+
       {notes && <Text style={styles.itemNotes}>{notes}</Text>}
-      
+
       <View style={styles.itemFooter}>
         <Text style={styles.addedBy}>Added by {addedBy}</Text>
-        <TouchableOpacity 
-          style={styles.boughtButton}
-          onPress={onMarkBought}
-        >
+        <TouchableOpacity style={styles.boughtButton} onPress={onMarkBought}>
           <Text style={styles.boughtButtonText}>✓ Bought</Text>
         </TouchableOpacity>
       </View>
@@ -80,54 +89,46 @@ export default function GroceriesScreen() {
   ]);
 
   const handleMarkBought = (id) => {
-    Alert.alert(
-      'Add Expense',
-      'Would you like to add this to expenses?',
-      [
-        {
-          text: 'Yes',
-          onPress: () => {
-            Alert.alert(
-              'Expense Details',
-              'This would open the expense form with this grocery item pre-filled'
-            );
-            // Update item status
-            setGroceryItems(prevItems =>
-              prevItems.map(item =>
-                item.id === id ? { ...item, status: 'bought' } : item
-              )
-            );
-          }
+    Alert.alert('Add Expense', 'Would you like to add this to expenses?', [
+      {
+        text: 'Yes',
+        onPress: () => {
+          Alert.alert(
+            'Expense Details',
+            'This would open the expense form with this grocery item pre-filled',
+          );
+          // Update item status
+          setGroceryItems((prevItems) =>
+            prevItems.map((item) => (item.id === id ? { ...item, status: 'bought' } : item)),
+          );
         },
-        {
-          text: 'Just Mark as Bought',
-          onPress: () => {
-            // Just update the status without creating an expense
-            setGroceryItems(prevItems =>
-              prevItems.map(item =>
-                item.id === id ? { ...item, status: 'bought' } : item
-              )
-            );
-          }
+      },
+      {
+        text: 'Just Mark as Bought',
+        onPress: () => {
+          // Just update the status without creating an expense
+          setGroceryItems((prevItems) =>
+            prevItems.map((item) => (item.id === id ? { ...item, status: 'bought' } : item)),
+          );
         },
-        {
-          text: 'Cancel',
-          style: 'cancel'
-        }
-      ]
-    );
+      },
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+    ]);
   };
-  
+
   const handleAddItem = () => {
     Alert.alert('Add Item', 'This would open the add grocery item form');
   };
 
   // Filter items by status
-  const outItems = groceryItems.filter(item => item.status === 'out');
-  const lowItems = groceryItems.filter(item => item.status === 'low');
-  const neededItems = groceryItems.filter(item => item.status === 'needed');
-  const boughtItems = groceryItems.filter(item => item.status === 'bought');
-  
+  const outItems = groceryItems.filter((item) => item.status === 'out');
+  const lowItems = groceryItems.filter((item) => item.status === 'low');
+  const neededItems = groceryItems.filter((item) => item.status === 'needed');
+  const boughtItems = groceryItems.filter((item) => item.status === 'bought');
+
   // Count items that need attention
   const attentionCount = outItems.length + lowItems.length;
 
@@ -139,21 +140,19 @@ export default function GroceriesScreen() {
           <Text style={styles.emoji}>🛒</Text>
           <Text style={styles.title}>Groceries</Text>
         </View>
-        
+
         {/* Attention Banner */}
         {attentionCount > 0 && (
           <View style={styles.attentionBanner}>
-            <Text style={styles.attentionText}>
-              {attentionCount} items need attention!
-            </Text>
+            <Text style={styles.attentionText}>{attentionCount} items need attention!</Text>
           </View>
         )}
-        
+
         {/* Out Items Section */}
         {outItems.length > 0 && (
           <View style={styles.section}>
             <SectionHeader title="Out" count={outItems.length} />
-            {outItems.map(item => (
+            {outItems.map((item) => (
               <GroceryItem
                 key={item.id}
                 name={item.name}
@@ -165,12 +164,12 @@ export default function GroceriesScreen() {
             ))}
           </View>
         )}
-        
+
         {/* Low Items Section */}
         {lowItems.length > 0 && (
           <View style={styles.section}>
             <SectionHeader title="Running Low" count={lowItems.length} />
-            {lowItems.map(item => (
+            {lowItems.map((item) => (
               <GroceryItem
                 key={item.id}
                 name={item.name}
@@ -182,12 +181,12 @@ export default function GroceriesScreen() {
             ))}
           </View>
         )}
-        
+
         {/* Needed Items Section */}
         {neededItems.length > 0 && (
           <View style={styles.section}>
             <SectionHeader title="Needed" count={neededItems.length} />
-            {neededItems.map(item => (
+            {neededItems.map((item) => (
               <GroceryItem
                 key={item.id}
                 name={item.name}
@@ -199,12 +198,12 @@ export default function GroceriesScreen() {
             ))}
           </View>
         )}
-        
+
         {/* Bought Items Section */}
         {boughtItems.length > 0 && (
           <View style={styles.section}>
             <SectionHeader title="Recently Bought" count={boughtItems.length} />
-            {boughtItems.map(item => (
+            {boughtItems.map((item) => (
               <GroceryItem
                 key={item.id}
                 name={item.name}
@@ -216,15 +215,12 @@ export default function GroceriesScreen() {
             ))}
           </View>
         )}
-        
+
         {/* Add Item Button */}
-        <TouchableOpacity 
-          style={styles.addButton}
-          onPress={handleAddItem}
-        >
+        <TouchableOpacity style={styles.addButton} onPress={handleAddItem}>
           <Text style={styles.addButtonText}>Add Item</Text>
         </TouchableOpacity>
-        
+
         {/* Spacer for bottom tabs */}
         <View style={{ height: 80 }} />
       </ScrollView>
