@@ -30,6 +30,10 @@ expo-env.d.ts
 .react-router
 coverage
 
+# Metro cache
+apps/mobile/caches/.metro-cache/
+apps/mobile/caches/metro-file-map*
+
 # IDE and editor files
 .idea
 .vscode

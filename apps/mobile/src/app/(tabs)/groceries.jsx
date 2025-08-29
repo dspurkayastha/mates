@@ -1,81 +1,126 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
   Alert,
   SafeAreaView,
   ScrollView,
 } from 'react-native';
+import {
+  Text,
+  GlassCard,
+  GlassButton,
+  Icon,
+  StatusIndicator,
+  useColors,
+  useTokens
+} from '@/components/ui';
+import * as Haptics from 'expo-haptics';
 
-// Grocery item component
-const GroceryItem = ({ name, status, addedBy, notes, onMarkBought }) => (
-  <TouchableOpacity
-    style={styles.groceryItem}
-    onLongPress={() => Alert.alert('Hint', 'Swipe right to mark as bought, left to change status')}
-  >
-    <View style={styles.itemContent}>
-      <View style={styles.itemHeader}>
-        <Text style={styles.itemName}>{name}</Text>
-        <View
-          style={[
-            styles.statusPill,
-            {
-              backgroundColor:
-                status === 'out'
-                  ? '#FFE8E8'
-                  : status === 'low'
-                    ? '#FEF8E8'
-                    : status === 'needed'
-                      ? '#E8F0FE'
-                      : '#E8F8E8',
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.statusText,
-              {
-                color:
-                  status === 'out'
-                    ? '#F44336'
-                    : status === 'low'
-                      ? '#FF9800'
-                      : status === 'needed'
-                        ? '#4A80F0'
-                        : '#4CAF50',
-              },
-            ]}
-          >
-            {status.toUpperCase()}
+// Glass Grocery item component with iOS 26 styling
+const GroceryItem = ({ name, status, addedBy, notes, onMarkBought }) => {
+  const colors = useColors();
+  const tokens = useTokens();
+  
+  const getStatusVariant = (status) => {
+    switch (status) {
+      case 'out': return 'error';
+      case 'low': return 'warning';
+      case 'needed': return 'info';
+      case 'bought': return 'success';
+      default: return 'info';
+    }
+  };
+  
+  return (
+    <GlassCard
+      variant="translucent"
+      size="medium"
+      interactive
+      style={{ marginBottom: tokens.Spacing.md }}
+      onLongPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        Alert.alert('Hint', 'Swipe right to mark as bought, left to change status');
+      }}
+    >
+      <View style={{ padding: tokens.Spacing.lg }}>
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: tokens.Spacing.sm
+        }}>
+          <Text variant="titleMedium" weight="semibold">{name}</Text>
+          <StatusIndicator
+            variant={getStatusVariant(status)}
+            label={status.toUpperCase()}
+            size="small"
+          />
+        </View>
+
+        {notes && (
+          <Text variant="bodySmall" color="secondary" style={{ marginBottom: tokens.Spacing.md }}>
+            {notes}
           </Text>
+        )}
+
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <Text variant="labelSmall" color="tertiary">
+            Added by {addedBy}
+          </Text>
+          <GlassButton
+            variant="success"
+            buttonStyle="tinted"
+            size="small"
+            onPress={onMarkBought}
+            leftIcon={<Icon name="Check" size="xs" color="inverse" />}
+          >
+            Bought
+          </GlassButton>
         </View>
       </View>
+    </GlassCard>
+  );
+};
 
-      {notes && <Text style={styles.itemNotes}>{notes}</Text>}
-
-      <View style={styles.itemFooter}>
-        <Text style={styles.addedBy}>Added by {addedBy}</Text>
-        <TouchableOpacity style={styles.boughtButton} onPress={onMarkBought}>
-          <Text style={styles.boughtButtonText}>✓ Bought</Text>
-        </TouchableOpacity>
+// Glass Section header component
+const SectionHeader = ({ title, count }) => {
+  const colors = useColors();
+  const tokens = useTokens();
+  
+  return (
+    <View style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: tokens.Spacing.md,
+      paddingHorizontal: tokens.Spacing.sm
+    }}>
+      <Text variant="titleLarge" weight="semibold" style={{ marginRight: tokens.Spacing.sm }}>
+        {title}
+      </Text>
+      <View style={{
+        backgroundColor: colors.interactive.primary,
+        borderRadius: tokens.BorderRadius.full,
+        paddingVertical: tokens.Spacing.xs,
+        paddingHorizontal: tokens.Spacing.sm,
+        minWidth: 24,
+        alignItems: 'center'
+      }}>
+        <Text variant="labelSmall" weight="bold" color="inverse">
+          {count}
+        </Text>
       </View>
     </View>
-  </TouchableOpacity>
-);
-
-// Section header component
-const SectionHeader = ({ title, count }) => (
-  <View style={styles.sectionHeader}>
-    <Text style={styles.sectionTitle}>{title}</Text>
-    <View style={styles.countBadge}>
-      <Text style={styles.countText}>{count}</Text>
-    </View>
-  </View>
-);
+  );
+};
 
 export default function GroceriesScreen() {
+  const colors = useColors();
+  const tokens = useTokens();
+  
   // Placeholder grocery items
   const [groceryItems, setGroceryItems] = useState([
     { id: '1', name: 'Milk', status: 'out', addedBy: 'You', notes: '1L, Amul' },
@@ -89,6 +134,7 @@ export default function GroceriesScreen() {
   ]);
 
   const handleMarkBought = (id) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Alert.alert('Add Expense', 'Would you like to add this to expenses?', [
       {
         text: 'Yes',
@@ -120,6 +166,7 @@ export default function GroceriesScreen() {
   };
 
   const handleAddItem = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     Alert.alert('Add Item', 'This would open the add grocery item form');
   };
 
@@ -133,24 +180,39 @@ export default function GroceriesScreen() {
   const attentionCount = outItems.length + lowItems.length;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
+      <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.emoji}>🛒</Text>
-          <Text style={styles.title}>Groceries</Text>
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: tokens.Spacing.lg,
+          paddingTop: tokens.Spacing.sm
+        }}>
+          <Icon name="ShoppingCart" size="xl" color="brand" style={{ marginRight: tokens.Spacing.sm }} />
+          <Text variant="headlineMedium" weight="bold">Groceries</Text>
         </View>
 
-        {/* Attention Banner */}
+        {/* Glass Attention Banner */}
         {attentionCount > 0 && (
-          <View style={styles.attentionBanner}>
-            <Text style={styles.attentionText}>{attentionCount} items need attention!</Text>
-          </View>
+          <GlassCard
+            variant="filled"
+            style={{
+              backgroundColor: colors.status.warning,
+              marginBottom: tokens.Spacing.lg
+            }}
+          >
+            <View style={{ padding: tokens.Spacing.md }}>
+              <Text variant="titleSmall" weight="semibold" color="inverse" align="center">
+                {attentionCount} items need attention!
+              </Text>
+            </View>
+          </GlassCard>
         )}
 
         {/* Out Items Section */}
         {outItems.length > 0 && (
-          <View style={styles.section}>
+          <View style={{ marginBottom: tokens.Spacing.xl }}>
             <SectionHeader title="Out" count={outItems.length} />
             {outItems.map((item) => (
               <GroceryItem
@@ -167,7 +229,7 @@ export default function GroceriesScreen() {
 
         {/* Low Items Section */}
         {lowItems.length > 0 && (
-          <View style={styles.section}>
+          <View style={{ marginBottom: tokens.Spacing.xl }}>
             <SectionHeader title="Running Low" count={lowItems.length} />
             {lowItems.map((item) => (
               <GroceryItem
@@ -184,7 +246,7 @@ export default function GroceriesScreen() {
 
         {/* Needed Items Section */}
         {neededItems.length > 0 && (
-          <View style={styles.section}>
+          <View style={{ marginBottom: tokens.Spacing.xl }}>
             <SectionHeader title="Needed" count={neededItems.length} />
             {neededItems.map((item) => (
               <GroceryItem
@@ -201,7 +263,7 @@ export default function GroceriesScreen() {
 
         {/* Bought Items Section */}
         {boughtItems.length > 0 && (
-          <View style={styles.section}>
+          <View style={{ marginBottom: tokens.Spacing.xl }}>
             <SectionHeader title="Recently Bought" count={boughtItems.length} />
             {boughtItems.map((item) => (
               <GroceryItem
@@ -216,10 +278,18 @@ export default function GroceriesScreen() {
           </View>
         )}
 
-        {/* Add Item Button */}
-        <TouchableOpacity style={styles.addButton} onPress={handleAddItem}>
-          <Text style={styles.addButtonText}>Add Item</Text>
-        </TouchableOpacity>
+        {/* Glass Add Item Button */}
+        <GlassButton
+          variant="primary"
+          buttonStyle="tinted"
+          size="large"
+          fullWidth
+          onPress={handleAddItem}
+          leftIcon={<Icon name="Plus" size="sm" color="inverse" />}
+          style={{ marginVertical: tokens.Spacing.lg }}
+        >
+          Add Item
+        </GlassButton>
 
         {/* Spacer for bottom tabs */}
         <View style={{ height: 80 }} />
@@ -228,138 +298,3 @@ export default function GroceriesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  scrollContent: {
-    padding: 16,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-    paddingTop: 8,
-  },
-  emoji: {
-    fontSize: 32,
-    marginRight: 8,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  attentionBanner: {
-    backgroundColor: '#FF9800',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 16,
-  },
-  attentionText: {
-    color: 'white',
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-  },
-  countBadge: {
-    backgroundColor: '#E8F0FE',
-    borderRadius: 12,
-    paddingVertical: 2,
-    paddingHorizontal: 8,
-    marginLeft: 8,
-  },
-  countText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#4A80F0',
-  },
-  groceryItem: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  itemContent: {
-    padding: 16,
-  },
-  itemHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  itemName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  statusPill: {
-    borderRadius: 12,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  itemNotes: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
-  },
-  itemFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  addedBy: {
-    fontSize: 12,
-    color: '#888',
-  },
-  boughtButton: {
-    backgroundColor: '#E8F8E8',
-    borderRadius: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-  },
-  boughtButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#4CAF50',
-  },
-  addButton: {
-    backgroundColor: '#4A80F0',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    marginVertical: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});

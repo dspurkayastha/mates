@@ -1,6 +1,6 @@
 import { isErrorLike, serializeError } from 'serialize-error';
 import React, { type ReactNode, useEffect, useState, useCallback, useRef } from 'react';
-import { Animated, Text, View } from 'react-native';
+import { Animated, Text, View, Platform } from 'react-native';
 
 export function SharedErrorBoundary({
   isOpen,
@@ -57,7 +57,19 @@ export function SharedErrorBoundary({
           maxWidth: 448,
           width: '100%',
           marginHorizontal: 16,
-          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
+          // Platform-specific shadow styles
+          ...Platform.select({
+            web: {
+              boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
+            },
+            default: {
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.15,
+              shadowRadius: 12,
+              elevation: 4,
+            },
+          }),
         }}
       >
         <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>

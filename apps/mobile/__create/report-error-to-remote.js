@@ -12,6 +12,13 @@ export const reportErrorToRemote = async ({ error }) => {
     );
     return { success: false };
   }
+  
+  // Safety check for error object
+  if (!error) {
+    console.debug('reportErrorToRemote: No error object provided');
+    return { success: false };
+  }
+  
   try {
     await fetch(process.env.EXPO_PUBLIC_LOGS_ENDPOINT, {
       method: 'POST',
@@ -31,6 +38,7 @@ export const reportErrorToRemote = async ({ error }) => {
       }),
     });
   } catch (fetchError) {
+    console.debug('reportErrorToRemote: Fetch error:', fetchError);
     return { success: false, error: fetchError };
   }
   return { success: true };

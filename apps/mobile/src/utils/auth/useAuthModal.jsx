@@ -9,7 +9,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { Linking } from 'expo';
+import * as Linking from 'expo-linking';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore, useAuthModal } from './store';
 
@@ -53,7 +53,7 @@ export const AuthModal = () => {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: Linking.createURL('/'),
+          emailRedirectTo: `exp://192.168.29.210:8081/--/auth/callback`,
         },
       });
 

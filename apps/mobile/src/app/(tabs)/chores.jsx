@@ -1,65 +1,129 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
   SafeAreaView,
   ScrollView,
 } from 'react-native';
+import {
+  Text,
+  GlassCard,
+  GlassButton,
+  Icon,
+  useColors,
+  useTokens
+} from '@/components/ui';
+import * as Haptics from 'expo-haptics';
 
-// Chore item component
-const ChoreItem = ({ icon, name, assignedTo, dueTime, isCompleted, onToggleComplete }) => (
-  <View style={styles.choreItem}>
-    <View style={styles.choreIconContainer}>
-      <Text style={styles.choreIcon}>{icon}</Text>
-    </View>
-
-    <View style={styles.choreDetails}>
-      <Text style={styles.choreName}>{name}</Text>
-      <View style={styles.choreSubDetails}>
-        <Text style={styles.choreAssigned}>
-          Assigned to: <Text style={styles.emphasizedText}>{assignedTo}</Text>
-        </Text>
-        <Text style={styles.choreDue}>
-          Due: <Text style={styles.emphasizedText}>{dueTime}</Text>
-        </Text>
-      </View>
-    </View>
-
-    <TouchableOpacity
-      style={[styles.completeButton, isCompleted ? styles.completedButton : {}]}
-      onPress={onToggleComplete}
+// Glass Chore item component with iOS 26 styling
+const ChoreItem = ({ icon, name, assignedTo, dueTime, isCompleted, onToggleComplete }) => {
+  const colors = useColors();
+  const tokens = useTokens();
+  
+  return (
+    <GlassCard
+      variant="translucent"
+      size="medium"
+      interactive
+      style={{ marginBottom: tokens.Spacing.md }}
     >
-      <Text style={[styles.completeButtonText, isCompleted ? styles.completedButtonText : {}]}>
-        {isCompleted ? '✓ Done' : 'Mark Done'}
-      </Text>
-    </TouchableOpacity>
-  </View>
-);
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: tokens.Spacing.lg
+      }}>
+        <View style={{
+          width: 40,
+          height: 40,
+          borderRadius: 20,
+          backgroundColor: colors.background.secondary,
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginRight: tokens.Spacing.md,
+        }}>
+          <Text style={{ fontSize: 20 }}>{icon}</Text>
+        </View>
 
-// Leaderboard item component
-const LeaderboardItem = ({ rank, name, completedCount, streak }) => (
-  <View style={styles.leaderboardItem}>
-    <View style={styles.rankContainer}>
-      <Text style={styles.rankText}>{rank}</Text>
-    </View>
+        <View style={{ flex: 1 }}>
+          <Text variant="titleMedium" weight="semibold" style={{ marginBottom: 4 }}>
+            {name}
+          </Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+            <Text variant="bodySmall" color="secondary" style={{ marginRight: 12 }}>
+              Assigned to: <Text variant="bodySmall" weight="medium" color="primary">{assignedTo}</Text>
+            </Text>
+            <Text variant="bodySmall" color="secondary">
+              Due: <Text variant="bodySmall" weight="medium" color="primary">{dueTime}</Text>
+            </Text>
+          </View>
+        </View>
 
-    <View style={styles.leaderDetails}>
-      <Text style={styles.leaderName}>{name}</Text>
-      <Text style={styles.leaderStats}>{completedCount} chores completed this week</Text>
-    </View>
+        <GlassButton
+          variant={isCompleted ? "success" : "secondary"}
+          buttonStyle="tinted"
+          size="small"
+          onPress={onToggleComplete}
+        >
+          {isCompleted ? '✓ Done' : 'Mark Done'}
+        </GlassButton>
+      </View>
+    </GlassCard>
+  );
+};
 
-    <View style={styles.streakContainer}>
-      <Text style={styles.streakText}>{streak}</Text>
-      <Text style={styles.streakLabel}>day streak</Text>
-    </View>
-  </View>
-);
+// Glass Leaderboard item component
+const LeaderboardItem = ({ rank, name, completedCount, streak }) => {
+  const colors = useColors();
+  const tokens = useTokens();
+  
+  return (
+    <GlassCard
+      variant="translucent"
+      size="medium"
+      style={{ marginBottom: tokens.Spacing.md }}
+    >
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: tokens.Spacing.lg
+      }}>
+        <View style={{
+          width: 40,
+          height: 40,
+          borderRadius: 20,
+          backgroundColor: colors.interactive.primary,
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginRight: tokens.Spacing.md,
+        }}>
+          <Text variant="titleMedium" weight="bold" color="inverse">{rank}</Text>
+        </View>
+
+        <View style={{ flex: 1 }}>
+          <Text variant="titleMedium" weight="semibold" style={{ marginBottom: 4 }}>
+            {name}
+          </Text>
+          <Text variant="bodySmall" color="secondary">
+            {completedCount} chores completed this week
+          </Text>
+        </View>
+
+        <View style={{ alignItems: 'center' }}>
+          <Text variant="titleMedium" weight="bold" color="warning">
+            {streak}
+          </Text>
+          <Text variant="labelSmall" color="tertiary">
+            day streak
+          </Text>
+        </View>
+      </View>
+    </GlassCard>
+  );
+};
 
 export default function ChoresScreen() {
   const [activeTab, setActiveTab] = useState('today');
+  const colors = useColors();
+  const tokens = useTokens();
 
   // Placeholder chores data
   const todayChores = [
@@ -133,65 +197,74 @@ export default function ChoresScreen() {
   ];
 
   const handleToggleComplete = (id) => {
-    Alert.alert('Complete Chore', 'This would mark the chore as completed in a real app', [
-      { text: 'OK' },
-    ]);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    // This would mark the chore as completed in a real app
+    console.log('Toggle complete for chore:', id);
   };
 
   const handleAddChore = () => {
-    Alert.alert('Add Chore', 'This would open a form to add a new chore with:', [
-      { text: 'Select Icon' },
-      { text: 'Enter Task Name' },
-      { text: 'Assign To' },
-      { text: 'Set Due Date/Time' },
-      { text: 'Set Frequency' },
-      { text: 'Cancel', style: 'cancel' },
-    ]);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // This would open a form to add a new chore
+    console.log('Add new chore');
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
+      <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.emoji}>🧹</Text>
-          <Text style={styles.title}>Chores</Text>
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: tokens.Spacing.lg,
+          paddingTop: tokens.Spacing.sm
+        }}>
+          <Icon name="SquareCheck" size="xl" color="brand" style={{ marginRight: tokens.Spacing.sm }} />
+          <Text variant="headlineMedium" weight="bold">Chores</Text>
         </View>
 
-        {/* Tabs */}
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'today' && styles.activeTab]}
+        {/* Glass Tabs */}
+        <View style={{
+          flexDirection: 'row',
+          marginBottom: tokens.Spacing.lg,
+          gap: tokens.Spacing.sm
+        }}>
+          <GlassButton
+            variant={activeTab === 'today' ? 'primary' : 'secondary'}
+            buttonStyle={activeTab === 'today' ? 'tinted' : 'outlined'}
+            size="medium"
             onPress={() => setActiveTab('today')}
+            style={{ flex: 1 }}
           >
-            <Text style={[styles.tabText, activeTab === 'today' && styles.activeTabText]}>
-              Today
-            </Text>
-          </TouchableOpacity>
+            Today
+          </GlassButton>
 
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'week' && styles.activeTab]}
+          <GlassButton
+            variant={activeTab === 'week' ? 'primary' : 'secondary'}
+            buttonStyle={activeTab === 'week' ? 'tinted' : 'outlined'}
+            size="medium"
             onPress={() => setActiveTab('week')}
+            style={{ flex: 1 }}
           >
-            <Text style={[styles.tabText, activeTab === 'week' && styles.activeTabText]}>
-              This Week
-            </Text>
-          </TouchableOpacity>
+            This Week
+          </GlassButton>
 
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'leaderboard' && styles.activeTab]}
+          <GlassButton
+            variant={activeTab === 'leaderboard' ? 'primary' : 'secondary'}
+            buttonStyle={activeTab === 'leaderboard' ? 'tinted' : 'outlined'}
+            size="medium"
             onPress={() => setActiveTab('leaderboard')}
+            style={{ flex: 1 }}
           >
-            <Text style={[styles.tabText, activeTab === 'leaderboard' && styles.activeTabText]}>
-              Leaderboard
-            </Text>
-          </TouchableOpacity>
+            Leaderboard
+          </GlassButton>
         </View>
 
         {/* Today's Chores */}
         {activeTab === 'today' && (
-          <View style={styles.choresList}>
-            <Text style={styles.sectionTitle}>Today's Chores</Text>
+          <View style={{ marginBottom: tokens.Spacing.xl }}>
+            <Text variant="titleLarge" weight="semibold" style={{ marginBottom: tokens.Spacing.md }}>
+              Today's Chores
+            </Text>
             {todayChores.map((chore) => (
               <ChoreItem
                 key={chore.id}
@@ -208,8 +281,10 @@ export default function ChoresScreen() {
 
         {/* This Week's Chores */}
         {activeTab === 'week' && (
-          <View style={styles.choresList}>
-            <Text style={styles.sectionTitle}>This Week's Chores</Text>
+          <View style={{ marginBottom: tokens.Spacing.xl }}>
+            <Text variant="titleLarge" weight="semibold" style={{ marginBottom: tokens.Spacing.md }}>
+              This Week's Chores
+            </Text>
             {weekChores.map((chore) => (
               <ChoreItem
                 key={chore.id}
@@ -226,8 +301,10 @@ export default function ChoresScreen() {
 
         {/* Leaderboard */}
         {activeTab === 'leaderboard' && (
-          <View style={styles.leaderboardList}>
-            <Text style={styles.sectionTitle}>Chores Leaderboard</Text>
+          <View style={{ marginBottom: tokens.Spacing.xl }}>
+            <Text variant="titleLarge" weight="semibold" style={{ marginBottom: tokens.Spacing.md }}>
+              Chores Leaderboard
+            </Text>
             {leaderboard.map((leader, index) => (
               <LeaderboardItem
                 key={leader.id}
@@ -241,9 +318,17 @@ export default function ChoresScreen() {
         )}
 
         {/* Add Chore Button */}
-        <TouchableOpacity style={styles.addButton} onPress={handleAddChore}>
-          <Text style={styles.addButtonText}>Add Chore</Text>
-        </TouchableOpacity>
+        <GlassButton
+          variant="primary"
+          buttonStyle="tinted"
+          size="large"
+          fullWidth
+          onPress={handleAddChore}
+          leftIcon={<Icon name="Plus" size="sm" color="inverse" />}
+          style={{ marginVertical: tokens.Spacing.lg }}
+        >
+          Add Chore
+        </GlassButton>
 
         {/* Spacer for bottom tabs */}
         <View style={{ height: 80 }} />
@@ -252,205 +337,3 @@ export default function ChoresScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  scrollContent: {
-    padding: 16,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-    paddingTop: 8,
-  },
-  emoji: {
-    fontSize: 32,
-    marginRight: 8,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    marginBottom: 16,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: 'center',
-    borderRadius: 8,
-  },
-  activeTab: {
-    backgroundColor: '#4A80F0',
-  },
-  tabText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
-  },
-  activeTabText: {
-    color: '#fff',
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
-  },
-  choresList: {
-    marginBottom: 20,
-  },
-  choreItem: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  choreIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F0E8FE',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  choreIcon: {
-    fontSize: 20,
-  },
-  choreDetails: {
-    flex: 1,
-  },
-  choreName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  choreSubDetails: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  choreAssigned: {
-    fontSize: 14,
-    color: '#666',
-    marginRight: 12,
-  },
-  choreDue: {
-    fontSize: 14,
-    color: '#666',
-  },
-  emphasizedText: {
-    fontWeight: '500',
-    color: '#333',
-  },
-  completeButton: {
-    backgroundColor: '#E8F0FE',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  completedButton: {
-    backgroundColor: '#E8F8E8',
-  },
-  completeButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#4A80F0',
-  },
-  completedButtonText: {
-    color: '#4CAF50',
-  },
-  leaderboardList: {
-    marginBottom: 20,
-  },
-  leaderboardItem: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  rankContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F0E8FE',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  rankText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#4A80F0',
-  },
-  leaderDetails: {
-    flex: 1,
-  },
-  leaderName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  leaderStats: {
-    fontSize: 14,
-    color: '#666',
-  },
-  streakContainer: {
-    alignItems: 'center',
-  },
-  streakText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FF9800',
-  },
-  streakLabel: {
-    fontSize: 12,
-    color: '#888',
-  },
-  addButton: {
-    backgroundColor: '#4A80F0',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    marginVertical: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});

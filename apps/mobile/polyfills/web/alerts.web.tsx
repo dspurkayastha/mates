@@ -7,6 +7,7 @@ import {
 	Animated,
 	TouchableOpacity,
 	TextInput,
+	Platform,
 } from 'react-native';
 
 type AlertButton = {
@@ -439,9 +440,12 @@ const styling = (userInterfaceStyle: string) =>
 			backgroundColor: 'rgba(0,0,0,0.2)',
 		},
 		content: {
-			backdropFilter: 'blur(20px)',
+			// Remove backdropFilter to prevent CSS compatibility issues
+			// backdropFilter: 'blur(20px)',
 			borderRadius: 12,
 			width: 244,
+			// Use semi-transparent background instead
+			backgroundColor: userInterfaceStyle === 'dark' ? 'rgba(28, 28, 30, 0.95)' : 'rgba(242, 242, 247, 0.95)',
 		},
 		contentContainer: {
 			paddingVertical: 20,
@@ -475,7 +479,13 @@ const styling = (userInterfaceStyle: string) =>
 			marginBottom: -8,
 			marginHorizontal: 12,
 			fontSize: 12,
-			outlineStyle: 'none',
+			// Use web-safe outline style
+			...Platform.select({
+				web: {
+					// @ts-ignore - web-only style
+					outline: 'none',
+				},
+			}),
 		},
 		textInputTop: {
 			borderTopLeftRadius: 8,

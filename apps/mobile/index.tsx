@@ -1,3 +1,11 @@
+// Import React Native core modules FIRST before any polyfills
+import 'expo-router/entry';
+import { SplashScreen } from 'expo-router';
+import { App } from 'expo-router/build/qualified-entry';
+import { type ReactNode, memo, useEffect } from 'react';
+import { AppRegistry, LogBox, SafeAreaView, Text, View } from 'react-native';
+
+// Exception handling setup
 import ExceptionsManager from 'react-native/Libraries/Core/ExceptionsManager';
 
 if (__DEV__) {
@@ -6,15 +14,12 @@ if (__DEV__) {
   };
 }
 
+// Load polyfills AFTER React Native core is initialized
 import 'react-native-url-polyfill/auto';
 import './src/__create/polyfills';
 global.Buffer = require('buffer').Buffer;
 
-import 'expo-router/entry';
-import { SplashScreen } from 'expo-router';
-import { App } from 'expo-router/build/qualified-entry';
-import { type ReactNode, memo, useEffect } from 'react';
-import { AppRegistry, LogBox, SafeAreaView, Text, View } from 'react-native';
+// Error boundaries and utilities
 import { serializeError } from 'serialize-error';
 import { DeviceErrorBoundaryWrapper } from './__create/DeviceErrorBoundary';
 import { ErrorBoundaryWrapper, SharedErrorBoundary } from './__create/SharedErrorBoundary';

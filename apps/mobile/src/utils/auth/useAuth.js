@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useAuthModal, useAuthStore } from './store';
-import { supabase } from '@/lib/supabase';
+import { supabase, SUPABASE_ENABLED } from '@/lib/supabase';
 
 /**
  * This hook provides authentication functionality.
@@ -15,6 +15,11 @@ export const useAuth = () => {
   const initiate = useCallback(() => {
     // Fetch existing session (if any) from Supabase (persisted in AsyncStorage)
     const init = async () => {
+      // If Supabase isn't configured, mark auth as ready with no user
+      if (!SUPABASE_ENABLED) {
+        useAuthStore.setState({ auth: null, isReady: true });
+        return;
+      }
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -26,8 +31,15 @@ export const useAuth = () => {
     init();
   }, []);
 
+  // Initialize auth on mount
+  useEffect(() => {
+    initiate();
+  }, [initiate]);
+
   // Subscribe to auth state changes so UI stays in sync
   useEffect(() => {
+    if (!SUPABASE_ENABLED) return;
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {

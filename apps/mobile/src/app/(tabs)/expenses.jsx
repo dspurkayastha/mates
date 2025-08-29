@@ -1,52 +1,88 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
   SafeAreaView,
   ScrollView,
 } from 'react-native';
+import { 
+  Text,
+  GlassCard, 
+  GlassButton, 
+  Icon,
+  StatusIndicator,
+  useColors,
+  useTokens
+} from '../../components/ui';
+import * as Haptics from 'expo-haptics';
 
-// Transaction card component
-const TransactionCard = ({ title, date, paidBy, sharedWith, amount, status }) => (
-  <View style={styles.transactionCard}>
-    <View style={styles.transactionHeader}>
-      <Text style={styles.transactionTitle}>{title}</Text>
-      <View
-        style={[
-          styles.statusBadge,
-          { backgroundColor: status === 'SETTLED' ? '#E8F8E8' : '#FFE8E8' },
-        ]}
-      >
-        <Text style={[styles.statusText, { color: status === 'SETTLED' ? '#4CAF50' : '#F44336' }]}>
-          {status}
+// Glass Transaction card component with iOS 26 styling
+const TransactionCard = ({ title, date, paidBy, sharedWith, amount, status }) => {
+  const colors = useColors();
+  const tokens = useTokens();
+  
+  return (
+    <GlassCard
+      variant="translucent"
+      size="medium"
+      style={{ marginBottom: tokens.Spacing.md }}
+    >
+      <View style={{ padding: tokens.Spacing.lg }}>
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: tokens.Spacing.sm
+        }}>
+          <Text variant="titleMedium" weight="semibold">{title}</Text>
+          <StatusIndicator
+            variant={status === 'SETTLED' ? 'success' : 'warning'}
+            label={status}
+            size="small"
+          />
+        </View>
+
+        <Text variant="bodySmall" color="secondary" style={{ marginBottom: tokens.Spacing.md }}>
+          {date}
         </Text>
-      </View>
-    </View>
 
-    <Text style={styles.transactionDate}>{date}</Text>
-
-    <View style={styles.transactionDetails}>
-      <View style={styles.detailRow}>
-        <Text style={styles.detailLabel}>Paid by:</Text>
-        <Text style={styles.detailValue}>{paidBy}</Text>
+        <View style={{
+          backgroundColor: colors.background.secondary,
+          borderRadius: tokens.BorderRadius.md,
+          padding: tokens.Spacing.md
+        }}>
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginBottom: tokens.Spacing.xs
+          }}>
+            <Text variant="bodySmall" color="secondary">Paid by:</Text>
+            <Text variant="bodySmall" weight="medium">{paidBy}</Text>
+          </View>
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginBottom: tokens.Spacing.xs
+          }}>
+            <Text variant="bodySmall" color="secondary">Shared with:</Text>
+            <Text variant="bodySmall" weight="medium">{sharedWith}</Text>
+          </View>
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }}>
+            <Text variant="bodySmall" color="secondary">Amount:</Text>
+            <Text variant="bodySmall" weight="bold" color="primary">₹{amount}</Text>
+          </View>
+        </View>
       </View>
-      <View style={styles.detailRow}>
-        <Text style={styles.detailLabel}>Shared with:</Text>
-        <Text style={styles.detailValue}>{sharedWith}</Text>
-      </View>
-      <View style={styles.detailRow}>
-        <Text style={styles.detailLabel}>Amount:</Text>
-        <Text style={[styles.detailValue, styles.amount]}>₹{amount}</Text>
-      </View>
-    </View>
-  </View>
-);
+    </GlassCard>
+  );
+};
 
 export default function ExpensesScreen() {
   const [activeTab, setActiveTab] = useState('all');
+  const colors = useColors();
+  const tokens = useTokens();
 
   // Placeholder transactions
   const transactions = [
@@ -90,56 +126,75 @@ export default function ExpensesScreen() {
 
   const handleTabPress = (tab) => {
     setActiveTab(tab);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     // In a real app, this would filter the transactions
   };
 
   const handleSettleUp = () => {
-    Alert.alert('Settle Up', 'This would open UPI/payment options');
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    // This would open UPI/payment options
+    console.log('Open settle up options');
   };
 
   const handleAddExpense = () => {
-    Alert.alert('Add Expense', 'This would open the expense form');
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    // This would open the expense form
+    console.log('Open add expense form');
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
+      <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.emoji}>💸</Text>
-          <Text style={styles.title}>Expenses</Text>
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: tokens.Spacing.lg,
+          paddingTop: tokens.Spacing.sm
+        }}>
+          <Icon name="DollarSign" size="xl" color="brand" style={{ marginRight: tokens.Spacing.sm }} />
+          <Text variant="headlineMedium" weight="bold">Expenses</Text>
         </View>
 
-        {/* Tabs */}
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'all' && styles.activeTab]}
+        {/* Glass Tabs */}
+        <View style={{
+          flexDirection: 'row',
+          marginBottom: tokens.Spacing.lg,
+          gap: tokens.Spacing.sm
+        }}>
+          <GlassButton
+            variant={activeTab === 'all' ? 'primary' : 'secondary'}
+            buttonStyle={activeTab === 'all' ? 'tinted' : 'outlined'}
+            size="medium"
             onPress={() => handleTabPress('all')}
+            style={{ flex: 1 }}
           >
-            <Text style={[styles.tabText, activeTab === 'all' && styles.activeTabText]}>All</Text>
-          </TouchableOpacity>
+            All
+          </GlassButton>
 
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'settled' && styles.activeTab]}
+          <GlassButton
+            variant={activeTab === 'settled' ? 'primary' : 'secondary'}
+            buttonStyle={activeTab === 'settled' ? 'tinted' : 'outlined'}
+            size="medium"
             onPress={() => handleTabPress('settled')}
+            style={{ flex: 1 }}
           >
-            <Text style={[styles.tabText, activeTab === 'settled' && styles.activeTabText]}>
-              Settled
-            </Text>
-          </TouchableOpacity>
+            Settled
+          </GlassButton>
 
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'owe' && styles.activeTab]}
+          <GlassButton
+            variant={activeTab === 'owe' ? 'primary' : 'secondary'}
+            buttonStyle={activeTab === 'owe' ? 'tinted' : 'outlined'}
+            size="medium"
             onPress={() => handleTabPress('owe')}
+            style={{ flex: 1 }}
           >
-            <Text style={[styles.tabText, activeTab === 'owe' && styles.activeTabText]}>
-              Owe/Owed
-            </Text>
-          </TouchableOpacity>
+            Owe/Owed
+          </GlassButton>
         </View>
 
         {/* Transaction List */}
-        <View style={styles.transactionList}>
+        <View style={{ marginBottom: tokens.Spacing.lg }}>
           {transactions.map((transaction) => (
             <TransactionCard
               key={transaction.id}
@@ -154,52 +209,98 @@ export default function ExpensesScreen() {
         </View>
 
         {/* Summary Section */}
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>August Summary</Text>
-
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Total Expenses:</Text>
-            <Text style={styles.summaryValue}>₹6,300</Text>
-          </View>
-
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>You paid:</Text>
-            <Text style={styles.summaryValue}>₹3,650</Text>
-          </View>
-
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>You owe:</Text>
-            <Text style={styles.summaryValue}>₹400</Text>
-          </View>
-
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>You are owed:</Text>
-            <Text style={styles.summaryValue}>₹850</Text>
-          </View>
-
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Net balance:</Text>
-            <Text style={[styles.summaryValue, { color: '#4CAF50', fontWeight: 'bold' }]}>
-              +₹450
+        <GlassCard
+          variant="translucent"
+          size="large"
+          style={{ marginBottom: tokens.Spacing.lg }}
+        >
+          <View style={{ padding: tokens.Spacing.lg }}>
+            <Text variant="titleLarge" weight="semibold" style={{ marginBottom: tokens.Spacing.md }}>
+              August Summary
             </Text>
+
+            <View style={{
+              backgroundColor: colors.background.secondary,
+              borderRadius: tokens.BorderRadius.md,
+              padding: tokens.Spacing.md
+            }}>
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: tokens.Spacing.sm
+              }}>
+                <Text variant="bodyMedium" color="secondary">Total Expenses:</Text>
+                <Text variant="bodyMedium" weight="medium">₹6,300</Text>
+              </View>
+
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: tokens.Spacing.sm
+              }}>
+                <Text variant="bodyMedium" color="secondary">You paid:</Text>
+                <Text variant="bodyMedium" weight="medium">₹3,650</Text>
+              </View>
+
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: tokens.Spacing.sm
+              }}>
+                <Text variant="bodyMedium" color="secondary">You owe:</Text>
+                <Text variant="bodyMedium" weight="medium">₹400</Text>
+              </View>
+
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: tokens.Spacing.sm
+              }}>
+                <Text variant="bodyMedium" color="secondary">You are owed:</Text>
+                <Text variant="bodyMedium" weight="medium">₹850</Text>
+              </View>
+
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between'
+              }}>
+                <Text variant="bodyMedium" color="secondary">Net balance:</Text>
+                <Text variant="bodyMedium" weight="bold" color="success">
+                  +₹450
+                </Text>
+              </View>
+            </View>
           </View>
-        </View>
+        </GlassCard>
 
-        {/* Action Buttons */}
-        <View style={styles.actionButtons}>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.settleButton]}
+        {/* Glass Action Buttons */}
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          marginBottom: tokens.Spacing.lg,
+          gap: tokens.Spacing.md
+        }}>
+          <GlassButton
+            variant="success"
+            buttonStyle="tinted"
+            size="large"
+            leftIcon={<Icon name="Check" size="sm" color="inverse" />}
             onPress={handleSettleUp}
+            style={{ flex: 1 }}
           >
-            <Text style={styles.actionButtonText}>Settle Up</Text>
-          </TouchableOpacity>
+            Settle Up
+          </GlassButton>
 
-          <TouchableOpacity
-            style={[styles.actionButton, styles.addButton]}
+          <GlassButton
+            variant="primary"
+            buttonStyle="tinted"
+            size="large"
+            leftIcon={<Icon name="Plus" size="sm" color="inverse" />}
             onPress={handleAddExpense}
+            style={{ flex: 1 }}
           >
-            <Text style={styles.actionButtonText}>Add Expense</Text>
-          </TouchableOpacity>
+            Add Expense
+          </GlassButton>
         </View>
 
         {/* Spacer for bottom tabs */}
@@ -209,177 +310,3 @@ export default function ExpensesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  scrollContent: {
-    padding: 16,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-    paddingTop: 8,
-  },
-  emoji: {
-    fontSize: 32,
-    marginRight: 8,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    marginBottom: 16,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: 'center',
-    borderRadius: 8,
-  },
-  activeTab: {
-    backgroundColor: '#4A80F0',
-  },
-  tabText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
-  },
-  activeTabText: {
-    color: '#fff',
-  },
-  transactionList: {
-    marginBottom: 16,
-  },
-  transactionCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  transactionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  transactionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  statusBadge: {
-    borderRadius: 12,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  transactionDate: {
-    fontSize: 14,
-    color: '#888',
-    marginBottom: 12,
-  },
-  transactionDetails: {
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
-    padding: 12,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-  },
-  detailLabel: {
-    fontSize: 14,
-    color: '#666',
-  },
-  detailValue: {
-    fontSize: 14,
-    color: '#333',
-    fontWeight: '500',
-  },
-  amount: {
-    fontWeight: '700',
-  },
-  summaryCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  summaryTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  summaryLabel: {
-    fontSize: 15,
-    color: '#666',
-  },
-  summaryValue: {
-    fontSize: 15,
-    color: '#333',
-    fontWeight: '500',
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  actionButton: {
-    flex: 1,
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  settleButton: {
-    backgroundColor: '#4CAF50',
-    marginRight: 8,
-  },
-  addButton: {
-    backgroundColor: '#4A80F0',
-    marginLeft: 8,
-  },
-  actionButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});

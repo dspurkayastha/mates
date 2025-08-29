@@ -1,48 +1,84 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { View, Text } from 'react-native';
+import { View, Platform } from 'react-native';
+import { 
+  HomeIcon, 
+  DollarSignIcon, 
+  ShoppingCartIcon, 
+  CheckSquareIcon, 
+  SettingsIcon,
+  UserIcon,
+  useColors,
+  useTokens 
+} from '@/components/ui';
 
-// Simple emoji tab icons
-function TabBarIcon({ focused, color, emoji }) {
+// Premium tab bar icon component with enhanced styling
+function TabBarIcon({ focused, IconComponent, hasNotification = false }) {
+  const colors = useColors();
+  const tokens = useTokens();
+  
   return (
     <View
       style={{
         alignItems: 'center',
         justifyContent: 'center',
         opacity: focused ? 1 : 0.7,
+        position: 'relative',
       }}
     >
-      <Text style={{ fontSize: 20, color }}>{emoji}</Text>
+      <IconComponent 
+        size="md" 
+        color={focused ? colors.interactive.primary : colors.text.secondary} 
+      />
+      {hasNotification && (
+        <View style={{
+          position: 'absolute',
+          top: -2,
+          right: -6,
+          width: 8,
+          height: 8,
+          borderRadius: 4,
+          backgroundColor: colors.status.error,
+          borderWidth: 1,
+          borderColor: colors.background.elevated,
+        }} />
+      )}
     </View>
   );
 }
 
 export default function TabsLayout() {
+  const colors = useColors();
+  const tokens = useTokens();
+  
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#4A80F0',
-        tabBarInactiveTintColor: '#888',
+        tabBarActiveTintColor: colors.interactive.primary,
+        tabBarInactiveTintColor: colors.text.secondary,
         tabBarStyle: {
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 8,
-          backgroundColor: '#fff',
-          borderTopWidth: 1,
-          borderTopColor: '#eee',
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
+          height: Platform.OS === 'ios' ? 85 : 65,
+          paddingBottom: Platform.OS === 'ios' ? 25 : 8,
+          paddingTop: 12,
+          backgroundColor: colors.background.elevated,
+          borderTopWidth: 0,
+          borderTopLeftRadius: 25,
+          borderTopRightRadius: 25,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.05,
-          shadowRadius: 5,
-          elevation: 5,
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.1,
+          shadowRadius: 12,
+          elevation: 12,
           position: 'absolute',
         },
         tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '500',
+          fontSize: 11,
+          fontWeight: '600',
+          marginTop: 4,
+        },
+        tabBarIconStyle: {
+          marginTop: 4,
         },
       }}
     >
@@ -50,8 +86,8 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ focused, color }) => (
-            <TabBarIcon focused={focused} color={color} emoji="🏠" />
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon focused={focused} IconComponent={HomeIcon} />
           ),
         }}
       />
@@ -59,8 +95,8 @@ export default function TabsLayout() {
         name="expenses"
         options={{
           title: 'Expenses',
-          tabBarIcon: ({ focused, color }) => (
-            <TabBarIcon focused={focused} color={color} emoji="💸" />
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon focused={focused} IconComponent={DollarSignIcon} hasNotification={true} />
           ),
         }}
       />
@@ -68,8 +104,8 @@ export default function TabsLayout() {
         name="groceries"
         options={{
           title: 'Groceries',
-          tabBarIcon: ({ focused, color }) => (
-            <TabBarIcon focused={focused} color={color} emoji="🛒" />
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon focused={focused} IconComponent={ShoppingCartIcon} hasNotification={true} />
           ),
         }}
       />
@@ -77,8 +113,17 @@ export default function TabsLayout() {
         name="chores"
         options={{
           title: 'Chores',
-          tabBarIcon: ({ focused, color }) => (
-            <TabBarIcon focused={focused} color={color} emoji="🧹" />
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon focused={focused} IconComponent={CheckSquareIcon} hasNotification={true} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon focused={focused} IconComponent={UserIcon} />
           ),
         }}
       />

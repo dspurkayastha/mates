@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
   Alert,
   SafeAreaView,
   ScrollView,
@@ -12,11 +8,23 @@ import {
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../utils/auth/useAuth';
 import { useAuthModal } from '../../utils/auth/useAuthModal';
+import {
+  Text,
+  GlassCard,
+  GlassButton,
+  GlassInput,
+  Icon,
+  useColors,
+  useTokens
+} from '@/components/ui';
+import * as Haptics from 'expo-haptics';
 
 export default function WelcomeScreen() {
   const router = useRouter();
   const { isAuthenticated, signIn, signUp } = useAuth();
   const { open: openAuthModal } = useAuthModal();
+  const colors = useColors();
+  const tokens = useTokens();
 
   const [groupCode, setGroupCode] = useState('');
   const [houseName, setHouseName] = useState('');
@@ -24,6 +32,7 @@ export default function WelcomeScreen() {
   const [isCreatingGroup, setIsCreatingGroup] = useState(false);
 
   const handleJoinGroup = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (!groupCode) {
       Alert.alert('Missing Information', 'Please enter a group code to join.');
       return;
@@ -33,22 +42,26 @@ export default function WelcomeScreen() {
   };
 
   const handleCreateGroup = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setIsCreatingGroup(true);
     Alert.alert('Create Group', 'Creating a new house group...');
     // In a real app, this would make an API call to create the group
   };
 
   const handleInvite = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     Alert.alert('Invite', 'This would open WhatsApp to invite roommates');
     // In a real app, this would open a share dialog or WhatsApp deep link
   };
 
   const handleContinue = () => {
     if (isCreatingGroup && !houseName) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       Alert.alert('Missing Information', 'Please enter a house name.');
       return;
     }
 
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     Alert.alert('Success', 'Moving to your dashboard...', [
       { text: 'OK', onPress: () => router.replace('/(tabs)') },
     ]);
@@ -56,203 +69,188 @@ export default function WelcomeScreen() {
   };
 
   const handleSignIn = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     openAuthModal({ mode: 'signin' });
   };
 
   const handleSignUp = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     openAuthModal({ mode: 'signup' });
   };
 
   if (!isAuthenticated) {
     return (
-      <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={styles.emojiContainer}>
-            <Text style={styles.emoji}>🏠</Text>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
+        <ScrollView contentContainerStyle={{
+          flexGrow: 1,
+          padding: tokens.Spacing.xl,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <View style={{ marginBottom: tokens.Spacing['2xl'] }}>
+            <Icon name="House" size="6xl" color="brand" />
           </View>
 
-          <Text style={styles.title}>Mates</Text>
-          <Text style={styles.subtitle}>Your Roommate Management App</Text>
+          <Text variant="headlineLarge" weight="bold" style={{ marginBottom: tokens.Spacing.sm }} align="center">
+            Mates
+          </Text>
+          <Text variant="titleMedium" color="secondary" style={{ marginBottom: tokens.Spacing['3xl'] }} align="center">
+            Your Roommate Management App
+          </Text>
 
-          <View style={styles.card}>
-            <Text style={styles.cardText}>Please sign in or create an account to continue</Text>
+          <GlassCard
+            variant="translucent"
+            size="large"
+            style={{
+              width: '100%',
+              marginBottom: tokens.Spacing['2xl']
+            }}
+          >
+            <View style={{ padding: tokens.Spacing.xl }}>
+              <Text variant="bodyLarge" color="secondary" style={{ marginBottom: tokens.Spacing.xl }} align="center">
+                Please sign in or create an account to continue
+              </Text>
 
-            <TouchableOpacity style={styles.primaryButton} onPress={handleSignIn}>
-              <Text style={styles.primaryButtonText}>Sign In</Text>
-            </TouchableOpacity>
+              <GlassButton
+                variant="primary"
+                buttonStyle="tinted"
+                size="large"
+                fullWidth
+                onPress={handleSignIn}
+                style={{ marginBottom: tokens.Spacing.md }}
+              >
+                Sign In
+              </GlassButton>
 
-            <TouchableOpacity style={styles.secondaryButton} onPress={handleSignUp}>
-              <Text style={styles.secondaryButtonText}>Sign Up</Text>
-            </TouchableOpacity>
-          </View>
+              <GlassButton
+                variant="secondary"
+                buttonStyle="outlined"
+                size="large"
+                fullWidth
+                onPress={handleSignUp}
+              >
+                Sign Up
+              </GlassButton>
+            </View>
+          </GlassCard>
         </ScrollView>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.emojiContainer}>
-          <Text style={styles.emoji}>🏠</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
+      <ScrollView contentContainerStyle={{
+        flexGrow: 1,
+        padding: tokens.Spacing.xl,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        <View style={{ marginBottom: tokens.Spacing['2xl'] }}>
+          <Icon name="House" size="6xl" color="brand" />
         </View>
 
-        <Text style={styles.title}>Mates</Text>
-        <Text style={styles.subtitle}>Join your house group</Text>
+        <Text variant="headlineLarge" weight="bold" style={{ marginBottom: tokens.Spacing.sm }} align="center">
+          Mates
+        </Text>
+        <Text variant="titleMedium" color="secondary" style={{ marginBottom: tokens.Spacing['3xl'] }} align="center">
+          Join your house group
+        </Text>
 
-        <View style={styles.card}>
-          {!isCreatingGroup ? (
-            <>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter Group Code"
-                value={groupCode}
-                onChangeText={setGroupCode}
-              />
+        <GlassCard
+          variant="translucent"
+          size="large"
+          style={{
+            width: '100%',
+            marginBottom: tokens.Spacing['2xl']
+          }}
+        >
+          <View style={{ padding: tokens.Spacing.xl }}>
+            {!isCreatingGroup ? (
+              <>
+                <GlassInput
+                  placeholder="Enter Group Code"
+                  value={groupCode}
+                  onChangeText={setGroupCode}
+                  variant="default"
+                  size="large"
+                  style={{ marginBottom: tokens.Spacing.lg }}
+                  leftIcon={<Icon name="Hash" size="sm" color="secondary" />}
+                />
 
-              <TouchableOpacity style={styles.primaryButton} onPress={handleJoinGroup}>
-                <Text style={styles.primaryButtonText}>Join Group</Text>
-              </TouchableOpacity>
+                <GlassButton
+                  variant="primary"
+                  buttonStyle="tinted"
+                  size="large"
+                  fullWidth
+                  onPress={handleJoinGroup}
+                  style={{ marginBottom: tokens.Spacing.md }}
+                >
+                  Join Group
+                </GlassButton>
 
-              <TouchableOpacity style={styles.secondaryButton} onPress={handleCreateGroup}>
-                <Text style={styles.secondaryButtonText}>Create New Group</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <>
-              <TextInput
-                style={styles.input}
-                placeholder="House Name"
-                value={houseName}
-                onChangeText={setHouseName}
-              />
+                <GlassButton
+                  variant="secondary"
+                  buttonStyle="outlined"
+                  size="large"
+                  fullWidth
+                  onPress={handleCreateGroup}
+                >
+                  Create New Group
+                </GlassButton>
+              </>
+            ) : (
+              <>
+                <GlassInput
+                  placeholder="House Name"
+                  value={houseName}
+                  onChangeText={setHouseName}
+                  variant="default"
+                  size="large"
+                  style={{ marginBottom: tokens.Spacing.lg }}
+                  leftIcon={<Icon name="House" size="sm" color="secondary" />}
+                />
 
-              <TextInput
-                style={styles.input}
-                placeholder="Your Nickname"
-                value={nickname}
-                onChangeText={setNickname}
-              />
+                <GlassInput
+                  placeholder="Your Nickname"
+                  value={nickname}
+                  onChangeText={setNickname}
+                  variant="default"
+                  size="large"
+                  style={{ marginBottom: tokens.Spacing.lg }}
+                  leftIcon={<Icon name="User" size="sm" color="secondary" />}
+                />
 
-              <TouchableOpacity style={styles.tertiaryButton} onPress={handleInvite}>
-                <Text style={styles.tertiaryButtonText}>Invite via WhatsApp</Text>
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
+                <GlassButton
+                  variant="success"
+                  buttonStyle="tinted"
+                  size="large"
+                  fullWidth
+                  onPress={handleInvite}
+                  leftIcon={<Icon name="MessageCircle" size="sm" color="inverse" />}
+                >
+                  Invite via WhatsApp
+                </GlassButton>
+              </>
+            )}
+          </View>
+        </GlassCard>
 
-        <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-          <Text style={styles.continueButtonText}>Continue</Text>
-        </TouchableOpacity>
+        <GlassButton
+          variant="primary"
+          buttonStyle="filled"
+          size="large"
+          fullWidth
+          onPress={handleContinue}
+          style={{
+            borderRadius: tokens.BorderRadius.full,
+            paddingVertical: tokens.Spacing.lg,
+            marginTop: tokens.Spacing.sm
+          }}
+        >
+          Continue
+        </GlassButton>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emojiContainer: {
-    marginBottom: 20,
-  },
-  emoji: {
-    fontSize: 60,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#333',
-  },
-  subtitle: {
-    fontSize: 18,
-    marginBottom: 30,
-    color: '#666',
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 24,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    marginBottom: 24,
-  },
-  cardText: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#555',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    marginBottom: 16,
-    width: '100%',
-  },
-  primaryButton: {
-    backgroundColor: '#4A80F0',
-    borderRadius: 8,
-    padding: 16,
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  primaryButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#4A80F0',
-    padding: 16,
-    width: '100%',
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    color: '#4A80F0',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  tertiaryButton: {
-    backgroundColor: 'transparent',
-    padding: 16,
-    width: '100%',
-    alignItems: 'center',
-  },
-  tertiaryButtonText: {
-    color: '#4A80F0',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  continueButton: {
-    backgroundColor: '#4A80F0',
-    borderRadius: 30,
-    padding: 18,
-    width: '100%',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  continueButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-});
