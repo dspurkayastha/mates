@@ -1,8 +1,0 @@
-node_modules
-build
-dist
-web-build
-polyfills/**
-__create/**
-metro.config.js
-index.web.tsx

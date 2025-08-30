@@ -4,7 +4,7 @@
  * Supports variants, sizes, haptic feedback, and accessibility
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   TouchableOpacity,
   TouchableOpacityProps,
@@ -106,7 +106,7 @@ export const Button: React.FC<ButtonProps> = ({
     
     onPress?.(event);
   };
-  const getButtonStyles = (): ViewStyle => {
+  const buttonStyles = useMemo((): ViewStyle => {
     const baseStyle: ViewStyle = {
       flexDirection: 'row',
       alignItems: 'center',
@@ -115,7 +115,6 @@ export const Button: React.FC<ButtonProps> = ({
       ...tokens.Shadows.md,
     };
 
-    // Size styles
     const sizeStyles = {
       small: {
         paddingHorizontal: tokens.Spacing.md,
@@ -132,16 +131,12 @@ export const Button: React.FC<ButtonProps> = ({
         paddingVertical: tokens.Spacing.lg,
         minHeight: 52,
       },
-    };
+    } as const;
 
-    // Variant styles
     let variantStyles: ViewStyle = {};
-    
     switch (variant) {
       case 'primary':
-        variantStyles = {
-          backgroundColor: colors.interactive.primary,
-        };
+        variantStyles = { backgroundColor: colors.interactive.primary };
         break;
       case 'secondary':
         variantStyles = {
@@ -151,31 +146,20 @@ export const Button: React.FC<ButtonProps> = ({
         };
         break;
       case 'tertiary':
-        variantStyles = {
-          backgroundColor: 'transparent',
-        };
+        variantStyles = { backgroundColor: 'transparent' };
         break;
       case 'danger':
-        variantStyles = {
-          backgroundColor: colors.interactive.danger,
-        };
+        variantStyles = { backgroundColor: colors.interactive.danger };
         break;
       case 'success':
-        variantStyles = {
-          backgroundColor: colors.interactive.success,
-        };
+        variantStyles = { backgroundColor: colors.interactive.success };
         break;
     }
 
-    // Disabled styles
     if (disabled) {
-      variantStyles = {
-        ...variantStyles,
-        opacity: 0.5,
-      };
+      variantStyles = { ...variantStyles, opacity: 0.5 };
     }
 
-    // Full width
     const widthStyle = fullWidth ? { width: '100%' as const } : {};
 
     return {
@@ -184,12 +168,11 @@ export const Button: React.FC<ButtonProps> = ({
       ...variantStyles,
       ...widthStyle,
     };
-  };
+  }, [variant, size, fullWidth, disabled, tokens, colors]);
 
-  // Get text color based on variant
-  const getTextColor = () => {
+  const textColor = useMemo(() => {
     if (disabled) return colors.text.tertiary;
-    
+
     switch (variant) {
       case 'primary':
       case 'danger':
@@ -202,10 +185,9 @@ export const Button: React.FC<ButtonProps> = ({
       default:
         return colors.text.inverse;
     }
-  };
+  }, [variant, disabled, colors]);
 
-  // Get text variant based on size
-  const getTextVariant = () => {
+  const textVariant = useMemo(() => {
     switch (size) {
       case 'small':
         return 'labelMedium' as const;
@@ -216,19 +198,14 @@ export const Button: React.FC<ButtonProps> = ({
       default:
         return 'labelLarge' as const;
     }
-  };
+  }, [size]);
 
-  // Get gradient colors for primary variant
-  const getGradientColors = () => {
+  const gradientColors = useMemo(() => {
     if (variant === 'primary') {
       return [colors.interactive.primary, colors.interactive.primaryHover];
     }
     return [colors.interactive.primary, colors.interactive.primary];
-  };
-
-  const buttonStyles = getButtonStyles();
-  const textColor = getTextColor();
-  const textVariant = getTextVariant();
+  }, [variant, colors]);
 
   const ButtonContent = () => (
     <>
@@ -283,7 +260,7 @@ export const Button: React.FC<ButtonProps> = ({
         {...props}
       >
         <LinearGradient
-          colors={getGradientColors() as [string, string, ...string[]]}
+          colors={gradientColors as [string, string, ...string[]]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={[

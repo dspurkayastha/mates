@@ -4,7 +4,7 @@
  * Supports semantic variants, responsive sizing, and accessibility
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Text as RNText, TextProps as RNTextProps } from 'react-native';
 import { useColors, useTokens } from '../../design-system/ThemeProvider';
 
@@ -57,8 +57,7 @@ export const Text: React.FC<TextProps> = ({
   const colors = useColors();
   const tokens = useTokens();
 
-  // Get typography style based on variant
-  const getTypographyStyle = () => {
+  const typographyStyle = useMemo(() => {
     switch (variant) {
       case 'displayLarge':
         return tokens.Typography.display.large;
@@ -93,11 +92,13 @@ export const Text: React.FC<TextProps> = ({
       default:
         return tokens.Typography.body.medium;
     }
-  };
+  }, [variant, tokens]);
 
-  // Get color based on variant or custom color
-  const getTextColor = () => {
-    if (color.startsWith('#') || color.startsWith('rgb')) {
+  const textColorValue = useMemo(() => {
+    if (
+      typeof color === 'string' &&
+      (color.startsWith('#') || color.startsWith('rgb'))
+    ) {
       return color;
     }
 
@@ -123,10 +124,9 @@ export const Text: React.FC<TextProps> = ({
       default:
         return colors.text.primary;
     }
-  };
+  }, [color, colors]);
 
-  // Get font weight
-  const getFontWeight = () => {
+  const fontWeightValue = useMemo(() => {
     if (weight) {
       switch (weight) {
         case 'normal':
@@ -141,16 +141,19 @@ export const Text: React.FC<TextProps> = ({
           return weight;
       }
     }
-    return getTypographyStyle().fontWeight;
-  };
+    return typographyStyle.fontWeight;
+  }, [weight, typographyStyle]);
 
-  const textStyle = {
-    ...getTypographyStyle(),
-    fontWeight: getFontWeight(),
-    color: getTextColor(),
-    textAlign: align,
-    fontFamily: 'Inter', // Using Inter font from global.css
-  };
+  const textStyle = useMemo(
+    () => ({
+      ...typographyStyle,
+      fontWeight: fontWeightValue,
+      color: textColorValue,
+      textAlign: align,
+      fontFamily: 'Inter', // Using Inter font from global.css
+    }),
+    [typographyStyle, fontWeightValue, textColorValue, align]
+  );
 
   // Determine accessibility role based on variant
   const getDefaultAccessibilityRole = () => {
