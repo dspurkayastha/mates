@@ -132,6 +132,7 @@ config.resolver = {
   platforms: ['ios', 'android', 'native', 'web'],
   // Custom alias resolution merged with original polyfills
   alias: {
+    '@': path.resolve(__dirname, './src'),
     // Optimize React Native modules
     'react-native-vector-icons': '@expo/vector-icons',
     // Add module aliases for better tree-shaking
