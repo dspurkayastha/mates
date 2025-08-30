@@ -5,8 +5,8 @@
  */
 
 import React, { useMemo } from 'react';
-import { Text as RNText, TextProps as RNTextProps } from 'react-native';
-import { useColors, useTokens } from '../../design-system/ThemeProvider';
+import { Text as RNText, TextProps as RNTextProps, Platform } from 'react-native';
+import { useColors, useTokens, useTheme } from '../../design-system/ThemeProvider';
 
 // ============================================================================
 // TYPES
@@ -56,6 +56,7 @@ export const Text: React.FC<TextProps> = ({
 }) => {
   const colors = useColors();
   const tokens = useTokens();
+  const { accessibility } = useTheme();
 
   const typographyStyle = useMemo(() => {
     switch (variant) {
@@ -144,15 +145,39 @@ export const Text: React.FC<TextProps> = ({
     return typographyStyle.fontWeight;
   }, [weight, typographyStyle]);
 
+  const scaledTypographyStyle = useMemo(() => {
+    const scaleMap: Record<string, number> = {
+      extraSmall: 0.8,
+      small: 0.9,
+      medium: 1,
+      large: 1.1,
+      extraLarge: 1.2,
+      huge: 1.3,
+      accessibility1: 1.4,
+      accessibility2: 1.5,
+      accessibility3: 1.6,
+      accessibility4: 1.7,
+      accessibility5: 1.8,
+    };
+    const scale = scaleMap[accessibility.preferredContentSizeCategory] || 1;
+    return {
+      ...typographyStyle,
+      fontSize: typographyStyle.fontSize * scale,
+      lineHeight: typographyStyle.lineHeight
+        ? typographyStyle.lineHeight * scale
+        : undefined,
+    };
+  }, [typographyStyle, accessibility.preferredContentSizeCategory]);
+
   const textStyle = useMemo(
     () => ({
-      ...typographyStyle,
+      ...scaledTypographyStyle,
       fontWeight: fontWeightValue,
       color: textColorValue,
       textAlign: align,
-      fontFamily: 'Inter', // Using Inter font from global.css
+      fontFamily: Platform.select({ ios: 'SF Pro', default: 'System' }),
     }),
-    [typographyStyle, fontWeightValue, textColorValue, align]
+    [scaledTypographyStyle, fontWeightValue, textColorValue, align]
   );
 
   // Determine accessibility role based on variant
