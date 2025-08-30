@@ -4,7 +4,7 @@
  * Features translucent overlays, smooth animations, and proper accessibility
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   Modal,
   ModalProps,
@@ -14,6 +14,7 @@ import {
   Dimensions,
   StatusBar,
   Platform,
+  StyleSheet,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -90,11 +91,10 @@ export const GlassModal: React.FC<GlassModalProps> = ({
   // iOS 26 Spring animation
   const springConfig = tokens.SpringAnimations.modal;
   
-  // Get modal dimensions based on size
-  const getModalDimensions = () => {
+  const modalDimensions = useMemo(() => {
     const maxWidth = screenWidth * 0.9;
     const maxHeight = screenHeight * 0.8;
-    
+
     switch (size) {
       case 'small':
         return {
@@ -104,34 +104,31 @@ export const GlassModal: React.FC<GlassModalProps> = ({
       case 'large':
         return {
           width: Math.min(500, maxWidth),
-          maxHeight: maxHeight,
+          maxHeight,
         };
       case 'fullscreen':
         return {
           width: screenWidth,
           maxHeight: screenHeight,
         };
-      default: // medium
+      default:
         return {
           width: Math.min(400, maxWidth),
           maxHeight: maxHeight * 0.7,
         };
     }
-  };
-  
-  const modalDimensions = getModalDimensions();
-  
-  // Get initial position for animations
-  const getInitialPosition = () => {
+  }, [screenWidth, screenHeight, size]);
+
+  const initialPosition = useMemo(() => {
     switch (position) {
       case 'top':
         return -screenHeight;
       case 'bottom':
         return screenHeight;
-      default: // center
+      default:
         return 0;
     }
-  };
+  }, [position, screenHeight]);
   
   // Show modal animation
   const showModal = () => {
@@ -157,7 +154,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
     if (position === 'center') {
       modalScale.value = withSpring(0.8, springConfig);
     } else {
-      modalTranslateY.value = withSpring(getInitialPosition(), springConfig);
+      modalTranslateY.value = withSpring(initialPosition, springConfig);
     }
     
     if (hapticFeedback) {
@@ -202,38 +199,35 @@ export const GlassModal: React.FC<GlassModalProps> = ({
     };
   });
   
-  // Container styles
-  const getContainerStyle = (): ViewStyle => {
+  const containerStyle = useMemo<ViewStyle>(() => {
     const baseStyle: ViewStyle = {
       flex: 1,
-      justifyContent: position === 'top' ? 'flex-start' : position === 'bottom' ? 'flex-end' : 'center',
+      justifyContent:
+        position === 'top'
+          ? 'flex-start'
+          : position === 'bottom'
+          ? 'flex-end'
+          : 'center',
       alignItems: 'center',
       paddingTop: position === 'top' ? insets.top : 0,
       paddingBottom: position === 'bottom' ? insets.bottom : 0,
     };
-    
+
     if (size === 'fullscreen') {
-      return {
-        ...baseStyle,
-        paddingHorizontal: 0,
-      };
+      return { ...baseStyle, paddingHorizontal: 0 };
     }
-    
-    return {
-      ...baseStyle,
-      paddingHorizontal: tokens.Spacing.lg,
-    };
-  };
-  
-  // Modal content styles
-  const getModalContentStyle = (): ViewStyle => {
+
+    return { ...baseStyle, paddingHorizontal: tokens.Spacing.lg };
+  }, [position, insets.top, insets.bottom, size, tokens.Spacing.lg]);
+
+  const modalContentStyle = useMemo<ViewStyle>(() => {
     const baseStyle: ViewStyle = {
       maxWidth: modalDimensions.width,
       maxHeight: modalDimensions.maxHeight,
       borderRadius: size === 'fullscreen' ? 0 : tokens.BorderRadius['3xl'],
-      overflow: 'hidden',
+      ...styles.modalContent,
     };
-    
+
     if (position === 'bottom') {
       return {
         ...baseStyle,
@@ -244,7 +238,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
         borderBottomRightRadius: 0,
       };
     }
-    
+
     if (position === 'top') {
       return {
         ...baseStyle,
@@ -255,32 +249,31 @@ export const GlassModal: React.FC<GlassModalProps> = ({
         borderBottomRightRadius: tokens.BorderRadius['3xl'],
       };
     }
-    
+
     return baseStyle;
-  };
-  
-  const containerStyle = getContainerStyle();
-  const modalContentStyle = getModalContentStyle();
+  }, [modalDimensions, size, position, tokens]);
   
   // Handle component
+  const handleContainerStyle = useMemo(
+    () => ({ alignItems: 'center', paddingVertical: tokens.Spacing.sm }),
+    [tokens]
+  );
+  const handleStyle = useMemo(
+    () => ({
+      width: 40,
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: withOpacity(colors.text.tertiary, 0.5),
+    }),
+    [colors]
+  );
+
   const renderHandle = () => {
     if (!showHandle || position === 'center') return null;
-    
+
     return (
-      <View
-        style={{
-          alignItems: 'center',
-          paddingVertical: tokens.Spacing.sm,
-        }}
-      >
-        <View
-          style={{
-            width: 40,
-            height: 4,
-            borderRadius: 2,
-            backgroundColor: withOpacity(colors.text.tertiary, 0.5),
-          }}
-        />
+      <View style={handleContainerStyle}>
+        <View style={handleStyle} />
       </View>
     );
   };
@@ -293,17 +286,13 @@ export const GlassModal: React.FC<GlassModalProps> = ({
       statusBarTranslucent
       {...props}
     >
-      <View style={{ flex: 1 }}>
+      <View style={styles.flex}>
         {/* Backdrop */}
         <Animated.View
           style={[
+            styles.backdrop,
             {
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: isDark 
+              backgroundColor: isDark
                 ? 'rgba(0, 0, 0, 0.7)'
                 : 'rgba(0, 0, 0, 0.4)',
             },
@@ -311,7 +300,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
           ]}
         >
           <TouchableOpacity
-            style={{ flex: 1 }}
+            style={styles.flex}
             onPress={handleBackdropPress}
             activeOpacity={1}
           />
@@ -320,7 +309,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
         {/* Modal Container */}
         <View style={[containerStyle, style]} pointerEvents="box-none">
           <Animated.View
-            style={[animatedModalStyle]}
+            style={animatedModalStyle}
             accessible={true}
             accessibilityRole="dialog"
             accessibilityLabel={accessibilityLabel}
@@ -342,5 +331,21 @@ export const GlassModal: React.FC<GlassModalProps> = ({
     </Modal>
   );
 };
+
+const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
+  backdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  modalContent: {
+    overflow: 'hidden',
+  },
+});
 
 export default GlassModal;

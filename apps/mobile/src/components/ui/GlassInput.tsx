@@ -4,13 +4,14 @@
  * Features semi-transparent background, smooth focus animations, and proper accessibility
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   TextInput,
   TextInputProps,
   View,
   ViewStyle,
   TextStyle,
+  StyleSheet,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -84,8 +85,7 @@ export const GlassInput: React.FC<GlassInputProps> = ({
   const focusProgress = useSharedValue(0);
   const borderScale = useSharedValue(1);
   
-  // Get dimensions based on size
-  const getDimensions = () => {
+  const dimensions = useMemo(() => {
     switch (size) {
       case 'small':
         return {
@@ -101,7 +101,7 @@ export const GlassInput: React.FC<GlassInputProps> = ({
           fontSize: tokens.Typography.body.large.fontSize,
           borderRadius: tokens.BorderRadius['2xl'],
         };
-      default: // medium
+      default:
         return {
           minHeight: 44,
           padding: tokens.Spacing.md,
@@ -109,16 +109,13 @@ export const GlassInput: React.FC<GlassInputProps> = ({
           borderRadius: tokens.BorderRadius.xl,
         };
     }
-  };
-  
-  const dimensions = getDimensions();
-  
-  // Get colors based on state
-  const getStateColors = () => {
-    const tintColors = isDark 
+  }, [size, tokens]);
+
+  const stateColors = useMemo(() => {
+    const tintColors = isDark
       ? tokens.GlassmorphismTokens.tintColors.dark
       : tokens.GlassmorphismTokens.tintColors.light;
-    
+
     if (hasError) {
       return {
         borderColor: colors.interactive.danger,
@@ -126,7 +123,7 @@ export const GlassInput: React.FC<GlassInputProps> = ({
         focusColor: colors.interactive.danger,
       };
     }
-    
+
     if (isFocused) {
       return {
         borderColor: colors.interactive.primary,
@@ -134,17 +131,15 @@ export const GlassInput: React.FC<GlassInputProps> = ({
         focusColor: colors.interactive.primary,
       };
     }
-    
+
     return {
-      borderColor: isDark 
+      borderColor: isDark
         ? tokens.GlassmorphismTokens.borderColors.dark.subtle
         : tokens.GlassmorphismTokens.borderColors.light.subtle,
       tintColor: tintColors.neutral,
       focusColor: colors.interactive.primary,
     };
-  };
-  
-  const stateColors = getStateColors();
+  }, [isDark, hasError, isFocused, colors, tokens]);
   
   // Handle focus events
   const handleFocus = (event: any) => {
@@ -184,73 +179,59 @@ export const GlassInput: React.FC<GlassInputProps> = ({
     };
   });
   
-  // Container styles
-  const getContainerStyles = (): ViewStyle => {
+  const containerStyles = useMemo<ViewStyle>(() => {
     const baseStyle: ViewStyle = {
       minHeight: dimensions.minHeight,
       borderRadius: dimensions.borderRadius,
       borderWidth: variant === 'outlined' ? 1.5 : 1,
-      overflow: 'hidden',
+      ...styles.container,
       opacity: disabled ? 0.5 : 1,
     };
-    
+
     switch (variant) {
       case 'outlined':
-        return {
-          ...baseStyle,
-          backgroundColor: 'transparent',
-        };
+        return { ...baseStyle, backgroundColor: 'transparent' };
       case 'filled':
         return {
           ...baseStyle,
           backgroundColor: withOpacity(colors.background.secondary, 0.6),
           borderWidth: 0,
         };
-      default: // glass
-        return {
-          ...baseStyle,
-          backgroundColor: stateColors.tintColor,
-        };
+      default:
+        return { ...baseStyle, backgroundColor: stateColors.tintColor };
     }
-  };
-  
-  // Input content styles
-  const getInputContentStyle = (): ViewStyle => {
-    return {
-      flexDirection: 'row',
-      alignItems: 'center',
+  }, [dimensions, variant, disabled, colors, stateColors]);
+
+  const inputContentStyle = useMemo<ViewStyle>(
+    () => ({
+      ...styles.inputContent,
       paddingHorizontal: dimensions.padding,
       paddingVertical: dimensions.padding * 0.75,
       minHeight: dimensions.minHeight,
-    };
-  };
-  
-  // Text input styles
-  const getTextInputStyle = (): TextStyle => {
-    return {
-      flex: 1,
+    }),
+    [dimensions]
+  );
+
+  const textInputStyle = useMemo<TextStyle>(
+    () => ({
+      ...styles.textInput,
       fontSize: dimensions.fontSize,
       color: disabled ? colors.text.tertiary : colors.text.primary,
       ...tokens.Typography.body.medium,
-      margin: 0,
-      padding: 0,
-      textAlignVertical: 'center',
       ...inputStyle,
-    };
-  };
-  
-  const containerStyles = getContainerStyles();
-  const inputContentStyle = getInputContentStyle();
-  const textInputStyle = getTextInputStyle();
+    }),
+    [dimensions.fontSize, disabled, colors, tokens, inputStyle]
+  );
+
+  const leftIconStyle = useMemo(() => ({ marginRight: tokens.Spacing.sm }), [tokens]);
+  const rightIconStyle = useMemo(() => ({ marginLeft: tokens.Spacing.sm }), [tokens]);
+  const labelStyle = useMemo(() => ({ marginBottom: tokens.Spacing.xs }), [tokens]);
+  const helperStyle = useMemo(() => ({ marginTop: tokens.Spacing.xs }), [tokens]);
   
   // Render input content
   const renderInputContent = () => (
     <View style={inputContentStyle}>
-      {leftIcon && (
-        <View style={{ marginRight: tokens.Spacing.sm }}>
-          {leftIcon}
-        </View>
-      )}
+      {leftIcon && <View style={leftIconStyle}>{leftIcon}</View>}
       
       <TextInput
         {...props}
@@ -266,11 +247,7 @@ export const GlassInput: React.FC<GlassInputProps> = ({
         testID={testID}
       />
       
-      {rightIcon && (
-        <View style={{ marginLeft: tokens.Spacing.sm }}>
-          {rightIcon}
-        </View>
-      )}
+      {rightIcon && <View style={rightIconStyle}>{rightIcon}</View>}
     </View>
   );
   
@@ -283,7 +260,7 @@ export const GlassInput: React.FC<GlassInputProps> = ({
           size="medium"
           weight="medium"
           color={hasError ? colors.interactive.danger : colors.text.secondary}
-          style={{ marginBottom: tokens.Spacing.xs }}
+          style={labelStyle}
         >
           {label}
         </Text>
@@ -314,7 +291,7 @@ export const GlassInput: React.FC<GlassInputProps> = ({
           variant="label"
           size="small"
           color={hasError ? colors.interactive.danger : colors.text.tertiary}
-          style={{ marginTop: tokens.Spacing.xs }}
+          style={helperStyle}
         >
           {errorText || helperText}
         </Text>
@@ -322,5 +299,20 @@ export const GlassInput: React.FC<GlassInputProps> = ({
     </View>
   );
 };
+const styles = StyleSheet.create({
+  container: {
+    overflow: 'hidden',
+  },
+  inputContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textInput: {
+    flex: 1,
+    margin: 0,
+    padding: 0,
+    textAlignVertical: 'center',
+  },
+});
 
 export default GlassInput;

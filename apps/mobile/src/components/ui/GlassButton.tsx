@@ -4,13 +4,14 @@
  * Features translucent layers, soft gradients, and spring animations
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   TouchableOpacity,
   TouchableOpacityProps,
   ActivityIndicator,
   ViewStyle,
   View,
+  StyleSheet,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -166,7 +167,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
   });
 
   // Get button dimensions and padding
-  const getButtonStyles = (): ViewStyle => {
+  const buttonStyles = useMemo<ViewStyle>(() => {
     const sizeStyles = {
       small: {
         paddingHorizontal: tokens.Spacing.md,
@@ -186,7 +187,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
         minHeight: 52,
         borderRadius: tokens.BorderRadius['2xl'],
       },
-    };
+    } as const;
 
     const widthStyle = fullWidth ? { width: '100%' as const } : {};
 
@@ -197,29 +198,33 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
       alignItems: 'center',
       justifyContent: 'center',
       overflow: 'hidden',
-    };
-  };
+    } as ViewStyle;
+  }, [size, fullWidth, tokens]);
 
-  // Get tint color for glass effect
-  const getTintColor = (): string => {
-    const tintColors = isDark 
+  const tintColor = useMemo(() => {
+    const tintColors = isDark
       ? tokens.GlassmorphismTokens.tintColors.dark
       : tokens.GlassmorphismTokens.tintColors.light;
-    
-    switch (variant) {
-      case 'primary': return tintColors.primary;
-      case 'secondary': return tintColors.secondary;
-      case 'success': return tintColors.success;
-      case 'danger': return tintColors.danger;
-      case 'tertiary': return tintColors.neutral;
-      default: return tintColors.primary;
-    }
-  };
 
-  // Get text color
-  const getTextColor = () => {
+    switch (variant) {
+      case 'primary':
+        return tintColors.primary;
+      case 'secondary':
+        return tintColors.secondary;
+      case 'success':
+        return tintColors.success;
+      case 'danger':
+        return tintColors.danger;
+      case 'tertiary':
+        return tintColors.neutral;
+      default:
+        return tintColors.primary;
+    }
+  }, [variant, isDark, tokens]);
+
+  const textColor = useMemo(() => {
     if (disabled) return colors.text.tertiary;
-    
+
     switch (buttonStyle) {
       case 'filled':
         switch (variant) {
@@ -234,47 +239,62 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
       case 'outlined':
       case 'plain':
         switch (variant) {
-          case 'primary': return colors.interactive.primary;
-          case 'danger': return colors.interactive.danger;
-          case 'success': return colors.interactive.success;
-          default: return colors.text.primary;
+          case 'primary':
+            return colors.interactive.primary;
+          case 'danger':
+            return colors.interactive.danger;
+          case 'success':
+            return colors.interactive.success;
+          default:
+            return colors.text.primary;
         }
       default:
         return colors.text.primary;
     }
-  };
+  }, [disabled, buttonStyle, variant, colors]);
 
-  // Get gradient colors for filled style
-  const getGradientColors = (): string[] => {
+  const gradientColors = useMemo(() => {
     switch (variant) {
       case 'primary':
         return [colors.interactive.primary, colors.interactive.primaryHover];
       case 'danger':
-        return [colors.interactive.danger, withOpacity(colors.interactive.danger, 0.8)];
+        return [
+          colors.interactive.danger,
+          withOpacity(colors.interactive.danger, 0.8),
+        ];
       case 'success':
-        return [colors.interactive.success, withOpacity(colors.interactive.success, 0.8)];
+        return [
+          colors.interactive.success,
+          withOpacity(colors.interactive.success, 0.8),
+        ];
       default:
         return ['transparent', 'transparent'];
     }
-  };
+  }, [variant, colors]);
 
-  const buttonStyles = getButtonStyles();
-  const textColor = getTextColor();
+  const leftIconStyle = useMemo(() => ({
+    marginRight: tokens.Spacing.sm,
+  }), [tokens]);
+
+  const rightIconStyle = useMemo(() => ({
+    marginLeft: tokens.Spacing.sm,
+  }), [tokens]);
+
+  const activityIndicatorStyle = useMemo(
+    () => ({ marginRight: children ? tokens.Spacing.sm : 0 }),
+    [children, tokens]
+  );
   
   // Render content
   const renderContent = () => (
     <>
-      {leftIcon && (
-        <View style={{ marginRight: tokens.Spacing.sm }}>
-          {leftIcon}
-        </View>
-      )}
+      {leftIcon && <View style={leftIconStyle}>{leftIcon}</View>}
       
       {loading ? (
-        <ActivityIndicator 
-          color={textColor} 
+        <ActivityIndicator
+          color={textColor}
           size={size === 'small' ? 'small' : 'small'}
-          style={{ marginRight: children ? tokens.Spacing.sm : 0 }}
+          style={activityIndicatorStyle}
         />
       ) : null}
       
@@ -284,17 +304,13 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
           size={size === 'large' ? 'large' : 'medium'}
           weight="medium"
           color={textColor}
-          style={{ textAlign: 'center' }}
+          style={styles.text}
         >
           {children}
         </Text>
       )}
       
-      {rightIcon && (
-        <View style={{ marginLeft: tokens.Spacing.sm }}>
-          {rightIcon}
-        </View>
-      )}
+      {rightIcon && <View style={rightIconStyle}>{rightIcon}</View>}
     </>
   );
 
@@ -304,13 +320,8 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
       case 'filled':
         return (
           <LinearGradient
-            colors={getGradientColors()}
-            style={[
-              buttonStyles,
-              {
-                opacity: disabled ? 0.5 : 1,
-              }
-            ]}
+            colors={gradientColors}
+            style={[buttonStyles, { opacity: disabled ? 0.5 : 1 }]}
           >
             {renderContent()}
           </LinearGradient>
@@ -324,10 +335,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
               tint={isDark ? 'dark' : 'light'}
               style={[
                 buttonStyles,
-                {
-                  backgroundColor: getTintColor(),
-                  opacity: disabled ? 0.5 : 1,
-                }
+                { backgroundColor: tintColor, opacity: disabled ? 0.5 : 1 },
               ]}
               shadowEnabled={!disabled}
               shadowIntensity="subtle"
@@ -347,9 +355,9 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
               {
                 backgroundColor: 'transparent',
                 borderWidth: 1.5,
-                borderColor: disabled ? colors.border.light : getTintColor(),
+                borderColor: disabled ? colors.border.light : tintColor,
                 opacity: disabled ? 0.5 : 1,
-              }
+              },
             ]}
             shadowEnabled={false}
           >
@@ -395,5 +403,11 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
     </Animated.View>
   );
 };
+
+const styles = StyleSheet.create({
+  text: {
+    textAlign: 'center',
+  },
+});
 
 export default GlassButton;

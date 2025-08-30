@@ -4,12 +4,13 @@
  * Features glassmorphism effects, interactive animations, and proper accessibility
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   ViewStyle,
   TouchableOpacity,
   TouchableOpacityProps,
+  StyleSheet,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -135,9 +136,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
     };
   });
 
-  // Get card styles based on variant and size
-  const getCardStyles = (): ViewStyle => {
-    // Size styles
+  const cardStyles = useMemo<ViewStyle>(() => {
     const sizeStyles = {
       small: {
         padding: tokens.Spacing.md,
@@ -151,48 +150,39 @@ export const GlassCard: React.FC<GlassCardProps> = ({
         padding: tokens.Spacing.xl,
         borderRadius: borderRadius || tokens.BorderRadius['2xl'],
       },
-    };
+    } as const;
 
     return {
       ...sizeStyles[size],
-      overflow: 'hidden',
-    };
-  };
+      ...styles.container,
+    } as ViewStyle;
+  }, [size, borderRadius, tokens]);
 
-  // Get variant-specific background and styling
-  const getVariantStyles = (): {
-    backgroundColor?: string;
-    borderColor?: string;
-    borderWidth?: number;
-    tint?: 'light' | 'dark' | 'systemMaterial';
-  } => {
-    const tintColors = isDark 
+  const variantStyles = useMemo(() => {
+    const tintColors = isDark
       ? tokens.GlassmorphismTokens.tintColors.dark
       : tokens.GlassmorphismTokens.tintColors.light;
-    
+
     switch (variant) {
       case 'elevated':
         return {
           backgroundColor: withOpacity(colors.background.elevated, 0.9),
           tint: isDark ? 'dark' : 'light',
         };
-        
       case 'outlined':
         return {
           backgroundColor: 'transparent',
-          borderColor: isDark 
+          borderColor: isDark
             ? tokens.GlassmorphismTokens.borderColors.dark.regular
             : tokens.GlassmorphismTokens.borderColors.light.regular,
           borderWidth: 1,
           tint: isDark ? 'dark' : 'light',
         };
-        
       case 'filled':
         return {
           backgroundColor: withOpacity(colors.background.secondary, 0.8),
           tint: isDark ? 'dark' : 'light',
         };
-        
       case 'translucent':
       default:
         return {
@@ -200,22 +190,18 @@ export const GlassCard: React.FC<GlassCardProps> = ({
           tint: 'systemMaterial',
         };
     }
-  };
+  }, [variant, isDark, colors, tokens]);
 
-  const cardStyles = getCardStyles();
-  const variantStyles = getVariantStyles();
-
-  // Generate accessibility properties
-  const getAccessibilityProps = () => {
+  const accessibilityProps = useMemo(() => {
     const defaultRole = interactive ? 'button' : 'text';
     const role = accessibilityRole || defaultRole;
-    
-    const defaultLabel = interactive 
-      ? (accessibilityLabel || 'Interactive card')
+
+    const defaultLabel = interactive
+      ? accessibilityLabel || 'Interactive card'
       : accessibilityLabel;
-    
+
     const defaultHint = interactive
-      ? (accessibilityHint || 'Double tap to interact with this card')
+      ? accessibilityHint || 'Double tap to interact with this card'
       : accessibilityHint;
 
     return {
@@ -225,7 +211,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
       accessibilityRole: role,
       testID,
     };
-  };
+  }, [interactive, accessibilityRole, accessibilityLabel, accessibilityHint, testID]);
 
   // Render card content
   const renderCardContent = () => {
@@ -276,7 +262,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
           activeOpacity={1} // We handle opacity with animations
-          {...getAccessibilityProps()}
+          {...accessibilityProps}
           {...(props as TouchableOpacityProps)}
         >
           {renderCardContent()}
@@ -286,13 +272,16 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   }
 
   return (
-    <View 
-      style={style}
-      {...getAccessibilityProps()}
-    >
+    <View style={style} {...accessibilityProps}>
       {renderCardContent()}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    overflow: 'hidden',
+  },
+});
 
 export default GlassCard;
