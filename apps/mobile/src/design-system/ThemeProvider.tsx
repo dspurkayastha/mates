@@ -258,7 +258,7 @@ export const useGlassColors = () => {
     // Provide fallback glass colors when context is not ready
     console.warn('useGlassColors called outside ThemeProvider, using fallback values');
     const glassTokens = DesignTokens.GlassmorphismTokens;
-    const tintColors = glassTokens.tintColors.light; // Default to light theme
+    const tintColors = glassTokens.tintColors; // Dynamic tint colors
     const borderColors = glassTokens.borderColors.light;
     const shadowColors = glassTokens.shadowColors.light;
     
@@ -275,7 +275,7 @@ export const useGlassColors = () => {
   const { isDark, tokens } = context;
   
   const glassTokens = tokens.GlassmorphismTokens;
-  const tintColors = isDark ? glassTokens.tintColors.dark : glassTokens.tintColors.light;
+  const tintColors = glassTokens.tintColors;
   const borderColors = isDark ? glassTokens.borderColors.dark : glassTokens.borderColors.light;
   const shadowColors = isDark ? glassTokens.shadowColors.dark : glassTokens.shadowColors.light;
   
@@ -379,16 +379,16 @@ export function getResponsiveValue<T>(values: {
  * Usage: getGlassBackground(theme, 'primary', 'regular')
  */
 export const getGlassBackground = (
-  theme: Theme, 
+  theme: Theme,
   variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'neutral' = 'primary',
   intensity: 'ultraThin' | 'thin' | 'regular' | 'thick' | 'ultraThick' = 'regular'
-): string => {
-  const isDark = theme.background.primary === theme.BaseColors.neutral[950];
+): any => {
   const glassTokens = DesignTokens.GlassmorphismTokens;
-  const tintColors = isDark ? glassTokens.tintColors.dark : glassTokens.tintColors.light;
+  const tintColors = glassTokens.tintColors;
   const opacity = glassTokens.opacity[intensity];
-  
-  return withOpacity(tintColors[variant], opacity);
+
+  const color = tintColors[variant] as any;
+  return typeof color === 'string' ? withOpacity(color, opacity) : color;
 };
 
 /**

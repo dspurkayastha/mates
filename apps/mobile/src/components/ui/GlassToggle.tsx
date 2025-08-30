@@ -107,9 +107,7 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
   
   // Get colors based on variant
   const getVariantColors = () => {
-    const tintColors = isDark 
-      ? tokens.GlassmorphismTokens.tintColors.dark
-      : tokens.GlassmorphismTokens.tintColors.light;
+    const tintColors = tokens.GlassmorphismTokens.tintColors;
     
     switch (variant) {
       case 'success':
@@ -167,9 +165,7 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
       toggleProgress.value,
       [0, 1],
       [
-        isDark 
-          ? tokens.GlassmorphismTokens.tintColors.dark.neutral
-          : tokens.GlassmorphismTokens.tintColors.light.neutral,
+        tokens.GlassmorphismTokens.tintColors.neutral,
         variantColors.activeTint,
       ]
     );

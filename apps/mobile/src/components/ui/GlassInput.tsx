@@ -115,9 +115,7 @@ export const GlassInput: React.FC<GlassInputProps> = ({
   
   // Get colors based on state
   const getStateColors = () => {
-    const tintColors = isDark 
-      ? tokens.GlassmorphismTokens.tintColors.dark
-      : tokens.GlassmorphismTokens.tintColors.light;
+    const tintColors = tokens.GlassmorphismTokens.tintColors;
     
     if (hasError) {
       return {

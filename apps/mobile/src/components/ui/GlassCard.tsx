@@ -166,9 +166,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
     borderWidth?: number;
     tint?: 'light' | 'dark' | 'systemMaterial';
   } => {
-    const tintColors = isDark 
-      ? tokens.GlassmorphismTokens.tintColors.dark
-      : tokens.GlassmorphismTokens.tintColors.light;
+    const tintColors = tokens.GlassmorphismTokens.tintColors;
     
     switch (variant) {
       case 'elevated':

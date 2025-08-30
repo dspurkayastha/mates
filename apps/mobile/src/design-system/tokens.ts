@@ -4,7 +4,15 @@
  * Semantic color tokens, typography scale, spacing system, and more
  */
 
-import { Appearance } from 'react-native';
+import { Appearance, Platform, DynamicColorIOS, PlatformColor } from 'react-native';
+
+// Helper to create dynamic colors across platforms
+const dynamicTintColor = (light: string, dark: string) => {
+  if (Platform.OS === 'ios') {
+    return DynamicColorIOS({ light, dark });
+  }
+  return Appearance.getColorScheme() === 'dark' ? dark : light;
+};
 
 // ============================================================================
 // iOS 26 GLASSMORPHISM TOKENS
@@ -30,26 +38,17 @@ export const GlassmorphismTokens = {
     ultra: 50,
   },
   
-  // Tinted glass colors for iOS 26 style buttons
+  // Tinted glass colors for iOS 26 style components
   tintColors: {
-    // Light mode tints
-    light: {
-      primary: 'rgba(74, 128, 240, 0.15)',
-      secondary: 'rgba(115, 115, 115, 0.08)',
-      success: 'rgba(34, 197, 94, 0.12)',
-      warning: 'rgba(245, 158, 11, 0.12)',
-      danger: 'rgba(239, 68, 68, 0.12)',
-      neutral: 'rgba(0, 0, 0, 0.04)',
-    },
-    // Dark mode tints
-    dark: {
-      primary: 'rgba(74, 128, 240, 0.25)',
-      secondary: 'rgba(255, 255, 255, 0.08)',
-      success: 'rgba(74, 222, 128, 0.18)',
-      warning: 'rgba(251, 191, 36, 0.18)',
-      danger: 'rgba(248, 113, 113, 0.18)',
-      neutral: 'rgba(255, 255, 255, 0.06)',
-    },
+    primary: dynamicTintColor('rgba(74, 128, 240, 0.15)', 'rgba(74, 128, 240, 0.25)'),
+    secondary: dynamicTintColor('rgba(115, 115, 115, 0.08)', 'rgba(255, 255, 255, 0.08)'),
+    success: dynamicTintColor('rgba(34, 197, 94, 0.12)', 'rgba(74, 222, 128, 0.18)'),
+    warning: dynamicTintColor('rgba(245, 158, 11, 0.12)', 'rgba(251, 191, 36, 0.18)'),
+    danger: dynamicTintColor('rgba(239, 68, 68, 0.12)', 'rgba(248, 113, 113, 0.18)'),
+    neutral:
+      Platform.OS === 'ios'
+        ? PlatformColor('systemFill')
+        : dynamicTintColor('rgba(0, 0, 0, 0.04)', 'rgba(255, 255, 255, 0.06)'),
   },
   
   // Glass border colors
