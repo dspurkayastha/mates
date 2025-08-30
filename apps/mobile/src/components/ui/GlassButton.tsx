@@ -201,18 +201,22 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
   };
 
   // Get tint color for glass effect
-  const getTintColor = (): string => {
-    const tintColors = isDark 
-      ? tokens.GlassmorphismTokens.tintColors.dark
-      : tokens.GlassmorphismTokens.tintColors.light;
-    
+  const getTintColor = () => {
+    const tintColors = tokens.GlassmorphismTokens.tintColors;
+
     switch (variant) {
-      case 'primary': return tintColors.primary;
-      case 'secondary': return tintColors.secondary;
-      case 'success': return tintColors.success;
-      case 'danger': return tintColors.danger;
-      case 'tertiary': return tintColors.neutral;
-      default: return tintColors.primary;
+      case 'primary':
+        return tintColors.primary;
+      case 'secondary':
+        return tintColors.secondary;
+      case 'success':
+        return tintColors.success;
+      case 'danger':
+        return tintColors.danger;
+      case 'tertiary':
+        return tintColors.neutral;
+      default:
+        return tintColors.primary;
     }
   };
 
