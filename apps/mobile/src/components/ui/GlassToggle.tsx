@@ -4,10 +4,11 @@
  * Features translucent track, smooth thumb animations, and haptic feedback
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   TouchableOpacity,
   ViewStyle,
+  StyleSheet,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -73,44 +74,22 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
     toggleProgress.value = withSpring(value ? 1 : 0, tokens.SpringAnimations.toggle);
   }, [value]);
   
-  // Get dimensions based on size
-  const getDimensions = () => {
+  const dimensions = useMemo(() => {
     switch (size) {
       case 'small':
-        return {
-          width: 36,
-          height: 20,
-          thumbSize: 16,
-          padding: 2,
-          borderRadius: 10,
-        };
+        return { width: 36, height: 20, thumbSize: 16, padding: 2, borderRadius: 10 };
       case 'large':
-        return {
-          width: 56,
-          height: 32,
-          thumbSize: 28,
-          padding: 2,
-          borderRadius: 16,
-        };
-      default: // medium
-        return {
-          width: 44,
-          height: 24,
-          thumbSize: 20,
-          padding: 2,
-          borderRadius: 12,
-        };
+        return { width: 56, height: 32, thumbSize: 28, padding: 2, borderRadius: 16 };
+      default:
+        return { width: 44, height: 24, thumbSize: 20, padding: 2, borderRadius: 12 };
     }
-  };
-  
-  const dimensions = getDimensions();
-  
-  // Get colors based on variant
-  const getVariantColors = () => {
-    const tintColors = isDark 
+  }, [size]);
+
+  const variantColors = useMemo(() => {
+    const tintColors = isDark
       ? tokens.GlassmorphismTokens.tintColors.dark
       : tokens.GlassmorphismTokens.tintColors.light;
-    
+
     switch (variant) {
       case 'success':
         return {
@@ -133,9 +112,7 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
           activeTint: tintColors.primary,
         };
     }
-  };
-  
-  const variantColors = getVariantColors();
+  }, [variant, isDark, colors, tokens]);
   
   // Handle press
   const handlePress = () => {
@@ -206,22 +183,26 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
     };
   });
   
-  // Track container style
-  const trackStyle: ViewStyle = {
-    width: dimensions.width,
-    height: dimensions.height,
-    borderRadius: dimensions.borderRadius,
-    padding: dimensions.padding,
-    opacity: disabled ? 0.5 : 1,
-  };
-  
-  // Thumb style
-  const thumbStyle: ViewStyle = {
-    width: dimensions.thumbSize,
-    height: dimensions.thumbSize,
-    borderRadius: dimensions.thumbSize / 2,
-    ...tokens.Shadows.sm,
-  };
+  const trackStyle = useMemo<ViewStyle>(
+    () => ({
+      width: dimensions.width,
+      height: dimensions.height,
+      borderRadius: dimensions.borderRadius,
+      padding: dimensions.padding,
+      opacity: disabled ? 0.5 : 1,
+    }),
+    [dimensions, disabled]
+  );
+
+  const thumbStyle = useMemo<ViewStyle>(
+    () => ({
+      width: dimensions.thumbSize,
+      height: dimensions.thumbSize,
+      borderRadius: dimensions.thumbSize / 2,
+      ...tokens.Shadows.sm,
+    }),
+    [dimensions, tokens]
+  );
   
   return (
     <TouchableOpacity
@@ -229,7 +210,7 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       disabled={disabled}
-      style={[{ alignSelf: 'flex-start' }, style]}
+      style={[styles.wrapper, style]}
       accessible={true}
       accessibilityRole="switch"
       accessibilityState={{ checked: value }}
@@ -252,5 +233,10 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
     </TouchableOpacity>
   );
 };
+const styles = StyleSheet.create({
+  wrapper: {
+    alignSelf: 'flex-start',
+  },
+});
 
 export default GlassToggle;
