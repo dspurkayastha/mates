@@ -1,12 +1,18 @@
 /**
  * Modern Card Component
  * Premium card with 2025 design standards
- * Supports glass variant, subtle shadows, and interaction states
+ * Subtle shadows and interaction states
  */
 
 import * as Haptics from 'expo-haptics';
 import React from 'react';
-import { Pressable, PressableProps, View, ViewStyle } from 'react-native';
+import {
+  Pressable,
+  PressableProps,
+  StyleSheet,
+  View,
+  ViewStyle,
+} from 'react-native';
 import type { GestureResponderEvent } from 'react-native';
 import Animated, {
   Easing,
@@ -16,18 +22,16 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import Text from './Text';
-import { useColors, useTokens, withOpacity } from '../../design-system/ThemeProvider';
+import { useTheme, useTokens } from '../../design-system/ThemeProvider';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-type CardVariant = 'elevated' | 'outlined' | 'filled' | 'glass';
-type CardSize = 'small' | 'medium' | 'large';
+type CardVariant = 'elevated' | 'outlined' | 'filled';
 
 interface BaseCardProps {
   variant?: CardVariant;
-  size?: CardSize;
   interactive?: boolean;
   hapticFeedback?: boolean;
   style?: ViewStyle;
@@ -58,7 +62,6 @@ type CardProps = InteractiveCardProps | StaticCardProps;
 
 export const Card: React.FC<CardProps> = ({
   variant = 'elevated',
-  size = 'medium',
   interactive = false,
   hapticFeedback = true,
   style,
@@ -69,17 +72,14 @@ export const Card: React.FC<CardProps> = ({
   testID,
   ...props
 }) => {
-  const colors = useColors();
+  const { theme } = useTheme();
   const tokens = useTokens();
   const scale = useSharedValue(1);
-  const shadowOpacity = useSharedValue(0.1);
 
   // Animation for interactive cards
   const animatedStyle = useAnimatedStyle(() => {
     return {
       transform: [{ scale: scale.value }],
-      // iOS shadowOpacity will be animated; Android relies on elevation in tokens.Shadows
-      shadowOpacity: shadowOpacity.value,
     };
   });
 
@@ -89,10 +89,6 @@ export const Card: React.FC<CardProps> = ({
 
     const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
     scale.value = withTiming(tokens.Animation.press.scale, {
-      duration: tokens.Animation.duration.in,
-      easing,
-    });
-    shadowOpacity.value = withTiming(0.15, {
       duration: tokens.Animation.duration.in,
       easing,
     });
@@ -110,71 +106,46 @@ export const Card: React.FC<CardProps> = ({
       duration: tokens.Animation.duration.out,
       easing,
     });
-    shadowOpacity.value = withTiming(0.1, {
-      duration: tokens.Animation.duration.out,
-      easing,
-    });
   };
 
-  // Get card styles based on variant and size
-  const getCardStyles = (): ViewStyle => {
-    const baseStyle: ViewStyle = {
-      borderRadius: tokens.BorderRadius.xl,
-      overflow: 'hidden',
+  const getOuterStyle = (): ViewStyle => {
+    const base: ViewStyle = {
+      borderRadius: tokens.BorderRadius.lg,
     };
-
-    // Size styles
-    const sizeStyles = {
-      small: { padding: tokens.Spacing.md },
-      medium: { padding: tokens.Spacing.lg },
-      large: { padding: tokens.Spacing.xl },
-    };
-
-    // Variant styles
-    let variantStyles: ViewStyle = {};
 
     switch (variant) {
       case 'elevated':
-        variantStyles = {
-          backgroundColor: colors.background.elevated,
-          ...tokens.Shadows.lg,
-        };
-        break;
-
-      case 'outlined':
-        variantStyles = {
-          backgroundColor: colors.background.primary,
-          borderWidth: 1,
-          borderColor: colors.border.light,
-          ...tokens.Shadows.sm,
-        };
-        break;
-
+        return { ...base, ...tokens.Shadows.lg };
       case 'filled':
-        variantStyles = {
-          backgroundColor: colors.background.secondary,
-          ...tokens.Shadows.md,
-        };
-        break;
-
-      case 'glass':
-        variantStyles = {
-          backgroundColor: withOpacity(colors.background.elevated, 0.8),
-          borderWidth: 1,
-          borderColor: withOpacity(colors.border.light, 0.2),
-          ...tokens.Shadows.xl,
-        };
-        break;
+      case 'outlined':
+      default:
+        return { ...base, ...tokens.Shadows.md };
     }
-
-    return {
-      ...baseStyle,
-      ...sizeStyles[size],
-      ...variantStyles,
-    };
   };
 
-  const cardStyles = getCardStyles();
+  const getInnerStyle = (): ViewStyle => {
+    const base: ViewStyle = {
+      backgroundColor: theme.background.primary,
+      borderRadius: tokens.BorderRadius.lg,
+      padding: tokens.Spacing.lg,
+      overflow: 'hidden',
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: theme.border.light,
+    };
+
+    switch (variant) {
+      case 'elevated':
+        return { ...base, backgroundColor: theme.background.elevated };
+      case 'filled':
+        return { ...base, backgroundColor: theme.background.secondary };
+      case 'outlined':
+      default:
+        return base;
+    }
+  };
+
+  const outerStyle = getOuterStyle();
+  const innerStyle = getInnerStyle();
 
   // Accessibility
   const getAccessibilityProps = () => {
@@ -202,34 +173,35 @@ export const Card: React.FC<CardProps> = ({
   if (interactive) {
     const { onPress, onPressIn, onPressOut, ...pressableProps } = props as InteractiveCardProps;
     const accessibilityProps = getAccessibilityProps();
-    const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
     return (
-      <AnimatedPressable
-        style={[cardStyles, style, animatedStyle]}
-        onPress={onPress}
-        onPressIn={(e: GestureResponderEvent) => {
-          handlePressIn();
-          onPressIn?.(e);
-        }}
-        onPressOut={(e: GestureResponderEvent) => {
-          handlePressOut();
-          onPressOut?.(e);
-        }}
-        {...accessibilityProps}
-        {...pressableProps}
-      >
-        {children}
-      </AnimatedPressable>
+      <Animated.View style={[outerStyle, animatedStyle, style]}>
+        <Pressable
+          style={innerStyle}
+          onPress={onPress}
+          onPressIn={(e: GestureResponderEvent) => {
+            handlePressIn();
+            onPressIn?.(e);
+          }}
+          onPressOut={(e: GestureResponderEvent) => {
+            handlePressOut();
+            onPressOut?.(e);
+          }}
+          {...accessibilityProps}
+          {...pressableProps}
+        >
+          {children}
+        </Pressable>
+      </Animated.View>
     );
   }
 
   // Render static card
   const accessibilityProps = getAccessibilityProps();
   return (
-    <View style={[cardStyles, style]} {...accessibilityProps}>
-      {children}
-    </View>
+    <Animated.View style={[outerStyle, style]} {...accessibilityProps}>
+      <View style={innerStyle}>{children}</View>
+    </Animated.View>
   );
 };
 
