@@ -10,85 +10,16 @@ import {
   GlassCard,
   GlassButton,
   Icon,
-  StatusIndicator,
-  useColors,
+  ListItem,
+  useTheme,
   useTokens
 } from '@/components/ui';
 import * as Haptics from 'expo-haptics';
 
-// Glass Grocery item component with iOS 26 styling
-const GroceryItem = ({ name, status, addedBy, notes, onMarkBought }) => {
-  const colors = useColors();
-  const tokens = useTokens();
-  
-  const getStatusVariant = (status) => {
-    switch (status) {
-      case 'out': return 'error';
-      case 'low': return 'warning';
-      case 'needed': return 'info';
-      case 'bought': return 'success';
-      default: return 'info';
-    }
-  };
-  
-  return (
-    <GlassCard
-      variant="translucent"
-      size="medium"
-      interactive
-      style={{ marginBottom: tokens.Spacing.md }}
-      onLongPress={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        Alert.alert('Hint', 'Swipe right to mark as bought, left to change status');
-      }}
-    >
-      <View style={{ padding: tokens.Spacing.lg }}>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: tokens.Spacing.sm
-        }}>
-          <Text variant="titleMedium" weight="semibold">{name}</Text>
-          <StatusIndicator
-            variant={getStatusVariant(status)}
-            label={status.toUpperCase()}
-            size="small"
-          />
-        </View>
-
-        {notes && (
-          <Text variant="bodySmall" color="secondary" style={{ marginBottom: tokens.Spacing.md }}>
-            {notes}
-          </Text>
-        )}
-
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <Text variant="labelSmall" color="tertiary">
-            Added by {addedBy}
-          </Text>
-          <GlassButton
-            variant="success"
-            buttonStyle="tinted"
-            size="small"
-            onPress={onMarkBought}
-            leftIcon={<Icon name="Check" size="xs" color="inverse" />}
-          >
-            Bought
-          </GlassButton>
-        </View>
-      </View>
-    </GlassCard>
-  );
-};
-
 // Glass Section header component
 const SectionHeader = ({ title, count }) => {
-  const colors = useColors();
+  const { theme } = useTheme();
+  const colors = theme;
   const tokens = useTokens();
   
   return (
@@ -118,7 +49,8 @@ const SectionHeader = ({ title, count }) => {
 };
 
 export default function GroceriesScreen() {
-  const colors = useColors();
+  const { theme } = useTheme();
+  const colors = theme;
   const tokens = useTokens();
   
   // Placeholder grocery items
@@ -170,6 +102,21 @@ export default function GroceriesScreen() {
     Alert.alert('Add Item', 'This would open the add grocery item form');
   };
 
+  const getStatusVariant = (status) => {
+    switch (status) {
+      case 'out':
+        return 'error';
+      case 'low':
+        return 'warning';
+      case 'needed':
+        return 'info';
+      case 'bought':
+        return 'success';
+      default:
+        return 'info';
+    }
+  };
+
   // Filter items by status
   const outItems = groceryItems.filter((item) => item.status === 'out');
   const lowItems = groceryItems.filter((item) => item.status === 'low');
@@ -215,13 +162,17 @@ export default function GroceriesScreen() {
           <View style={{ marginBottom: tokens.Spacing.xl }}>
             <SectionHeader title="Out" count={outItems.length} />
             {outItems.map((item) => (
-              <GroceryItem
+              <ListItem
                 key={item.id}
-                name={item.name}
-                status={item.status}
-                addedBy={item.addedBy}
-                notes={item.notes}
-                onMarkBought={() => handleMarkBought(item.id)}
+                title={item.name}
+                meta={`Added by ${item.addedBy}`}
+                media={<Icon name="ShoppingCart" size="lg" color="brand" />}
+                accessory={{
+                  type: 'badge',
+                  label: item.status.toUpperCase(),
+                  variant: getStatusVariant(item.status),
+                }}
+                onPress={() => handleMarkBought(item.id)}
               />
             ))}
           </View>
@@ -232,13 +183,17 @@ export default function GroceriesScreen() {
           <View style={{ marginBottom: tokens.Spacing.xl }}>
             <SectionHeader title="Running Low" count={lowItems.length} />
             {lowItems.map((item) => (
-              <GroceryItem
+              <ListItem
                 key={item.id}
-                name={item.name}
-                status={item.status}
-                addedBy={item.addedBy}
-                notes={item.notes}
-                onMarkBought={() => handleMarkBought(item.id)}
+                title={item.name}
+                meta={`Added by ${item.addedBy}`}
+                media={<Icon name="ShoppingCart" size="lg" color="brand" />}
+                accessory={{
+                  type: 'badge',
+                  label: item.status.toUpperCase(),
+                  variant: getStatusVariant(item.status),
+                }}
+                onPress={() => handleMarkBought(item.id)}
               />
             ))}
           </View>
@@ -249,13 +204,17 @@ export default function GroceriesScreen() {
           <View style={{ marginBottom: tokens.Spacing.xl }}>
             <SectionHeader title="Needed" count={neededItems.length} />
             {neededItems.map((item) => (
-              <GroceryItem
+              <ListItem
                 key={item.id}
-                name={item.name}
-                status={item.status}
-                addedBy={item.addedBy}
-                notes={item.notes}
-                onMarkBought={() => handleMarkBought(item.id)}
+                title={item.name}
+                meta={`Added by ${item.addedBy}`}
+                media={<Icon name="ShoppingCart" size="lg" color="brand" />}
+                accessory={{
+                  type: 'badge',
+                  label: item.status.toUpperCase(),
+                  variant: getStatusVariant(item.status),
+                }}
+                onPress={() => handleMarkBought(item.id)}
               />
             ))}
           </View>
@@ -266,13 +225,17 @@ export default function GroceriesScreen() {
           <View style={{ marginBottom: tokens.Spacing.xl }}>
             <SectionHeader title="Recently Bought" count={boughtItems.length} />
             {boughtItems.map((item) => (
-              <GroceryItem
+              <ListItem
                 key={item.id}
-                name={item.name}
-                status={item.status}
-                addedBy={item.addedBy}
-                notes={item.notes}
-                onMarkBought={() => handleMarkBought(item.id)}
+                title={item.name}
+                meta={`Added by ${item.addedBy}`}
+                media={<Icon name="ShoppingCart" size="lg" color="brand" />}
+                accessory={{
+                  type: 'badge',
+                  label: item.status.toUpperCase(),
+                  variant: getStatusVariant(item.status),
+                }}
+                onPress={() => handleMarkBought(item.id)}
               />
             ))}
           </View>

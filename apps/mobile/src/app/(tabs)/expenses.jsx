@@ -4,84 +4,21 @@ import {
   SafeAreaView,
   ScrollView,
 } from 'react-native';
-import { 
+import {
   Text,
-  GlassCard, 
-  GlassButton, 
+  GlassCard,
+  GlassButton,
   Icon,
-  StatusIndicator,
-  useColors,
+  ListItem,
+  useTheme,
   useTokens
 } from '../../components/ui';
 import * as Haptics from 'expo-haptics';
 
-// Glass Transaction card component with iOS 26 styling
-const TransactionCard = ({ title, date, paidBy, sharedWith, amount, status }) => {
-  const colors = useColors();
-  const tokens = useTokens();
-  
-  return (
-    <GlassCard
-      variant="translucent"
-      size="medium"
-      style={{ marginBottom: tokens.Spacing.md }}
-    >
-      <View style={{ padding: tokens.Spacing.lg }}>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: tokens.Spacing.sm
-        }}>
-          <Text variant="titleMedium" weight="semibold">{title}</Text>
-          <StatusIndicator
-            variant={status === 'SETTLED' ? 'success' : 'warning'}
-            label={status}
-            size="small"
-          />
-        </View>
-
-        <Text variant="bodySmall" color="secondary" style={{ marginBottom: tokens.Spacing.md }}>
-          {date}
-        </Text>
-
-        <View style={{
-          backgroundColor: colors.background.secondary,
-          borderRadius: tokens.BorderRadius.md,
-          padding: tokens.Spacing.md
-        }}>
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginBottom: tokens.Spacing.xs
-          }}>
-            <Text variant="bodySmall" color="secondary">Paid by:</Text>
-            <Text variant="bodySmall" weight="medium">{paidBy}</Text>
-          </View>
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginBottom: tokens.Spacing.xs
-          }}>
-            <Text variant="bodySmall" color="secondary">Shared with:</Text>
-            <Text variant="bodySmall" weight="medium">{sharedWith}</Text>
-          </View>
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between'
-          }}>
-            <Text variant="bodySmall" color="secondary">Amount:</Text>
-            <Text variant="bodySmall" weight="bold" color="primary">₹{amount}</Text>
-          </View>
-        </View>
-      </View>
-    </GlassCard>
-  );
-};
-
 export default function ExpensesScreen() {
   const [activeTab, setActiveTab] = useState('all');
-  const colors = useColors();
+  const { theme } = useTheme();
+  const colors = theme;
   const tokens = useTokens();
 
   // Placeholder transactions
@@ -196,14 +133,13 @@ export default function ExpensesScreen() {
         {/* Transaction List */}
         <View style={{ marginBottom: tokens.Spacing.lg }}>
           {transactions.map((transaction) => (
-            <TransactionCard
+            <ListItem
               key={transaction.id}
+              media={<Icon name="Receipt" size="lg" color="brand" />}
               title={transaction.title}
-              date={transaction.date}
-              paidBy={transaction.paidBy}
-              sharedWith={transaction.sharedWith}
-              amount={transaction.amount}
-              status={transaction.status}
+              meta={`Paid by ${transaction.paidBy} • ₹${transaction.amount}`}
+              accessory={{ type: 'chevron' }}
+              onPress={() => {}}
             />
           ))}
         </View>
