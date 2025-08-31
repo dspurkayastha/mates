@@ -3,13 +3,14 @@
  * Accessibility-focused voice commands and speech synthesis
  */
 
-import React, { useState, useEffect } from 'react';
-import { View } from 'react-native';
-import * as Speech from 'expo-speech';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
-import { useColors, useTokens } from '../../design-system/ThemeProvider';
-import { Text, Card, Button, Icon } from '../../components/ui';
+import * as Speech from 'expo-speech';
+import React, { useState, useEffect } from 'react';
+import { View } from 'react-native';
+
+import { Text, Card, Button, Icon } from '../components/ui';
+import { useColors, useTokens } from '../design-system/ThemeProvider';
 
 // ============================================================================
 // VOICE CONTROL MANAGER
@@ -42,7 +43,7 @@ class VoiceControlManager {
 
   async speak(text: string): Promise<void> {
     if (!this.settings.enabled) return;
-    
+
     try {
       await Speech.speak(text, {
         language: this.settings.language,
@@ -60,7 +61,7 @@ class VoiceControlManager {
       this.speak('Command executed');
       return true;
     }
-    
+
     this.speak('Command not recognized');
     return false;
   }
@@ -85,7 +86,9 @@ class VoiceControlManager {
     }
   }
 
-  getSettings() { return { ...this.settings }; }
+  getSettings() {
+    return { ...this.settings };
+  }
 }
 
 // ============================================================================
@@ -93,7 +96,7 @@ class VoiceControlManager {
 // ============================================================================
 
 export const VoiceControlWidget: React.FC = () => {
-  const colors = useColors();
+  const _colors = useColors();
   const tokens = useTokens();
   const [isActive, setIsActive] = useState(false);
 
@@ -104,7 +107,7 @@ export const VoiceControlWidget: React.FC = () => {
   const handleToggle = async () => {
     setIsActive(!isActive);
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    
+
     if (!isActive) {
       voiceControlManager.speak('Voice control activated');
     } else {
@@ -121,7 +124,11 @@ export const VoiceControlWidget: React.FC = () => {
         style={{ borderRadius: tokens.BorderRadius.full }}
         accessibilityLabel="Toggle voice control"
       >
-        <Icon name={isActive ? 'MicOff' : 'Mic'} size="lg" color={isActive ? 'inverse' : 'primary'} />
+        <Icon
+          name={isActive ? 'MicOff' : 'Mic'}
+          size="lg"
+          color={isActive ? 'inverse' : 'primary'}
+        />
       </Button>
     </View>
   );
@@ -137,18 +144,25 @@ export const VoiceControlSettings: React.FC = () => {
 
   const handleToggle = async () => {
     const newEnabled = !settings.enabled;
-    setSettings(prev => ({ ...prev, enabled: newEnabled }));
+    setSettings((prev) => ({ ...prev, enabled: newEnabled }));
     await voiceControlManager.updateSettings({ enabled: newEnabled });
   };
 
   return (
     <Card variant="elevated" style={{ padding: tokens.Spacing.lg }}>
-      <Text variant="titleMedium" color="primary" weight="semibold" style={{ marginBottom: tokens.Spacing.md }}>
+      <Text
+        variant="titleMedium"
+        color="primary"
+        weight="semibold"
+        style={{ marginBottom: tokens.Spacing.md }}
+      >
         Voice Control
       </Text>
-      
+
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text variant="bodyMedium" color="primary">Enable Voice Commands</Text>
+        <Text variant="bodyMedium" color="primary">
+          Enable Voice Commands
+        </Text>
         <Button
           variant={settings.enabled ? 'primary' : 'secondary'}
           size="small"
@@ -157,7 +171,7 @@ export const VoiceControlSettings: React.FC = () => {
           {settings.enabled ? 'ON' : 'OFF'}
         </Button>
       </View>
-      
+
       <Button
         variant="secondary"
         size="medium"

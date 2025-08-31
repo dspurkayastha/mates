@@ -5,12 +5,7 @@
  */
 
 import React from 'react';
-import {
-  View,
-  ViewStyle,
-  TouchableOpacity,
-  TouchableOpacityProps,
-} from 'react-native';
+import { View, ViewStyle, TouchableOpacity, TouchableOpacityProps } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -47,7 +42,9 @@ interface BaseGlassCardProps {
   testID?: string;
 }
 
-interface InteractiveGlassCardProps extends Omit<BaseGlassCardProps, 'accessibilityRole'>, Omit<TouchableOpacityProps, 'style' | 'children'> {
+interface InteractiveGlassCardProps
+  extends Omit<BaseGlassCardProps, 'accessibilityRole'>,
+    Omit<TouchableOpacityProps, 'style' | 'children'> {
   interactive: true;
   accessibilityRole?: 'none' | 'button' | 'link' | 'text' | 'summary';
 }
@@ -82,23 +79,23 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   const colors = useColors();
   const tokens = useTokens();
   const isDark = colors.background.primary === tokens.BaseColors.neutral[950];
-  
+
   // Animation values
   const scale = useSharedValue(1);
   const shadowOpacity = useSharedValue(1);
   const backgroundOpacity = useSharedValue(1);
-  
+
   // iOS 26 Spring animation
   const springConfig = tokens.SpringAnimations.glass;
 
   // Handle interactions for interactive cards
   const handlePressIn = () => {
     if (!interactive) return;
-    
+
     scale.value = withSpring(0.98, springConfig);
     shadowOpacity.value = withSpring(1.5, springConfig);
     backgroundOpacity.value = withSpring(0.9, springConfig);
-    
+
     if (hapticFeedback) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
@@ -106,7 +103,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
 
   const handlePressOut = () => {
     if (!interactive) return;
-    
+
     scale.value = withSpring(1, springConfig);
     shadowOpacity.value = withSpring(1, springConfig);
     backgroundOpacity.value = withSpring(1, springConfig);
@@ -118,17 +115,13 @@ export const GlassCard: React.FC<GlassCardProps> = ({
       transform: [{ scale: scale.value }],
     };
   });
-  
+
   const animatedShadowStyle = useAnimatedStyle(() => {
     return {
-      shadowOpacity: interpolate(
-        shadowOpacity.value,
-        [1, 1.5],
-        [0.1, 0.2]
-      ),
+      shadowOpacity: interpolate(shadowOpacity.value, [1, 1.5], [0.1, 0.2]),
     };
   });
-  
+
   const animatedBackgroundStyle = useAnimatedStyle(() => {
     return {
       opacity: backgroundOpacity.value,
@@ -167,34 +160,34 @@ export const GlassCard: React.FC<GlassCardProps> = ({
     tint?: 'light' | 'dark' | 'systemMaterial';
   } => {
     const tintColors = tokens.GlassmorphismTokens.tintColors;
-    
+
     switch (variant) {
       case 'elevated':
         return {
           backgroundColor: withOpacity(colors.background.elevated, 0.9),
           tint: isDark ? 'dark' : 'light',
         };
-        
+
       case 'outlined':
         return {
           backgroundColor: 'transparent',
-          borderColor: isDark 
+          borderColor: isDark
             ? tokens.GlassmorphismTokens.borderColors.dark.regular
             : tokens.GlassmorphismTokens.borderColors.light.regular,
           borderWidth: 1,
           tint: isDark ? 'dark' : 'light',
         };
-        
+
       case 'filled':
         return {
           backgroundColor: withOpacity(colors.background.secondary, 0.8),
           tint: isDark ? 'dark' : 'light',
         };
-        
+
       case 'translucent':
       default:
         return {
-          backgroundColor: tintColors.neutral,
+          backgroundColor: tintColors.neutral as string,
           tint: 'systemMaterial',
         };
     }
@@ -207,13 +200,13 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   const getAccessibilityProps = () => {
     const defaultRole = interactive ? 'button' : 'text';
     const role = accessibilityRole || defaultRole;
-    
-    const defaultLabel = interactive 
-      ? (accessibilityLabel || 'Interactive card')
+
+    const defaultLabel = interactive
+      ? accessibilityLabel || 'Interactive card'
       : accessibilityLabel;
-    
+
     const defaultHint = interactive
-      ? (accessibilityHint || 'Double tap to interact with this card')
+      ? accessibilityHint || 'Double tap to interact with this card'
       : accessibilityHint;
 
     return {
@@ -249,7 +242,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
         </Animated.View>
       );
     }
-    
+
     // For non-glass variants, use regular View with glass-like styling
     const combinedStyles: ViewStyle = {
       ...cardStyles,
@@ -259,11 +252,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
       ...tokens.Shadows.lg,
     };
 
-    return (
-      <Animated.View style={[combinedStyles, animatedShadowStyle]}>
-        {children}
-      </Animated.View>
-    );
+    return <Animated.View style={[combinedStyles, animatedShadowStyle]}>{children}</Animated.View>;
   };
 
   // Render interactive or static card
@@ -284,10 +273,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   }
 
   return (
-    <View 
-      style={style}
-      {...getAccessibilityProps()}
-    >
+    <View style={style} {...getAccessibilityProps()}>
       {renderCardContent()}
     </View>
   );

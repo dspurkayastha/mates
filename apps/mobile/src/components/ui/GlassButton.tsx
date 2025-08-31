@@ -80,16 +80,16 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
   const colors = useColors();
   const tokens = useTokens();
   const isDark = colors.background.primary === tokens.BaseColors.neutral[950];
-  
+
   // Animation values
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
   const backgroundOpacity = useSharedValue(1);
-  
+
   // Generate accessibility label if not provided
   const getAccessibilityLabel = () => {
     if (accessibilityLabel) return accessibilityLabel;
-    
+
     const childText = typeof children === 'string' ? children : 'Button';
     if (loading) return `${childText}, Loading`;
     if (disabled) return `${childText}, Disabled`;
@@ -99,10 +99,10 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
   // Generate accessibility hint if not provided
   const getAccessibilityHint = () => {
     if (accessibilityHint) return accessibilityHint;
-    
+
     if (loading) return 'Please wait while the action is being processed';
     if (disabled) return 'This button is currently disabled';
-    
+
     switch (variant) {
       case 'danger':
         return 'Double tap to perform a destructive action';
@@ -115,14 +115,14 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
 
   // iOS 26 Spring animation
   const springConfig = tokens.SpringAnimations.button;
-  
+
   // Handle press with iOS 26 style animations
   const handlePressIn = () => {
     if (disabled || loading) return;
-    
+
     scale.value = withSpring(0.96, springConfig);
     backgroundOpacity.value = withSpring(0.8, springConfig);
-    
+
     if (hapticFeedback) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
@@ -130,24 +130,24 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
 
   const handlePressOut = () => {
     if (disabled || loading) return;
-    
+
     scale.value = withSpring(1, springConfig);
     backgroundOpacity.value = withSpring(1, springConfig);
   };
 
   const handlePress = (event: any) => {
     if (disabled || loading) return;
-    
+
     // Glass ripple effect
     scale.value = withSequence(
       withSpring(0.94, { ...springConfig, damping: 15 }),
-      withSpring(1, springConfig)
+      withSpring(1, springConfig),
     );
-    
+
     if (hapticFeedback) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
-    
+
     onPress?.(event);
   };
 
@@ -158,7 +158,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
       opacity: opacity.value,
     };
   });
-  
+
   const animatedBackgroundStyle = useAnimatedStyle(() => {
     return {
       opacity: backgroundOpacity.value,
@@ -223,7 +223,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
   // Get text color
   const getTextColor = () => {
     if (disabled) return colors.text.tertiary;
-    
+
     switch (buttonStyle) {
       case 'filled':
         switch (variant) {
@@ -238,10 +238,14 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
       case 'outlined':
       case 'plain':
         switch (variant) {
-          case 'primary': return colors.interactive.primary;
-          case 'danger': return colors.interactive.danger;
-          case 'success': return colors.interactive.success;
-          default: return colors.text.primary;
+          case 'primary':
+            return colors.interactive.primary;
+          case 'danger':
+            return colors.interactive.danger;
+          case 'success':
+            return colors.interactive.success;
+          default:
+            return colors.text.primary;
         }
       default:
         return colors.text.primary;
@@ -249,7 +253,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
   };
 
   // Get gradient colors for filled style
-  const getGradientColors = (): string[] => {
+  const getGradientColors = (): [string, string] => {
     switch (variant) {
       case 'primary':
         return [colors.interactive.primary, colors.interactive.primaryHover];
@@ -264,28 +268,23 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
 
   const buttonStyles = getButtonStyles();
   const textColor = getTextColor();
-  
+
   // Render content
   const renderContent = () => (
     <>
-      {leftIcon && (
-        <View style={{ marginRight: tokens.Spacing.sm }}>
-          {leftIcon}
-        </View>
-      )}
-      
+      {leftIcon && <View style={{ marginRight: tokens.Spacing.sm }}>{leftIcon}</View>}
+
       {loading ? (
-        <ActivityIndicator 
-          color={textColor} 
+        <ActivityIndicator
+          color={textColor}
           size={size === 'small' ? 'small' : 'small'}
           style={{ marginRight: children ? tokens.Spacing.sm : 0 }}
         />
       ) : null}
-      
+
       {children && (
-        <Text 
-          variant={size === 'small' ? 'label' : 'body'}
-          size={size === 'large' ? 'large' : 'medium'}
+        <Text
+          variant={size === 'small' ? 'labelMedium' : 'bodyMedium'}
           weight="medium"
           color={textColor}
           style={{ textAlign: 'center' }}
@@ -293,12 +292,8 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
           {children}
         </Text>
       )}
-      
-      {rightIcon && (
-        <View style={{ marginLeft: tokens.Spacing.sm }}>
-          {rightIcon}
-        </View>
-      )}
+
+      {rightIcon && <View style={{ marginLeft: tokens.Spacing.sm }}>{rightIcon}</View>}
     </>
   );
 
@@ -313,13 +308,13 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
               buttonStyles,
               {
                 opacity: disabled ? 0.5 : 1,
-              }
+              },
             ]}
           >
             {renderContent()}
           </LinearGradient>
         );
-        
+
       case 'tinted':
         return (
           <Animated.View style={animatedBackgroundStyle}>
@@ -331,7 +326,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
                 {
                   backgroundColor: getTintColor(),
                   opacity: disabled ? 0.5 : 1,
-                }
+                },
               ]}
               shadowEnabled={!disabled}
               shadowIntensity="subtle"
@@ -340,7 +335,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
             </GlassView>
           </Animated.View>
         );
-        
+
       case 'outlined':
         return (
           <GlassView
@@ -353,14 +348,14 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
                 borderWidth: 1.5,
                 borderColor: disabled ? colors.border.light : getTintColor(),
                 opacity: disabled ? 0.5 : 1,
-              }
+              },
             ]}
             shadowEnabled={false}
           >
             {renderContent()}
           </GlassView>
         );
-        
+
       case 'plain':
       default:
         return (
@@ -370,7 +365,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
               {
                 backgroundColor: 'transparent',
                 opacity: disabled ? 0.5 : 1,
-              }
+              },
             ]}
           >
             {renderContent()}

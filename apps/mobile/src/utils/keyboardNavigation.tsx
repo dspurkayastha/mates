@@ -107,7 +107,7 @@ export const useFocusManager = (options: FocusManagerOptions = {}) => {
       if (!options.trapFocus || event.key !== 'Tab') return;
 
       const focusableElements = container.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       );
 
       const firstElement = focusableElements[0] as HTMLElement;
@@ -188,8 +188,7 @@ export const FocusIndicator: React.FC<FocusIndicatorProps> = ({
         },
         style,
       ]}
-      onFocus={onFocus}
-      onBlur={onBlur}
+      {...({ onFocus, onBlur } as any)}
     >
       {children}
     </View>
@@ -209,12 +208,12 @@ class KeyboardNavigationManager {
   }
 
   unregisterElement(id: string) {
-    this.focusableElements = this.focusableElements.filter(item => item.id !== id);
+    this.focusableElements = this.focusableElements.filter((item) => item.id !== id);
   }
 
   focusNext() {
     if (this.focusableElements.length === 0) return;
-    
+
     this.currentIndex = (this.currentIndex + 1) % this.focusableElements.length;
     const element = this.focusableElements[this.currentIndex]?.element;
     if (element && element.focus) {
@@ -224,10 +223,9 @@ class KeyboardNavigationManager {
 
   focusPrevious() {
     if (this.focusableElements.length === 0) return;
-    
-    this.currentIndex = this.currentIndex <= 0 
-      ? this.focusableElements.length - 1 
-      : this.currentIndex - 1;
+
+    this.currentIndex =
+      this.currentIndex <= 0 ? this.focusableElements.length - 1 : this.currentIndex - 1;
     const element = this.focusableElements[this.currentIndex]?.element;
     if (element && element.focus) {
       element.focus();
@@ -236,7 +234,7 @@ class KeyboardNavigationManager {
 
   focusFirst() {
     if (this.focusableElements.length === 0) return;
-    
+
     this.currentIndex = 0;
     const element = this.focusableElements[0]?.element;
     if (element && element.focus) {
@@ -246,7 +244,7 @@ class KeyboardNavigationManager {
 
   focusLast() {
     if (this.focusableElements.length === 0) return;
-    
+
     this.currentIndex = this.focusableElements.length - 1;
     const element = this.focusableElements[this.currentIndex]?.element;
     if (element && element.focus) {
