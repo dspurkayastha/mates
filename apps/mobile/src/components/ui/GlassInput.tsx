@@ -5,13 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import {
-  TextInput,
-  TextInputProps,
-  View,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
+import { TextInput, TextInputProps, View, ViewStyle, TextStyle } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -74,16 +68,16 @@ export const GlassInput: React.FC<GlassInputProps> = ({
   const colors = useColors();
   const tokens = useTokens();
   const isDark = colors.background.primary === tokens.BaseColors.neutral[950];
-  
+
   // State
   const [isFocused, setIsFocused] = useState(false);
   const hasError = !!errorText;
   const hasValue = !!value;
-  
+
   // Animation values
   const focusProgress = useSharedValue(0);
   const borderScale = useSharedValue(1);
-  
+
   // Get dimensions based on size
   const getDimensions = () => {
     switch (size) {
@@ -110,13 +104,13 @@ export const GlassInput: React.FC<GlassInputProps> = ({
         };
     }
   };
-  
+
   const dimensions = getDimensions();
-  
+
   // Get colors based on state
   const getStateColors = () => {
     const tintColors = tokens.GlassmorphismTokens.tintColors;
-    
+
     if (hasError) {
       return {
         borderColor: colors.interactive.danger,
@@ -124,7 +118,7 @@ export const GlassInput: React.FC<GlassInputProps> = ({
         focusColor: colors.interactive.danger,
       };
     }
-    
+
     if (isFocused) {
       return {
         borderColor: colors.interactive.primary,
@@ -132,56 +126,53 @@ export const GlassInput: React.FC<GlassInputProps> = ({
         focusColor: colors.interactive.primary,
       };
     }
-    
+
     return {
-      borderColor: isDark 
+      borderColor: isDark
         ? tokens.GlassmorphismTokens.borderColors.dark.subtle
         : tokens.GlassmorphismTokens.borderColors.light.subtle,
       tintColor: tintColors.neutral,
       focusColor: colors.interactive.primary,
     };
   };
-  
+
   const stateColors = getStateColors();
-  
+
   // Handle focus events
   const handleFocus = (event: any) => {
     setIsFocused(true);
     focusProgress.value = withSpring(1, tokens.SpringAnimations.toggle);
     borderScale.value = withSpring(1.02, tokens.SpringAnimations.toggle);
-    
+
     if (hapticFeedback) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    
+
     onFocus?.(event);
   };
-  
+
   const handleBlur = (event: any) => {
     setIsFocused(false);
     focusProgress.value = withSpring(0, tokens.SpringAnimations.toggle);
     borderScale.value = withSpring(1, tokens.SpringAnimations.toggle);
-    
+
     onBlur?.(event);
   };
-  
+
   // Animated styles
   const animatedContainerStyle = useAnimatedStyle(() => {
     const borderColor = interpolateColor(
       focusProgress.value,
       [0, 1],
-      [
-        stateColors.borderColor,
-        stateColors.focusColor,
-      ]
+      [stateColors.borderColor, stateColors.focusColor],
     );
-    
+
     return {
       transform: [{ scale: borderScale.value }],
       borderColor,
     };
   });
-  
+
   // Container styles
   const getContainerStyles = (): ViewStyle => {
     const baseStyle: ViewStyle = {
@@ -191,7 +182,7 @@ export const GlassInput: React.FC<GlassInputProps> = ({
       overflow: 'hidden',
       opacity: disabled ? 0.5 : 1,
     };
-    
+
     switch (variant) {
       case 'outlined':
         return {
@@ -211,7 +202,7 @@ export const GlassInput: React.FC<GlassInputProps> = ({
         };
     }
   };
-  
+
   // Input content styles
   const getInputContentStyle = (): ViewStyle => {
     return {
@@ -222,12 +213,11 @@ export const GlassInput: React.FC<GlassInputProps> = ({
       minHeight: dimensions.minHeight,
     };
   };
-  
+
   // Text input styles
   const getTextInputStyle = (): TextStyle => {
     return {
       flex: 1,
-      fontSize: dimensions.fontSize,
       color: disabled ? colors.text.tertiary : colors.text.primary,
       ...tokens.Typography.body.medium,
       margin: 0,
@@ -236,20 +226,16 @@ export const GlassInput: React.FC<GlassInputProps> = ({
       ...inputStyle,
     };
   };
-  
+
   const containerStyles = getContainerStyles();
   const inputContentStyle = getInputContentStyle();
   const textInputStyle = getTextInputStyle();
-  
+
   // Render input content
   const renderInputContent = () => (
     <View style={inputContentStyle}>
-      {leftIcon && (
-        <View style={{ marginRight: tokens.Spacing.sm }}>
-          {leftIcon}
-        </View>
-      )}
-      
+      {leftIcon && <View style={{ marginRight: tokens.Spacing.sm }}>{leftIcon}</View>}
+
       <TextInput
         {...props}
         value={value}
@@ -263,22 +249,17 @@ export const GlassInput: React.FC<GlassInputProps> = ({
         accessibilityHint={accessibilityHint}
         testID={testID}
       />
-      
-      {rightIcon && (
-        <View style={{ marginLeft: tokens.Spacing.sm }}>
-          {rightIcon}
-        </View>
-      )}
+
+      {rightIcon && <View style={{ marginLeft: tokens.Spacing.sm }}>{rightIcon}</View>}
     </View>
   );
-  
+
   return (
     <View style={style}>
       {/* Label */}
       {label && (
         <Text
-          variant="label"
-          size="medium"
+          variant="labelMedium"
           weight="medium"
           color={hasError ? colors.interactive.danger : colors.text.secondary}
           style={{ marginBottom: tokens.Spacing.xs }}
@@ -286,7 +267,7 @@ export const GlassInput: React.FC<GlassInputProps> = ({
           {label}
         </Text>
       )}
-      
+
       {/* Input Container */}
       <Animated.View style={[animatedContainerStyle]}>
         {variant === 'default' ? (
@@ -300,17 +281,14 @@ export const GlassInput: React.FC<GlassInputProps> = ({
             {renderInputContent()}
           </GlassView>
         ) : (
-          <View style={containerStyles}>
-            {renderInputContent()}
-          </View>
+          <View style={containerStyles}>{renderInputContent()}</View>
         )}
       </Animated.View>
-      
+
       {/* Helper/Error Text */}
       {(helperText || errorText) && (
         <Text
-          variant="label"
-          size="small"
+          variant="labelMedium"
           color={hasError ? colors.interactive.danger : colors.text.tertiary}
           style={{ marginTop: tokens.Spacing.xs }}
         >

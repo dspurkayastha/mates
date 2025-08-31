@@ -5,10 +5,7 @@
  */
 
 import React from 'react';
-import {
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+import { TouchableOpacity, ViewStyle } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -62,17 +59,17 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
   const colors = useColors();
   const tokens = useTokens();
   const isDark = colors.background.primary === tokens.BaseColors.neutral[950];
-  
+
   // Animation values
   const toggleProgress = useSharedValue(value ? 1 : 0);
   const scale = useSharedValue(1);
   const thumbScale = useSharedValue(1);
-  
+
   // Update toggle position when value changes
   React.useEffect(() => {
     toggleProgress.value = withSpring(value ? 1 : 0, tokens.SpringAnimations.toggle);
   }, [value]);
-  
+
   // Get dimensions based on size
   const getDimensions = () => {
     switch (size) {
@@ -102,13 +99,13 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
         };
     }
   };
-  
+
   const dimensions = getDimensions();
-  
+
   // Get colors based on variant
   const getVariantColors = () => {
     const tintColors = tokens.GlassmorphismTokens.tintColors;
-    
+
     switch (variant) {
       case 'success':
         return {
@@ -132,76 +129,70 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
         };
     }
   };
-  
+
   const variantColors = getVariantColors();
-  
+
   // Handle press
   const handlePress = () => {
     if (disabled) return;
-    
+
     if (hapticFeedback) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    
+
     onValueChange(!value);
   };
-  
+
   // Handle press in/out for visual feedback
   const handlePressIn = () => {
     if (disabled) return;
     scale.value = withSpring(0.95, tokens.SpringAnimations.toggle);
     thumbScale.value = withSpring(1.1, tokens.SpringAnimations.toggle);
   };
-  
+
   const handlePressOut = () => {
     if (disabled) return;
     scale.value = withSpring(1, tokens.SpringAnimations.toggle);
     thumbScale.value = withSpring(1, tokens.SpringAnimations.toggle);
   };
-  
+
   // Animated styles for track
   const animatedTrackStyle = useAnimatedStyle(() => {
     const backgroundColor = interpolateColor(
       toggleProgress.value,
       [0, 1],
-      [
-        tokens.GlassmorphismTokens.tintColors.neutral,
-        variantColors.activeTint,
-      ]
+      [String(tokens.GlassmorphismTokens.tintColors.neutral), String(variantColors.activeTint)],
     );
-    
+
     return {
       backgroundColor,
       transform: [{ scale: scale.value }],
     };
   });
-  
+
   // Animated styles for thumb
   const animatedThumbStyle = useAnimatedStyle(() => {
     const translateX = interpolate(
       toggleProgress.value,
       [0, 1],
-      [0, dimensions.width - dimensions.thumbSize - dimensions.padding * 2]
+      [0, dimensions.width - dimensions.thumbSize - dimensions.padding * 2],
     );
-    
+
     const backgroundColor = interpolateColor(
       toggleProgress.value,
       [0, 1],
       [
-        isDark ? colors.background.elevated : colors.background.primary,
-        colors.background.primary,
-      ]
-    );
-    
-    return {
-      transform: [
-        { translateX },
-        { scale: thumbScale.value }
+        String(isDark ? colors.background.elevated : colors.background.primary),
+        String(colors.background.primary),
       ],
+    );
+
+    return {
+      transform: [{ translateX }, { scale: thumbScale.value }],
       backgroundColor,
     };
   });
-  
+
   // Track container style
   const trackStyle: ViewStyle = {
     width: dimensions.width,
@@ -210,7 +201,7 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
     padding: dimensions.padding,
     opacity: disabled ? 0.5 : 1,
   };
-  
+
   // Thumb style
   const thumbStyle: ViewStyle = {
     width: dimensions.thumbSize,
@@ -218,7 +209,7 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
     borderRadius: dimensions.thumbSize / 2,
     ...tokens.Shadows.sm,
   };
-  
+
   return (
     <TouchableOpacity
       onPress={handlePress}

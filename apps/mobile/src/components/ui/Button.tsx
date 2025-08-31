@@ -6,16 +6,23 @@
 
 import React, { useMemo } from 'react';
 import {
-  TouchableOpacity,
-  TouchableOpacityProps,
+  Pressable,
+  PressableProps,
   ActivityIndicator,
   ViewStyle,
   View,
+  StyleSheet,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { useColors, useTokens } from '../../design-system/ThemeProvider';
 import Text from './Text';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 // ============================================================================
 // TYPES
@@ -24,7 +31,7 @@ import Text from './Text';
 type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'danger' | 'success';
 type ButtonSize = 'small' | 'medium' | 'large';
 
-interface ButtonProps extends Omit<TouchableOpacityProps, 'style'> {
+interface ButtonProps extends Omit<PressableProps, 'style'> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   fullWidth?: boolean;
@@ -69,6 +76,17 @@ export const Button: React.FC<ButtonProps> = ({
   const colors = useColors();
   const tokens = useTokens();
 
+  const scale = useSharedValue(1);
+  const iconOffset = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const iconAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: iconOffset.value }],
+  }));
+
   // Generate accessibility label if not provided
   const getAccessibilityLabel = () => {
     if (accessibilityLabel) return accessibilityLabel;
@@ -106,12 +124,36 @@ export const Button: React.FC<ButtonProps> = ({
     
     onPress?.(event);
   };
+
+  const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
+  const handlePressIn = () => {
+    if (disabled || loading) return;
+    scale.value = withTiming(tokens.Animation.press.scale, {
+      duration: tokens.Animation.duration.in,
+      easing,
+    });
+    iconOffset.value = withTiming(tokens.Animation.press.iconNudge, {
+      duration: tokens.Animation.duration.in,
+      easing,
+    });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withTiming(1, {
+      duration: tokens.Animation.duration.out,
+      easing,
+    });
+    iconOffset.value = withTiming(0, {
+      duration: tokens.Animation.duration.out,
+      easing,
+    });
+  };
   const buttonStyles = useMemo((): ViewStyle => {
     const baseStyle: ViewStyle = {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      borderRadius: tokens.BorderRadius.xl,
+      borderRadius: tokens.BorderRadius.md,
       ...tokens.Shadows.md,
     };
 
@@ -235,20 +277,23 @@ export const Button: React.FC<ButtonProps> = ({
       {rightIcon && !loading && (
         <React.Fragment>
           <View style={{ width: tokens.Spacing.sm }} />
-          {rightIcon}
+          <Animated.View style={iconAnimatedStyle}>{rightIcon}</Animated.View>
         </React.Fragment>
       )}
     </>
   );
 
+  const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
   // Render with gradient if enabled and primary variant
   if (gradient && variant === 'primary' && !disabled) {
     return (
-      <TouchableOpacity
-        style={[{ borderRadius: tokens.BorderRadius.xl }, style]}
+      <AnimatedPressable
+        style={[buttonStyles, animatedStyle, style]}
         onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
         disabled={disabled || loading}
-        activeOpacity={0.8}
         accessibilityLabel={getAccessibilityLabel()}
         accessibilityHint={getAccessibilityHint()}
         accessibilityRole={accessibilityRole}
@@ -263,24 +308,21 @@ export const Button: React.FC<ButtonProps> = ({
           colors={gradientColors as [string, string, ...string[]]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={[
-            buttonStyles,
-            { backgroundColor: 'transparent' }
-          ]}
-        >
-          <ButtonContent />
-        </LinearGradient>
-      </TouchableOpacity>
+          style={[StyleSheet.absoluteFill, { borderRadius: tokens.BorderRadius.md }]}
+        />
+        <ButtonContent />
+      </AnimatedPressable>
     );
   }
 
   // Regular button
   return (
-    <TouchableOpacity
-      style={[buttonStyles, style]}
+    <AnimatedPressable
+      style={[buttonStyles, animatedStyle, style]}
       onPress={handlePress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       disabled={disabled || loading}
-      activeOpacity={0.8}
       accessibilityLabel={getAccessibilityLabel()}
       accessibilityHint={getAccessibilityHint()}
       accessibilityRole={accessibilityRole}
@@ -292,7 +334,7 @@ export const Button: React.FC<ButtonProps> = ({
       {...props}
     >
       <ButtonContent />
-    </TouchableOpacity>
+    </AnimatedPressable>
   );
 };
 

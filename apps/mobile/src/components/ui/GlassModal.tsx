@@ -77,24 +77,24 @@ export const GlassModal: React.FC<GlassModalProps> = ({
   const tokens = useTokens();
   const insets = useSafeAreaInsets();
   const isDark = colors.background.primary === tokens.BaseColors.neutral[950];
-  
+
   // Screen dimensions
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-  
+
   // Animation values
   const backdropOpacity = useSharedValue(0);
   const modalScale = useSharedValue(0.8);
   const modalTranslateY = useSharedValue(screenHeight);
   const modalOpacity = useSharedValue(0);
-  
+
   // iOS 26 Spring animation
   const springConfig = tokens.SpringAnimations.modal;
-  
+
   // Get modal dimensions based on size
   const getModalDimensions = () => {
     const maxWidth = screenWidth * 0.9;
     const maxHeight = screenHeight * 0.8;
-    
+
     switch (size) {
       case 'small':
         return {
@@ -118,9 +118,9 @@ export const GlassModal: React.FC<GlassModalProps> = ({
         };
     }
   };
-  
+
   const modalDimensions = getModalDimensions();
-  
+
   // Get initial position for animations
   const getInitialPosition = () => {
     switch (position) {
@@ -132,39 +132,39 @@ export const GlassModal: React.FC<GlassModalProps> = ({
         return 0;
     }
   };
-  
+
   // Show modal animation
   const showModal = () => {
     backdropOpacity.value = withTiming(1, { duration: 200 });
     modalOpacity.value = withTiming(1, { duration: 200 });
-    
+
     if (position === 'center') {
       modalScale.value = withSpring(1, springConfig);
     } else {
       modalTranslateY.value = withSpring(0, springConfig);
     }
-    
+
     if (hapticFeedback) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
   };
-  
+
   // Hide modal animation
   const hideModal = () => {
     backdropOpacity.value = withTiming(0, { duration: 200 });
     modalOpacity.value = withTiming(0, { duration: 200 });
-    
+
     if (position === 'center') {
       modalScale.value = withSpring(0.8, springConfig);
     } else {
       modalTranslateY.value = withSpring(getInitialPosition(), springConfig);
     }
-    
+
     if (hapticFeedback) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
   };
-  
+
   // Handle visibility changes
   useEffect(() => {
     if (visible) {
@@ -173,21 +173,21 @@ export const GlassModal: React.FC<GlassModalProps> = ({
       hideModal();
     }
   }, [visible]);
-  
+
   // Handle backdrop press
   const handleBackdropPress = () => {
     if (dismissOnBackdropPress) {
       onClose();
     }
   };
-  
+
   // Animated styles
   const animatedBackdropStyle = useAnimatedStyle(() => {
     return {
       opacity: backdropOpacity.value,
     };
   });
-  
+
   const animatedModalStyle = useAnimatedStyle(() => {
     if (position === 'center') {
       return {
@@ -195,36 +195,37 @@ export const GlassModal: React.FC<GlassModalProps> = ({
         transform: [{ scale: modalScale.value }],
       };
     }
-    
+
     return {
       opacity: modalOpacity.value,
       transform: [{ translateY: modalTranslateY.value }],
     };
   });
-  
+
   // Container styles
   const getContainerStyle = (): ViewStyle => {
     const baseStyle: ViewStyle = {
       flex: 1,
-      justifyContent: position === 'top' ? 'flex-start' : position === 'bottom' ? 'flex-end' : 'center',
+      justifyContent:
+        position === 'top' ? 'flex-start' : position === 'bottom' ? 'flex-end' : 'center',
       alignItems: 'center',
       paddingTop: position === 'top' ? insets.top : 0,
       paddingBottom: position === 'bottom' ? insets.bottom : 0,
     };
-    
+
     if (size === 'fullscreen') {
       return {
         ...baseStyle,
         paddingHorizontal: 0,
       };
     }
-    
+
     return {
       ...baseStyle,
       paddingHorizontal: tokens.Spacing.lg,
     };
   };
-  
+
   // Modal content styles
   const getModalContentStyle = (): ViewStyle => {
     const baseStyle: ViewStyle = {
@@ -233,7 +234,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
       borderRadius: size === 'fullscreen' ? 0 : tokens.BorderRadius['3xl'],
       overflow: 'hidden',
     };
-    
+
     if (position === 'bottom') {
       return {
         ...baseStyle,
@@ -244,7 +245,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
         borderBottomRightRadius: 0,
       };
     }
-    
+
     if (position === 'top') {
       return {
         ...baseStyle,
@@ -255,17 +256,17 @@ export const GlassModal: React.FC<GlassModalProps> = ({
         borderBottomRightRadius: tokens.BorderRadius['3xl'],
       };
     }
-    
+
     return baseStyle;
   };
-  
+
   const containerStyle = getContainerStyle();
   const modalContentStyle = getModalContentStyle();
-  
+
   // Handle component
   const renderHandle = () => {
     if (!showHandle || position === 'center') return null;
-    
+
     return (
       <View
         style={{
@@ -284,15 +285,9 @@ export const GlassModal: React.FC<GlassModalProps> = ({
       </View>
     );
   };
-  
+
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="none"
-      statusBarTranslucent
-      {...props}
-    >
+    <Modal visible={visible} transparent animationType="none" statusBarTranslucent {...props}>
       <View style={{ flex: 1 }}>
         {/* Backdrop */}
         <Animated.View
@@ -303,26 +298,20 @@ export const GlassModal: React.FC<GlassModalProps> = ({
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: isDark 
-                ? 'rgba(0, 0, 0, 0.7)'
-                : 'rgba(0, 0, 0, 0.4)',
+              backgroundColor: isDark ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.4)',
             },
             animatedBackdropStyle,
           ]}
         >
-          <TouchableOpacity
-            style={{ flex: 1 }}
-            onPress={handleBackdropPress}
-            activeOpacity={1}
-          />
+          <TouchableOpacity style={{ flex: 1 }} onPress={handleBackdropPress} activeOpacity={1} />
         </Animated.View>
-        
+
         {/* Modal Container */}
         <View style={[containerStyle, style]} pointerEvents="box-none">
           <Animated.View
             style={[animatedModalStyle]}
             accessible={true}
-            accessibilityRole="dialog"
+            accessibilityRole="alert"
             accessibilityLabel={accessibilityLabel}
             testID={testID}
           >

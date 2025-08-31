@@ -5,7 +5,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { View, ViewStyle, Platform, StyleSheet } from 'react-native';
+import { View, ViewStyle, Platform, StyleSheet, StyleProp, AccessibilityRole } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useColors, useTokens, withOpacity } from '../../design-system/ThemeProvider';
 
@@ -14,13 +14,24 @@ import { useColors, useTokens, withOpacity } from '../../design-system/ThemeProv
 // ============================================================================
 
 type GlassIntensity = 'ultraThin' | 'thin' | 'regular' | 'thick' | 'ultraThick';
-type GlassTint = 'none' | 'light' | 'dark' | 'extraLight' | 'prominent' | 'regular' | 'systemUltraThinMaterial' | 'systemThinMaterial' | 'systemMaterial' | 'systemThickMaterial' | 'systemChromeMaterial';
+type GlassTint =
+  | 'none'
+  | 'light'
+  | 'dark'
+  | 'extraLight'
+  | 'prominent'
+  | 'regular'
+  | 'systemUltraThinMaterial'
+  | 'systemThinMaterial'
+  | 'systemMaterial'
+  | 'systemThickMaterial'
+  | 'systemChromeMaterial';
 
 interface GlassViewProps {
   children?: React.ReactNode;
   intensity?: GlassIntensity;
   tint?: GlassTint;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   borderRadius?: number;
   borderWidth?: number;
   borderColor?: string;
@@ -29,7 +40,7 @@ interface GlassViewProps {
   // Accessibility
   accessible?: boolean;
   accessibilityLabel?: string;
-  accessibilityRole?: string;
+  accessibilityRole?: AccessibilityRole;
   testID?: string;
 }
 
@@ -70,24 +81,36 @@ export const GlassView: React.FC<GlassViewProps> = ({
   // Get blur intensity value
   const getBlurIntensity = useMemo((): number => {
     switch (intensity) {
-      case 'ultraThin': return tokens.GlassmorphismTokens.blur.subtle;
-      case 'thin': return tokens.GlassmorphismTokens.blur.light;
-      case 'regular': return tokens.GlassmorphismTokens.blur.regular;
-      case 'thick': return tokens.GlassmorphismTokens.blur.heavy;
-      case 'ultraThick': return tokens.GlassmorphismTokens.blur.ultra;
-      default: return tokens.GlassmorphismTokens.blur.regular;
+      case 'ultraThin':
+        return tokens.GlassmorphismTokens.blur.subtle;
+      case 'thin':
+        return tokens.GlassmorphismTokens.blur.light;
+      case 'regular':
+        return tokens.GlassmorphismTokens.blur.regular;
+      case 'thick':
+        return tokens.GlassmorphismTokens.blur.heavy;
+      case 'ultraThick':
+        return tokens.GlassmorphismTokens.blur.ultra;
+      default:
+        return tokens.GlassmorphismTokens.blur.regular;
     }
   }, [intensity, tokens]);
 
   // Get opacity value for fallback backgrounds
   const getOpacity = useMemo((): number => {
     switch (intensity) {
-      case 'ultraThin': return tokens.GlassmorphismTokens.opacity.ultraThin;
-      case 'thin': return tokens.GlassmorphismTokens.opacity.thin;
-      case 'regular': return tokens.GlassmorphismTokens.opacity.regular;
-      case 'thick': return tokens.GlassmorphismTokens.opacity.thick;
-      case 'ultraThick': return tokens.GlassmorphismTokens.opacity.ultraThick;
-      default: return tokens.GlassmorphismTokens.opacity.regular;
+      case 'ultraThin':
+        return tokens.GlassmorphismTokens.opacity.ultraThin;
+      case 'thin':
+        return tokens.GlassmorphismTokens.opacity.thin;
+      case 'regular':
+        return tokens.GlassmorphismTokens.opacity.regular;
+      case 'thick':
+        return tokens.GlassmorphismTokens.opacity.thick;
+      case 'ultraThick':
+        return tokens.GlassmorphismTokens.opacity.ultraThick;
+      default:
+        return tokens.GlassmorphismTokens.opacity.regular;
     }
   }, [intensity, tokens]);
 
@@ -155,36 +178,31 @@ export const GlassView: React.FC<GlassViewProps> = ({
   }, [shadowEnabled, isDark, shadowIntensity, tokens]);
 
   // Container styles
-  const containerStyles: ViewStyle = {
-    borderRadius,
-    borderWidth,
-    borderColor: getBorderColor,
-    overflow: 'hidden',
-    ...getShadowStyles,
-    ...style,
-  };
+  const containerStyles = StyleSheet.flatten<ViewStyle>([
+    {
+      borderRadius,
+      borderWidth,
+      borderColor: getBorderColor,
+      overflow: 'hidden' as const,
+    } as ViewStyle,
+    getShadowStyles,
+    style as any,
+  ]);
 
   // Fallback background for web and older platforms
-  const fallbackBackground = withOpacity(
-    isDark ? '#000000' : '#FFFFFF',
-    getOpacity
-  );
+  const fallbackBackground = withOpacity(isDark ? '#000000' : '#FFFFFF', getOpacity);
 
   // Use BlurView on supported platforms, fallback to semi-transparent View
   if (Platform.OS === 'ios' || Platform.OS === 'android') {
     return (
-      <View 
+      <View
         style={containerStyles}
         accessible={accessible}
         accessibilityLabel={accessibilityLabel}
         accessibilityRole={accessibilityRole}
         testID={testID}
       >
-        <BlurView
-          intensity={getBlurIntensity}
-          tint={tint}
-          style={styles.blurView}
-        >
+        <BlurView intensity={getBlurIntensity} tint={tint as any} style={styles.blurView}>
           {children}
         </BlurView>
       </View>
@@ -193,14 +211,8 @@ export const GlassView: React.FC<GlassViewProps> = ({
 
   // Fallback for web and other platforms
   return (
-    <View 
-      style={[
-        containerStyles,
-        {
-          backgroundColor: fallbackBackground,
-          backdropFilter: `blur(${getBlurIntensity}px)`, // CSS backdrop-filter for web
-        }
-      ]}
+    <View
+      style={StyleSheet.flatten([containerStyles, { backgroundColor: fallbackBackground }])}
       accessible={accessible}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole={accessibilityRole}

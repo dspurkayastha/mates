@@ -90,13 +90,13 @@ export class AccessibilityTester {
     return results;
   }
 
-  private async testScreenReaderSupport(): Promise<TestResult> {
+  async testScreenReaderSupport(): Promise<TestResult> {
     try {
       const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
       const announcement = 'Testing screen reader support';
-      
+
       AccessibilityInfo.announceForAccessibility(announcement);
-      
+
       return {
         id: 'screen_reader_support',
         name: 'Screen Reader Support',
@@ -118,19 +118,20 @@ export class AccessibilityTester {
     }
   }
 
-  private async testAccessibilityLabels(): Promise<TestResult> {
+  async testAccessibilityLabels(): Promise<TestResult> {
     // This would typically involve traversing the component tree
     // For now, we'll simulate the test
     const elementsWithoutLabels = 0; // Would be calculated by traversing DOM/component tree
-    
+
     return {
       id: 'accessibility_labels',
       name: 'Accessibility Labels',
       category: 'accessibility',
       status: elementsWithoutLabels === 0 ? 'pass' : 'fail',
-      message: elementsWithoutLabels === 0 
-        ? 'All interactive elements have accessibility labels'
-        : `${elementsWithoutLabels} elements missing accessibility labels`,
+      message:
+        elementsWithoutLabels === 0
+          ? 'All interactive elements have accessibility labels'
+          : `${elementsWithoutLabels} elements missing accessibility labels`,
       details: { missingLabels: elementsWithoutLabels },
       timestamp: Date.now(),
     };
@@ -139,52 +140,55 @@ export class AccessibilityTester {
   private async testAccessibilityRoles(): Promise<TestResult> {
     // Simulate role testing
     const elementsWithoutRoles = 0;
-    
+
     return {
       id: 'accessibility_roles',
       name: 'Accessibility Roles',
       category: 'accessibility',
       status: elementsWithoutRoles === 0 ? 'pass' : 'warning',
-      message: elementsWithoutRoles === 0
-        ? 'All elements have appropriate accessibility roles'
-        : `${elementsWithoutRoles} elements missing or incorrect roles`,
+      message:
+        elementsWithoutRoles === 0
+          ? 'All elements have appropriate accessibility roles'
+          : `${elementsWithoutRoles} elements missing or incorrect roles`,
       details: { missingRoles: elementsWithoutRoles },
       timestamp: Date.now(),
     };
   }
 
-  private async testTouchTargets(): Promise<TestResult> {
+  async testTouchTargets(): Promise<TestResult> {
     // Simulate touch target size testing
     const minimumSize = 44; // iOS HIG minimum
     const elementsUnderMinimum = 0; // Would be calculated
-    
+
     return {
       id: 'touch_targets',
       name: 'Touch Target Sizes',
       category: 'accessibility',
       status: elementsUnderMinimum === 0 ? 'pass' : 'fail',
-      message: elementsUnderMinimum === 0
-        ? `All touch targets meet minimum size (${minimumSize}pt)`
-        : `${elementsUnderMinimum} touch targets below minimum size`,
+      message:
+        elementsUnderMinimum === 0
+          ? `All touch targets meet minimum size (${minimumSize}pt)`
+          : `${elementsUnderMinimum} touch targets below minimum size`,
       details: { minimumSize, violations: elementsUnderMinimum },
       timestamp: Date.now(),
     };
   }
 
-  private async testColorContrast(): Promise<TestResult> {
+  async testColorContrast(): Promise<TestResult> {
     // This would require actual color analysis
     // For now, we'll assume our design system provides good contrast
     const contrastRatio = 4.5; // WCAG AA standard
     const violations = 0;
-    
+
     return {
       id: 'color_contrast',
       name: 'Color Contrast',
       category: 'accessibility',
       status: violations === 0 ? 'pass' : 'fail',
-      message: violations === 0
-        ? `All text meets WCAG AA contrast requirements (${contrastRatio}:1)`
-        : `${violations} contrast violations found`,
+      message:
+        violations === 0
+          ? `All text meets WCAG AA contrast requirements (${contrastRatio}:1)`
+          : `${violations} contrast violations found`,
       details: { requiredRatio: contrastRatio, violations },
       timestamp: Date.now(),
     };
@@ -208,7 +212,7 @@ export class CrossPlatformTester {
     return results;
   }
 
-  private async testPlatformDetection(): Promise<TestResult> {
+  async testPlatformDetection(): Promise<TestResult> {
     const platformInfo = {
       os: Platform.OS,
       version: Platform.Version,
@@ -228,13 +232,13 @@ export class CrossPlatformTester {
     };
   }
 
-  private async testScreenSizeHandling(): Promise<TestResult> {
+  async testScreenSizeHandling(): Promise<TestResult> {
     const { width, height } = Dimensions.get('window');
     const { width: screenWidth, height: screenHeight } = Dimensions.get('screen');
-    
+
     const isTablet = width > 768;
     const aspectRatio = width / height;
-    
+
     return {
       id: 'screen_size_handling',
       name: 'Screen Size Handling',
@@ -261,7 +265,7 @@ export class CrossPlatformTester {
     };
 
     const availableCount = Object.values(features).filter(Boolean).length;
-    
+
     return {
       id: 'platform_features',
       name: 'Platform-Specific Features',
@@ -273,7 +277,7 @@ export class CrossPlatformTester {
     };
   }
 
-  private async testNavigationConsistency(): Promise<TestResult> {
+  async testNavigationConsistency(): Promise<TestResult> {
     // Test navigation patterns across platforms
     const navigationPatterns = {
       tabBar: true,
@@ -298,7 +302,8 @@ export class CrossPlatformTester {
     // Test font rendering and fallbacks
     const fontInfo = {
       platform: Platform.OS,
-      defaultFont: Platform.OS === 'ios' ? 'San Francisco' : Platform.OS === 'android' ? 'Roboto' : 'System',
+      defaultFont:
+        Platform.OS === 'ios' ? 'San Francisco' : Platform.OS === 'android' ? 'Roboto' : 'System',
       customFont: 'Inter',
       fontScaling: true,
     };
@@ -331,15 +336,15 @@ export class PerformanceTester {
     return results;
   }
 
-  private async testRenderPerformance(): Promise<TestResult> {
+  async testRenderPerformance(): Promise<TestResult> {
     const startTime = Date.now();
-    
+
     // Simulate render time test
-    await new Promise(resolve => setTimeout(resolve, 10));
-    
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
     const renderTime = Date.now() - startTime;
     const threshold = 16; // 60fps threshold
-    
+
     return {
       id: 'render_performance',
       name: 'Render Performance',
@@ -351,7 +356,7 @@ export class PerformanceTester {
     };
   }
 
-  private async testMemoryUsage(): Promise<TestResult> {
+  async testMemoryUsage(): Promise<TestResult> {
     // This would require native modules for accurate memory measurement
     const mockMemoryUsage = {
       used: 45, // MB
@@ -360,7 +365,7 @@ export class PerformanceTester {
     };
 
     const usagePercentage = (mockMemoryUsage.used / mockMemoryUsage.total) * 100;
-    
+
     return {
       id: 'memory_usage',
       name: 'Memory Usage',
@@ -372,7 +377,7 @@ export class PerformanceTester {
     };
   }
 
-  private async testBundleSize(): Promise<TestResult> {
+  async testBundleSize(): Promise<TestResult> {
     // Mock bundle size analysis
     const bundleInfo = {
       total: 2.4, // MB
@@ -396,7 +401,7 @@ export class PerformanceTester {
     // Test animation smoothness
     const fps = 60; // Would be measured during actual animations
     const targetFps = 60;
-    
+
     return {
       id: 'animation_performance',
       name: 'Animation Performance',
@@ -425,10 +430,10 @@ export class TestRunner {
 
     for (const suite of this.suites) {
       console.log(`Running test suite: ${suite.name}`);
-      
+
       try {
         await suite.setup?.();
-        
+
         for (const test of suite.tests) {
           if (test.skip) {
             allResults.push({
@@ -459,7 +464,7 @@ export class TestRunner {
             });
           }
         }
-        
+
         await suite.teardown?.();
       } catch (error) {
         console.error(`Test suite ${suite.name} failed:`, error);
@@ -476,20 +481,20 @@ export class TestRunner {
   }
 
   generateReport(results: TestResult[]): string {
-    const passed = results.filter(r => r.status === 'pass').length;
-    const failed = results.filter(r => r.status === 'fail').length;
-    const warnings = results.filter(r => r.status === 'warning').length;
-    const skipped = results.filter(r => r.status === 'skip').length;
+    const passed = results.filter((r) => r.status === 'pass').length;
+    const failed = results.filter((r) => r.status === 'fail').length;
+    const warnings = results.filter((r) => r.status === 'warning').length;
+    const skipped = results.filter((r) => r.status === 'skip').length;
 
     let report = '# Test Report\n\n';
     report += `**Summary**: ${passed} passed, ${failed} failed, ${warnings} warnings, ${skipped} skipped\n\n`;
 
-    const categories = [...new Set(results.map(r => r.category))];
-    
+    const categories = [...new Set(results.map((r) => r.category))];
+
     for (const category of categories) {
-      const categoryResults = results.filter(r => r.category === category);
+      const categoryResults = results.filter((r) => r.category === category);
       report += `## ${category.charAt(0).toUpperCase() + category.slice(1)} Tests\n\n`;
-      
+
       for (const result of categoryResults) {
         const icon = this.getStatusIcon(result.status);
         report += `${icon} **${result.name}**: ${result.message}\n`;
@@ -502,11 +507,16 @@ export class TestRunner {
 
   private getStatusIcon(status: string): string {
     switch (status) {
-      case 'pass': return '✅';
-      case 'fail': return '❌';
-      case 'warning': return '⚠️';
-      case 'skip': return '⏭️';
-      default: return '❓';
+      case 'pass':
+        return '✅';
+      case 'fail':
+        return '❌';
+      case 'warning':
+        return '⚠️';
+      case 'skip':
+        return '⏭️';
+      default:
+        return '❓';
     }
   }
 }
@@ -517,7 +527,7 @@ export class TestRunner {
 
 export const createAccessibilityTestSuite = (): TestSuite => {
   const tester = new AccessibilityTester();
-  
+
   return {
     name: 'Accessibility Tests',
     tests: [
@@ -551,7 +561,7 @@ export const createAccessibilityTestSuite = (): TestSuite => {
 
 export const createCrossPlatformTestSuite = (): TestSuite => {
   const tester = new CrossPlatformTester();
-  
+
   return {
     name: 'Cross-Platform Tests',
     tests: [
@@ -579,7 +589,7 @@ export const createCrossPlatformTestSuite = (): TestSuite => {
 
 export const createPerformanceTestSuite = (): TestSuite => {
   const tester = new PerformanceTester();
-  
+
   return {
     name: 'Performance Tests',
     tests: [

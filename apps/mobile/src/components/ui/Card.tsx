@@ -5,17 +5,14 @@
  */
 
 import React from 'react';
-import {
-  View,
-  ViewStyle,
-  TouchableOpacity,
-  TouchableOpacityProps,
-} from 'react-native';
+import { View, ViewStyle, Pressable, PressableProps } from 'react-native';
 import Animated, {
+  Easing,
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
+  withTiming,
   interpolate,
+  createAnimatedComponent,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useColors, useTokens, withOpacity } from '../../design-system/ThemeProvider';
@@ -42,7 +39,9 @@ interface BaseCardProps {
   testID?: string;
 }
 
-interface InteractiveCardProps extends Omit<BaseCardProps, 'accessibilityRole'>, Omit<TouchableOpacityProps, 'style' | 'children'> {
+interface InteractiveCardProps
+  extends Omit<BaseCardProps, 'accessibilityRole'>,
+    Omit<PressableProps, 'style' | 'children'> {
   interactive: true;
   accessibilityRole?: 'none' | 'button' | 'link' | 'text' | 'summary';
 }
@@ -86,13 +85,17 @@ export const Card: React.FC<CardProps> = ({
   // Handle press interactions
   const handlePressIn = () => {
     if (!interactive) return;
-    
-    scale.value = withSpring(0.98, {
-      damping: 20,
-      stiffness: 300,
+
+    const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
+    scale.value = withTiming(tokens.Animation.press.scale, {
+      duration: tokens.Animation.duration.in,
+      easing,
     });
-    shadowOpacity.value = withSpring(0.15);
-    
+    shadowOpacity.value = withTiming(0.15, {
+      duration: tokens.Animation.duration.in,
+      easing,
+    });
+
     if (hapticFeedback) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
@@ -100,18 +103,22 @@ export const Card: React.FC<CardProps> = ({
 
   const handlePressOut = () => {
     if (!interactive) return;
-    
-    scale.value = withSpring(1, {
-      damping: 20,
-      stiffness: 300,
+
+    const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
+    scale.value = withTiming(1, {
+      duration: tokens.Animation.duration.out,
+      easing,
     });
-    shadowOpacity.value = withSpring(0.1);
+    shadowOpacity.value = withTiming(0.1, {
+      duration: tokens.Animation.duration.out,
+      easing,
+    });
   };
 
   // Get card styles based on variant and size
   const getCardStyles = (): ViewStyle => {
     const baseStyle: ViewStyle = {
-      borderRadius: tokens.BorderRadius['2xl'],
+      borderRadius: tokens.BorderRadius.xl,
       overflow: 'hidden',
     };
 
@@ -130,7 +137,7 @@ export const Card: React.FC<CardProps> = ({
 
     // Variant styles
     let variantStyles: ViewStyle = {};
-    
+
     switch (variant) {
       case 'elevated':
         variantStyles = {
@@ -138,7 +145,7 @@ export const Card: React.FC<CardProps> = ({
           ...tokens.Shadows.lg,
         };
         break;
-        
+
       case 'outlined':
         variantStyles = {
           backgroundColor: colors.background.primary,
@@ -147,24 +154,20 @@ export const Card: React.FC<CardProps> = ({
           ...tokens.Shadows.sm,
         };
         break;
-        
+
       case 'filled':
         variantStyles = {
           backgroundColor: colors.background.secondary,
           ...tokens.Shadows.md,
         };
         break;
-        
+
       case 'glass':
         variantStyles = {
           backgroundColor: withOpacity(colors.background.elevated, 0.8),
           borderWidth: 1,
           borderColor: withOpacity(colors.border.light, 0.2),
           ...tokens.Shadows.xl,
-          // Glass morphism effect
-          backdropFilter: 'blur(20px)',
-          // Note: backdropFilter is not supported in React Native, 
-          // but we'll use expo-blur for this in advanced implementation
         };
         break;
     }
@@ -182,13 +185,13 @@ export const Card: React.FC<CardProps> = ({
   const getAccessibilityProps = () => {
     const defaultRole = interactive ? 'button' : 'text';
     const role = accessibilityRole || defaultRole;
-    
-    const defaultLabel = interactive 
-      ? (accessibilityLabel || 'Interactive card')
+
+    const defaultLabel = interactive
+      ? accessibilityLabel || 'Interactive card'
       : accessibilityLabel;
-    
+
     const defaultHint = interactive
-      ? (accessibilityHint || 'Double tap to interact with this card')
+      ? accessibilityHint || 'Double tap to interact with this card'
       : accessibilityHint;
 
     return {
@@ -202,39 +205,34 @@ export const Card: React.FC<CardProps> = ({
 
   // Render interactive card
   if (interactive) {
-    const { onPress, onPressIn, onPressOut, ...touchableProps } = props as InteractiveCardProps;
+    const { onPress, onPressIn, onPressOut, ...pressableProps } = props as InteractiveCardProps;
     const accessibilityProps = getAccessibilityProps();
-    
+    const AnimatedPressable = createAnimatedComponent(Pressable);
+
     return (
-      <Animated.View style={[animatedStyle]}>
-        <TouchableOpacity
-          style={[cardStyles, style]}
-          onPress={onPress}
-          onPressIn={(e) => {
-            handlePressIn();
-            onPressIn?.(e);
-          }}
-          onPressOut={(e) => {
-            handlePressOut();
-            onPressOut?.(e);
-          }}
-          activeOpacity={0.95}
-          {...accessibilityProps}
-          {...touchableProps}
-        >
-          {children}
-        </TouchableOpacity>
-      </Animated.View>
+      <AnimatedPressable
+        style={[cardStyles, style, animatedStyle]}
+        onPress={onPress}
+        onPressIn={(e) => {
+          handlePressIn();
+          onPressIn?.(e);
+        }}
+        onPressOut={(e) => {
+          handlePressOut();
+          onPressOut?.(e);
+        }}
+        {...accessibilityProps}
+        {...pressableProps}
+      >
+        {children}
+      </AnimatedPressable>
     );
   }
 
   // Render static card
   const accessibilityProps = getAccessibilityProps();
   return (
-    <View 
-      style={[cardStyles, style]}
-      {...accessibilityProps}
-    >
+    <View style={[cardStyles, style]} {...accessibilityProps}>
       {children}
     </View>
   );
@@ -251,24 +249,21 @@ interface CardHeaderProps {
   style?: ViewStyle;
 }
 
-export const CardHeader: React.FC<CardHeaderProps> = ({
-  title,
-  subtitle,
-  action,
-  style,
-}) => {
+export const CardHeader: React.FC<CardHeaderProps> = ({ title, subtitle, action, style }) => {
   const tokens = useTokens();
 
   return (
-    <View style={[
-      {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        justifyContent: 'space-between',
-        marginBottom: tokens.Spacing.md,
-      },
-      style,
-    ]}>
+    <View
+      style={[
+        {
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          marginBottom: tokens.Spacing.md,
+        },
+        style,
+      ]}
+    >
       <View style={{ flex: 1 }}>
         {title && (
           <Text
@@ -285,11 +280,7 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
           </Text>
         )}
       </View>
-      {action && (
-        <View style={{ marginLeft: tokens.Spacing.md }}>
-          {action}
-        </View>
-      )}
+      {action && <View style={{ marginLeft: tokens.Spacing.md }}>{action}</View>}
     </View>
   );
 };
@@ -303,15 +294,8 @@ interface CardContentProps {
   style?: ViewStyle;
 }
 
-export const CardContent: React.FC<CardContentProps> = ({
-  children,
-  style,
-}) => {
-  return (
-    <View style={style}>
-      {children}
-    </View>
-  );
+export const CardContent: React.FC<CardContentProps> = ({ children, style }) => {
+  return <View style={style}>{children}</View>;
 };
 
 // ============================================================================
@@ -323,22 +307,21 @@ interface CardFooterProps {
   style?: ViewStyle;
 }
 
-export const CardFooter: React.FC<CardFooterProps> = ({
-  children,
-  style,
-}) => {
+export const CardFooter: React.FC<CardFooterProps> = ({ children, style }) => {
   const tokens = useTokens();
 
   return (
-    <View style={[
-      {
-        marginTop: tokens.Spacing.md,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-      },
-      style,
-    ]}>
+    <View
+      style={[
+        {
+          marginTop: tokens.Spacing.md,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+        },
+        style,
+      ]}
+    >
       {children}
     </View>
   );
