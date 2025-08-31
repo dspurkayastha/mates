@@ -30,3 +30,11 @@ jobs:
         working-directory: apps/mobile
         continue-on-error: true
         run: npm run lint
+
+      - name: Typecheck
+        working-directory: apps/mobile
+        run: npm run typecheck
+
+      - name: Test
+        working-directory: apps/mobile
+        run: npm test
