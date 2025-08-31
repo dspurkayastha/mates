@@ -17,7 +17,7 @@ if (__DEV__) {
 // Load polyfills AFTER React Native core is initialized
 import 'react-native-url-polyfill/auto';
 import './src/__create/polyfills';
-global.Buffer = require('buffer').Buffer;
+(globalThis as any).Buffer = require('buffer').Buffer;
 
 // Error boundaries and utilities
 import { serializeError } from 'serialize-error';
@@ -27,11 +27,7 @@ import { ErrorBoundaryWrapper, SharedErrorBoundary } from './__create/SharedErro
 if (__DEV__) {
   LogBox.ignoreAllLogs();
   LogBox.uninstall();
-  function WrapperComponentProvider({
-    children,
-  }: {
-    children: ReactNode;
-  }) {
+  function WrapperComponentProvider({ children }: { children: ReactNode }) {
     return <DeviceErrorBoundaryWrapper>{children}</DeviceErrorBoundaryWrapper>;
   }
 
