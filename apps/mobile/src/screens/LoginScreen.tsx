@@ -32,10 +32,12 @@ import {
   Text,
   GlassButton,
   GlassCard,
+  GlassInput,
   Icon,
   BiometricPrompt,
   BiometricSetup,
 } from '../components/ui';
+import { supabase, SUPABASE_ENABLED } from '@/lib/supabase';
 
 // ============================================================================
 // TYPES
@@ -124,14 +126,20 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     setError('');
 
     try {
-      // Simulate login API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // For demo purposes, accept any email/password
+      if (SUPABASE_ENABLED) {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+        if (signInError) throw signInError;
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
+
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       onLoginSuccess();
-    } catch (error) {
-      setError('Login failed. Please try again.');
+    } catch (error: any) {
+      setError(error?.message || 'Login failed. Please try again.');
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setIsLoading(false);
@@ -284,61 +292,33 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               ) : null}
 
               {/* Email Input */}
-              <View style={{ marginBottom: tokens.Spacing.lg }}>
-                <Text
-                  variant="labelMedium"
-                  color="primary"
-                  weight="medium"
-                  style={{ marginBottom: tokens.Spacing.sm }}
-                >
-                  Email Address
-                </Text>
-                <View
-                  style={{
-                    borderWidth: 1,
-                    borderColor: colors.border.medium,
-                    borderRadius: tokens.BorderRadius.lg,
-                    padding: tokens.Spacing.lg,
-                    backgroundColor: colors.background.secondary,
-                  }}
-                >
-                  {/* Note: In a real app, you'd use TextInput here */}
-                  <Text
-                    variant="bodyMedium"
-                    color="tertiary"
-                  >
-                    demo@mates.app
-                  </Text>
-                </View>
-              </View>
+              <GlassInput
+                label="Email Address"
+                placeholder="you@example.com"
+                value={formData.email}
+                onChangeText={(email) => setFormData((p) => ({ ...p, email }))}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+                textContentType="emailAddress"
+                size="large"
+                style={{ marginBottom: tokens.Spacing.lg }}
+              />
 
               {/* Password Input */}
-              <View style={{ marginBottom: tokens.Spacing['2xl'] }}>
-                <Text
-                  variant="labelMedium"
-                  color="primary"
-                  weight="medium"
-                  style={{ marginBottom: tokens.Spacing.sm }}
-                >
-                  Password
-                </Text>
-                <View
-                  style={{
-                    borderWidth: 1,
-                    borderColor: colors.border.medium,
-                    borderRadius: tokens.BorderRadius.lg,
-                    padding: tokens.Spacing.lg,
-                    backgroundColor: colors.background.secondary,
-                  }}
-                >
-                  <Text
-                    variant="bodyMedium"
-                    color="tertiary"
-                  >
-                    ••••••••
-                  </Text>
-                </View>
-              </View>
+              <GlassInput
+                label="Password"
+                placeholder="••••••••"
+                value={formData.password}
+                onChangeText={(password) =>
+                  setFormData((p) => ({ ...p, password }))
+                }
+                secureTextEntry
+                autoCapitalize="none"
+                textContentType="password"
+                size="large"
+                style={{ marginBottom: tokens.Spacing['2xl'] }}
+              />
 
               {/* Login Button */}
               <GlassButton

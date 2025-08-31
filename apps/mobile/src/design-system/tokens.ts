@@ -185,6 +185,15 @@ const BaseColors = {
   },
 };
 
+// Premium app theme colors following restrained duotone with playful accent
+export const ThemeColors = {
+  background: BaseColors.neutral[50],
+  surface: BaseColors.neutral[0],
+  accent: BaseColors.primary[500],
+  // subtle tinted surface using accent color at ~3% opacity
+  surfaceTint: 'rgba(74, 128, 240, 0.03)',
+};
+
 // ============================================================================
 // SEMANTIC COLOR TOKENS
 // ============================================================================
@@ -520,12 +529,11 @@ export const Spacing = {
 
 export const BorderRadius = {
   none: 0,
-  xs: 2,
-  sm: 4,
-  md: 6,
-  lg: 8,
-  xl: 12,
-  '2xl': 16,
+  sm: 12,
+  md: 16,
+  lg: 20,
+  xl: 24,
+  '2xl': 24,
   '3xl': 24,
   full: 9999,
 };
@@ -545,28 +553,28 @@ export const Shadows = {
   md: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.06,
     shadowRadius: 4,
     elevation: 2,
   },
   lg: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 4,
   },
   xl: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 6,
   },
   inner: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
+    shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: -1, // Inset shadow effect
   },
@@ -578,20 +586,15 @@ export const Shadows = {
 
 export const Animation = {
   duration: {
-    instant: 0,
-    fast: 150,
-    normal: 200,
-    slow: 300,
-    slower: 500,
+    in: 180,
+    out: 140,
   },
-  
   easing: {
-    linear: 'linear',
-    easeIn: 'ease-in',
-    easeOut: 'ease-out',
-    easeInOut: 'ease-in-out',
-    spring: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-    bounce: 'cubic-bezier(0.68, -0.6, 0.32, 1.6)',
+    standard: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+  },
+  press: {
+    scale: 0.98,
+    iconNudge: 2,
   },
 };
 
@@ -618,6 +621,7 @@ export const getTheme = () => {
 // Export everything as default for easy importing
 export default {
   BaseColors,
+  ThemeColors,
   LightTheme,
   DarkTheme,
   HighContrastLightTheme,

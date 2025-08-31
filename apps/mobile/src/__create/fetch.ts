@@ -6,15 +6,16 @@ const authKey = `${process.env.EXPO_PUBLIC_PROJECT_GROUP_ID}-jwt`;
 
 const getURLFromArgs = (...args: Parameters<typeof fetch>) => {
   const [urlArg] = args;
-  let url: string | null;
   if (typeof urlArg === 'string') {
-    url = urlArg;
-  } else if (typeof urlArg === 'object' && urlArg !== null) {
-    url = urlArg.url;
-  } else {
-    url = null;
+    return urlArg;
   }
-  return url;
+  if (urlArg instanceof URL) {
+    return urlArg.toString();
+  }
+  if (urlArg instanceof Request) {
+    return urlArg.url;
+  }
+  return null;
 };
 
 const isFirstPartyURL = (url: string) => {

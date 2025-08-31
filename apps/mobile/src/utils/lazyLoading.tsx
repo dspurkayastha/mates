@@ -9,7 +9,10 @@ import {
   View,
   Image,
   ImageProps,
+  ImageStyle,
   ViewStyle,
+  StyleProp,
+  StyleSheet,
   Dimensions,
   Platform,
 } from 'react-native';
@@ -42,7 +45,7 @@ export const useInView = (options: UseInViewOptions = {}) => {
 
   useEffect(() => {
     const element = elementRef.current;
-    
+
     if (!element || Platform.OS !== 'web') {
       // For native platforms, we'll use a simple viewport check
       setInView(true);
@@ -59,12 +62,12 @@ export const useInView = (options: UseInViewOptions = {}) => {
       ([entry]) => {
         setEntry(entry);
         setInView(entry.isIntersecting);
-        
+
         if (entry.isIntersecting && triggerOnce) {
           observer.disconnect();
         }
       },
-      { threshold, rootMargin }
+      { threshold, rootMargin },
     );
 
     // @ts-ignore - Web specific implementation
@@ -89,7 +92,7 @@ interface LazyImageProps extends Omit<ImageProps, 'source'> {
   priority?: boolean;
   onLoad?: () => void;
   onError?: () => void;
-  style?: ViewStyle;
+  style?: StyleProp<ImageStyle>;
 }
 
 export const LazyImage: React.FC<LazyImageProps> = ({
@@ -106,7 +109,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
 }) => {
   const colors = useColors();
   const tokens = useTokens();
-  const { ref, inView } = useInView({ 
+  const { ref, inView } = useInView({
     threshold: 0.1,
     triggerOnce: true,
   });
@@ -131,7 +134,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
         },
         () => {
           // Ignore errors in size fetching
-        }
+        },
       );
     }
   }, [shouldLoad, source]);
@@ -163,31 +166,30 @@ export const LazyImage: React.FC<LazyImageProps> = ({
       containerStyle.aspectRatio = imageSize.width / imageSize.height;
     }
 
-    return {
-      backgroundColor: colors.background.secondary,
-      borderRadius: tokens.BorderRadius.md,
-      overflow: 'hidden',
-      ...containerStyle,
-      ...style,
-    };
+    return StyleSheet.flatten([
+      {
+        backgroundColor: colors.background.secondary,
+        borderRadius: tokens.BorderRadius.md,
+        overflow: 'hidden',
+      },
+      containerStyle,
+      style,
+    ]);
   };
 
   return (
     <View ref={ref} style={getContainerStyle()}>
-      {!shouldLoad && (
-        placeholder || (
+      {!shouldLoad &&
+        (placeholder || (
           <LoadingSkeleton
-            width="100%"
-            height="100%"
-            style={{ borderRadius: tokens.BorderRadius.md }}
+            style={{ width: '100%', height: '100%', borderRadius: tokens.BorderRadius.md }}
           />
-        )
-      )}
+        ))}
 
       {shouldLoad && !error && (
         <>
-          {!loaded && (
-            placeholder || (
+          {!loaded &&
+            (placeholder || (
               <View
                 style={{
                   position: 'absolute',
@@ -201,13 +203,10 @@ export const LazyImage: React.FC<LazyImageProps> = ({
                 }}
               >
                 <LoadingSkeleton
-                  width="100%"
-                  height="100%"
-                  style={{ borderRadius: tokens.BorderRadius.md }}
+                  style={{ width: '100%', height: '100%', borderRadius: tokens.BorderRadius.md }}
                 />
               </View>
-            )
-          )}
+            ))}
 
           <Animated.View style={[{ flex: 1 }, animatedStyle]}>
             <Image
@@ -225,8 +224,8 @@ export const LazyImage: React.FC<LazyImageProps> = ({
         </>
       )}
 
-      {error && (
-        fallback || (
+      {error &&
+        (fallback || (
           <View
             style={{
               flex: 1,
@@ -240,8 +239,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
               Failed to load image
             </Text>
           </View>
-        )
-      )}
+        ))}
     </View>
   );
 };
@@ -285,22 +283,14 @@ export const LazyComponent: React.FC<LazyComponentProps> = ({
   if (!shouldRender) {
     return (
       <View ref={ref}>
-        {placeholder || (
-          <LoadingSkeleton
-            width="100%"
-            height={100}
-            style={{ marginBottom: 16 }}
-          />
-        )}
+        {placeholder || <LoadingSkeleton width="100%" height={100} style={{ marginBottom: 16 }} />}
       </View>
     );
   }
 
   return (
     <Suspense fallback={fallback || <LoadingSkeleton width="100%" height={100} />}>
-      <View ref={ref}>
-        {children}
-      </View>
+      <View ref={ref}>{children}</View>
     </Suspense>
   );
 };
@@ -310,7 +300,7 @@ export const LazyComponent: React.FC<LazyComponentProps> = ({
 // ============================================================================
 
 export const createLazyScreen = <T extends React.ComponentType<any>>(
-  importFunc: () => Promise<{ default: T }>
+  importFunc: () => Promise<{ default: T }>,
 ) => {
   return lazy(importFunc);
 };
@@ -443,9 +433,7 @@ export class ImagePreloader {
 
     const results: boolean[] = [];
     for (const batch of batches) {
-      const batchResults = await Promise.all(
-        batch.map(uri => this.preload(uri))
-      );
+      const batchResults = await Promise.all(batch.map((uri) => this.preload(uri)));
       results.push(...batchResults);
     }
 
@@ -482,12 +470,11 @@ export const useLazyLoad = (threshold = 0.1) => {
 export const splitBundle = {
   // Core components (always loaded)
   core: () => import('../components/ui'),
-  
+
   // Feature-specific bundles
-  expenses: () => import('../screens/expenses'),
   settings: () => import('../screens/SettingsScreen'),
   onboarding: () => import('../components/ui/Onboarding'),
-  
+
   // Utility bundles
   analytics: () => import('../utils/performance'),
   accessibility: () => import('../utils/accessibility'),

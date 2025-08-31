@@ -7,11 +7,11 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Appearance, StatusBar } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import DesignTokens, { 
-  LightTheme, 
-  DarkTheme, 
-  HighContrastLightTheme, 
-  HighContrastDarkTheme 
+import DesignTokens, {
+  LightTheme,
+  DarkTheme,
+  HighContrastLightTheme,
+  HighContrastDarkTheme,
 } from './tokens';
 import { accessibilityManager, AccessibilityState } from '../utils/accessibility';
 
@@ -76,11 +76,12 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Calculate the actual theme to use
   const actualScheme = config.colorScheme === 'auto' ? systemScheme : config.colorScheme;
   const isDark = actualScheme === 'dark';
-  
+
   // Determine if high contrast should be used
-  const isHighContrast = config.contrast === 'high' ||
+  const isHighContrast =
+    config.contrast === 'high' ||
     (config.followSystemContrast && accessibility.isHighContrastEnabled);
-  
+
   // Select the appropriate theme
   const getTheme = (): Theme => {
     if (isHighContrast) {
@@ -88,7 +89,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     }
     return isDark ? DarkTheme : LightTheme;
   };
-  
+
   const theme = getTheme();
 
   // Load saved preferences on mount
@@ -99,21 +100,21 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           AsyncStorage.getItem(THEME_STORAGE_KEY),
           AsyncStorage.getItem(CONTRAST_STORAGE_KEY),
         ]);
-        
+
         const newConfig: Partial<ThemeConfig> = {};
-        
+
         if (savedScheme && ['light', 'dark', 'auto'].includes(savedScheme)) {
           newConfig.colorScheme = savedScheme as ColorScheme;
         }
-        
+
         if (savedContrast) {
           const contrastData = JSON.parse(savedContrast);
           newConfig.contrast = contrastData.mode || 'normal';
           newConfig.followSystemContrast = contrastData.followSystem !== false;
         }
-        
+
         if (Object.keys(newConfig).length > 0) {
-          setConfig(prev => ({ ...prev, ...newConfig }));
+          setConfig((prev) => ({ ...prev, ...newConfig }));
         }
       } catch (error) {
         console.warn('Failed to load theme preferences:', error);
@@ -135,10 +136,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Listen to accessibility changes
   useEffect(() => {
     // Initialize accessibility manager
-    accessibilityManager.initialize().catch(error => {
+    accessibilityManager.initialize().catch((error) => {
       console.warn('Failed to initialize accessibility manager:', error);
     });
-    
+
     const unsubscribe = accessibilityManager.subscribe(setAccessibility);
     return unsubscribe;
   }, []);
@@ -154,10 +155,13 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       try {
         await Promise.all([
           AsyncStorage.setItem(THEME_STORAGE_KEY, config.colorScheme),
-          AsyncStorage.setItem(CONTRAST_STORAGE_KEY, JSON.stringify({
-            mode: config.contrast,
-            followSystem: config.followSystemContrast,
-          })),
+          AsyncStorage.setItem(
+            CONTRAST_STORAGE_KEY,
+            JSON.stringify({
+              mode: config.contrast,
+              followSystem: config.followSystemContrast,
+            }),
+          ),
         ]);
       } catch (error) {
         console.warn('Failed to save theme preferences:', error);
@@ -170,20 +174,20 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Theme manipulation functions
   const toggleTheme = () => {
     const nextScheme: ColorScheme = config.colorScheme === 'light' ? 'dark' : 'light';
-    setConfig(prev => ({ ...prev, colorScheme: nextScheme }));
+    setConfig((prev) => ({ ...prev, colorScheme: nextScheme }));
   };
 
   const toggleContrast = () => {
     const nextContrast: ContrastMode = config.contrast === 'normal' ? 'high' : 'normal';
-    setConfig(prev => ({ ...prev, contrast: nextContrast }));
+    setConfig((prev) => ({ ...prev, contrast: nextContrast }));
   };
 
   const handleSetColorScheme = (scheme: ColorScheme) => {
-    setConfig(prev => ({ ...prev, colorScheme: scheme }));
+    setConfig((prev) => ({ ...prev, colorScheme: scheme }));
   };
 
   const handleSetContrastMode = (contrast: ContrastMode) => {
-    setConfig(prev => ({ ...prev, contrast }));
+    setConfig((prev) => ({ ...prev, contrast }));
   };
 
   const contextValue: ThemeContextType = {
@@ -261,7 +265,7 @@ export const useGlassColors = () => {
     const tintColors = glassTokens.tintColors; // Dynamic tint colors
     const borderColors = glassTokens.borderColors.light;
     const shadowColors = glassTokens.shadowColors.light;
-    
+
     return {
       tint: tintColors,
       borders: borderColors,
@@ -271,14 +275,14 @@ export const useGlassColors = () => {
       isDark: false,
     };
   }
-  
+
   const { isDark, tokens } = context;
-  
+
   const glassTokens = tokens.GlassmorphismTokens;
   const tintColors = glassTokens.tintColors;
   const borderColors = isDark ? glassTokens.borderColors.dark : glassTokens.borderColors.light;
   const shadowColors = isDark ? glassTokens.shadowColors.dark : glassTokens.shadowColors.light;
-  
+
   return {
     tint: tintColors,
     borders: borderColors,
@@ -293,9 +297,11 @@ export const useGlassColors = () => {
  * Hook to get glass variant colors
  * Returns appropriate glass colors for different component variants
  */
-export const useGlassVariant = (variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'neutral' = 'primary') => {
+export const useGlassVariant = (
+  variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'neutral' = 'primary',
+) => {
   const { tint, borders, shadows } = useGlassColors();
-  
+
   return {
     tintColor: tint[variant],
     borderColor: borders.regular,
@@ -307,15 +313,24 @@ export const useGlassVariant = (variant: 'primary' | 'secondary' | 'success' | '
  * Hook to get glass intensity settings
  * Returns blur and opacity values for different glass intensities
  */
-export const useGlassIntensity = (intensity: 'ultraThin' | 'thin' | 'regular' | 'thick' | 'ultraThick' = 'regular') => {
+export const useGlassIntensity = (
+  intensity: 'ultraThin' | 'thin' | 'regular' | 'thick' | 'ultraThick' = 'regular',
+) => {
   const { opacity, blur } = useGlassColors();
-  
+
   return {
     opacity: opacity[intensity],
-    blur: blur[intensity === 'ultraThin' ? 'subtle' : 
-          intensity === 'thin' ? 'light' : 
-          intensity === 'regular' ? 'regular' : 
-          intensity === 'thick' ? 'heavy' : 'ultra'],
+    blur: blur[
+      intensity === 'ultraThin'
+        ? 'subtle'
+        : intensity === 'thin'
+          ? 'light'
+          : intensity === 'regular'
+            ? 'regular'
+            : intensity === 'thick'
+              ? 'heavy'
+              : 'ultra'
+    ],
   };
 };
 
@@ -328,7 +343,7 @@ export const useGlassIntensity = (intensity: 'ultraThin' | 'thin' | 'regular' | 
  * Usage: createThemedStyles((theme) => ({ container: { backgroundColor: theme.background.primary } }))
  */
 export const createThemedStyles = <T extends Record<string, any>>(
-  stylesFactory: (theme: Theme) => T
+  stylesFactory: (theme: Theme) => T,
 ) => {
   return (theme: Theme): T => stylesFactory(theme);
 };
@@ -342,7 +357,7 @@ export const withOpacity = (color: string, opacity: number): string => {
     // Replace the alpha value in existing rgba
     return color.replace(/rgba\(([^,]+),([^,]+),([^,]+),([^)]+)\)/, `rgba($1,$2,$3,${opacity})`);
   }
-  
+
   if (color.startsWith('#')) {
     // Convert hex to rgba
     const hex = color.replace('#', '');
@@ -351,7 +366,7 @@ export const withOpacity = (color: string, opacity: number): string => {
     const b = parseInt(hex.substr(4, 2), 16);
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   }
-  
+
   // Return as-is for named colors or other formats
   return color;
 };
@@ -360,12 +375,7 @@ export const withOpacity = (color: string, opacity: number): string => {
  * Get responsive value based on screen size
  * Usage: getResponsiveValue({ mobile: 16, tablet: 18, desktop: 20 })
  */
-export function getResponsiveValue<T>(values: {
-  mobile: T;
-  tablet?: T;
-  desktop?: T;
-  wide?: T;
-}): T {
+export function getResponsiveValue<T>(values: { mobile: T; tablet?: T; desktop?: T; wide?: T }): T {
   // For now, return mobile value (implement proper responsive logic later)
   return values.mobile;
 }
@@ -381,7 +391,7 @@ export function getResponsiveValue<T>(values: {
 export const getGlassBackground = (
   theme: Theme,
   variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'neutral' = 'primary',
-  intensity: 'ultraThin' | 'thin' | 'regular' | 'thick' | 'ultraThick' = 'regular'
+  intensity: 'ultraThin' | 'thin' | 'regular' | 'thick' | 'ultraThick' = 'regular',
 ): any => {
   const glassTokens = DesignTokens.GlassmorphismTokens;
   const tintColors = glassTokens.tintColors;
@@ -397,12 +407,12 @@ export const getGlassBackground = (
  */
 export const getGlassBorder = (
   theme: Theme,
-  strength: 'subtle' | 'regular' | 'strong' = 'regular'
+  strength: 'subtle' | 'regular' | 'strong' = 'regular',
 ): string => {
-  const isDark = theme.background.primary === theme.BaseColors.neutral[950];
+  const isDark = theme.background.primary === DesignTokens.BaseColors.neutral[950];
   const glassTokens = DesignTokens.GlassmorphismTokens;
   const borderColors = isDark ? glassTokens.borderColors.dark : glassTokens.borderColors.light;
-  
+
   return borderColors[strength];
 };
 
@@ -412,12 +422,12 @@ export const getGlassBorder = (
  */
 export const getGlassShadow = (
   theme: Theme,
-  intensity: 'subtle' | 'regular' | 'strong' = 'regular'
+  intensity: 'subtle' | 'regular' | 'strong' = 'regular',
 ): string => {
-  const isDark = theme.background.primary === theme.BaseColors.neutral[950];
+  const isDark = theme.background.primary === DesignTokens.BaseColors.neutral[950];
   const glassTokens = DesignTokens.GlassmorphismTokens;
   const shadowColors = isDark ? glassTokens.shadowColors.dark : glassTokens.shadowColors.light;
-  
+
   return shadowColors[intensity];
 };
 
@@ -433,7 +443,7 @@ export const createGlassStyle = (
     borderRadius?: number;
     borderWidth?: number;
     shadowEnabled?: boolean;
-  } = {}
+  } = {},
 ) => {
   const {
     variant = 'neutral',
@@ -446,7 +456,7 @@ export const createGlassStyle = (
   const backgroundColor = getGlassBackground(theme, variant, intensity);
   const borderColor = getGlassBorder(theme, 'regular');
   const shadowColor = getGlassShadow(theme, 'regular');
-  
+
   return {
     backgroundColor,
     borderColor,
@@ -475,7 +485,7 @@ export const getDynamicGlassColors = (
     isError?: boolean;
     isDisabled?: boolean;
     variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'neutral';
-  } = {}
+  } = {},
 ) => {
   const {
     isPressed = false,
@@ -486,18 +496,18 @@ export const getDynamicGlassColors = (
   } = state;
 
   let finalVariant = variant;
-  
+
   // Override variant based on state
   if (isError) finalVariant = 'danger';
-  
+
   // Get base colors
   const baseBackground = getGlassBackground(theme, finalVariant, 'regular');
   const baseBorder = getGlassBorder(theme, 'regular');
-  
+
   // Modify based on state
   let backgroundColor = baseBackground;
   let borderColor = baseBorder;
-  
+
   if (isDisabled) {
     backgroundColor = withOpacity(backgroundColor, 0.5);
     borderColor = withOpacity(borderColor, 0.5);
@@ -506,7 +516,7 @@ export const getDynamicGlassColors = (
   } else if (isFocused) {
     borderColor = theme.interactive.primary;
   }
-  
+
   return {
     backgroundColor,
     borderColor,
