@@ -1,7 +1,7 @@
 /**
  * Modern Card Component
  * Premium card with 2025 design standards
- * Supports glass morphism, advanced shadows, and interaction states
+ * Supports glass variant, subtle shadows, and interaction states
  */
 
 import React from 'react';
@@ -11,7 +11,6 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  interpolate,
   createAnimatedComponent,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
@@ -78,11 +77,12 @@ export const Card: React.FC<CardProps> = ({
   const animatedStyle = useAnimatedStyle(() => {
     return {
       transform: [{ scale: scale.value }],
+      // iOS shadowOpacity will be animated; Android relies on elevation in tokens.Shadows
       shadowOpacity: shadowOpacity.value,
     };
   });
 
-  // Handle press interactions
+  // Handle press interactions (non-bouncy, premium feel)
   const handlePressIn = () => {
     if (!interactive) return;
 
@@ -181,7 +181,7 @@ export const Card: React.FC<CardProps> = ({
 
   const cardStyles = getCardStyles();
 
-  // Generate accessibility properties
+  // Accessibility
   const getAccessibilityProps = () => {
     const defaultRole = interactive ? 'button' : 'text';
     const role = accessibilityRole || defaultRole;
