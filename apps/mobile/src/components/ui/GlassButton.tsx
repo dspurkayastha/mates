@@ -15,9 +15,10 @@ import {
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
+  withTiming,
   withSequence,
   runOnJS,
+  Easing,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
@@ -113,15 +114,16 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
     }
   };
 
-  // iOS 26 Spring animation
-  const springConfig = tokens.SpringAnimations.button;
+  const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
+  const timingIn = { duration: tokens.Animation.duration.in, easing };
+  const timingOut = { duration: tokens.Animation.duration.out, easing };
 
   // Handle press with iOS 26 style animations
   const handlePressIn = () => {
     if (disabled || loading) return;
 
-    scale.value = withSpring(0.96, springConfig);
-    backgroundOpacity.value = withSpring(0.8, springConfig);
+    scale.value = withTiming(tokens.Animation.press.scale, timingIn);
+    backgroundOpacity.value = withTiming(0.8, timingIn);
 
     if (hapticFeedback) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -131,8 +133,8 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
   const handlePressOut = () => {
     if (disabled || loading) return;
 
-    scale.value = withSpring(1, springConfig);
-    backgroundOpacity.value = withSpring(1, springConfig);
+    scale.value = withTiming(1, timingOut);
+    backgroundOpacity.value = withTiming(1, timingOut);
   };
 
   const handlePress = (event: any) => {
@@ -140,8 +142,8 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
 
     // Glass ripple effect
     scale.value = withSequence(
-      withSpring(0.94, { ...springConfig, damping: 15 }),
-      withSpring(1, springConfig),
+      withTiming(tokens.Animation.press.scale - 0.02, timingIn),
+      withTiming(1, timingOut),
     );
 
     if (hapticFeedback) {

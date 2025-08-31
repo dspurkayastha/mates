@@ -7,7 +7,6 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../utils/auth/useAuth';
-import { useAuthModal } from '../../utils/auth/useAuthModal';
 import {
   Text,
   GlassCard,
@@ -22,7 +21,6 @@ import * as Haptics from 'expo-haptics';
 export default function WelcomeScreen() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const { open: openAuthModal } = useAuthModal();
   const colors = useColors();
   const tokens = useTokens();
 
@@ -75,7 +73,7 @@ export default function WelcomeScreen() {
 
   const handleSignUp = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    openAuthModal({ mode: 'signup' });
+    router.push('/login');
   };
 
   if (!isAuthenticated) {

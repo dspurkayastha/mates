@@ -4,7 +4,6 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthModal } from '../utils/auth/useAuthModal';
 import { DeepLinkHandler } from '../utils/auth/DeepLinkHandler';
 import { ThemeProvider } from '../components/ui';
 import { View, Text } from 'react-native';
@@ -80,8 +79,6 @@ export default function RootLayout() {
           <GestureHandlerRootView style={{ flex: 1 }}>
             {/* Deep Link Handler for Supabase Magic Links */}
             <DeepLinkHandler />
-            {/* Global auth modal – can be triggered from anywhere via useAuthModal */}
-            <AuthModal />
             <Stack screenOptions={{ headerShown: false }} initialRouteName="index">
               <Stack.Screen name="index" />
             </Stack>

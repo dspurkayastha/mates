@@ -17,9 +17,9 @@ import {
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
   withTiming,
   interpolate,
+  Easing,
 } from 'react-native-reanimated';
 import { useColors, useTokens } from '../../design-system/ThemeProvider';
 import { generateAccessibilityLabel, generateAccessibilityHint } from '../../utils/accessibility';
@@ -156,11 +156,17 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({
   }));
 
   const handlePressIn = () => {
-    scale.value = withSpring(0.98);
+    scale.value = withTiming(tokens.Animation.press.scale, {
+      duration: tokens.Animation.duration.in,
+      easing: Easing.bezier(0.2, 0.8, 0.2, 1),
+    });
   };
 
   const handlePressOut = () => {
-    scale.value = withSpring(1);
+    scale.value = withTiming(1, {
+      duration: tokens.Animation.duration.out,
+      easing: Easing.bezier(0.2, 0.8, 0.2, 1),
+    });
   };
 
   return (
@@ -456,11 +462,25 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     setShowResults(shouldShowResults);
     
     if (shouldShowResults) {
-      resultsOpacity.value = withTiming(1, { duration: 200 });
-      resultsTranslateY.value = withSpring(0);
+      const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
+      resultsOpacity.value = withTiming(1, {
+        duration: tokens.Animation.duration.in,
+        easing,
+      });
+      resultsTranslateY.value = withTiming(0, {
+        duration: tokens.Animation.duration.in,
+        easing,
+      });
     } else {
-      resultsOpacity.value = withTiming(0, { duration: 150 });
-      resultsTranslateY.value = withTiming(-10, { duration: 150 });
+      const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
+      resultsOpacity.value = withTiming(0, {
+        duration: tokens.Animation.duration.out,
+        easing,
+      });
+      resultsTranslateY.value = withTiming(-10, {
+        duration: tokens.Animation.duration.out,
+        easing,
+      });
     }
   }, [focused, query, showRecentSearches]);
 
@@ -475,14 +495,20 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleFocus = () => {
     setFocused(true);
-    searchBarScale.value = withSpring(1.02);
+    searchBarScale.value = withTiming(1.02, {
+      duration: tokens.Animation.duration.in,
+      easing: Easing.bezier(0.2, 0.8, 0.2, 1),
+    });
   };
 
   const handleBlur = () => {
     // Delay blur to allow result selection
     setTimeout(() => {
       setFocused(false);
-      searchBarScale.value = withSpring(1);
+      searchBarScale.value = withTiming(1, {
+        duration: tokens.Animation.duration.out,
+        easing: Easing.bezier(0.2, 0.8, 0.2, 1),
+      });
     }, 150);
   };
 

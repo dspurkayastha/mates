@@ -16,8 +16,6 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withDelay,
-  interpolate,
-  Extrapolation,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
@@ -306,12 +304,7 @@ export const AnalyticsScreen: React.FC = () => {
 
   const contentAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{
-      translateY: interpolate(
-        contentTranslateY.value,
-        [0, 50],
-        [0, 50],
-        Extrapolation.CLAMP
-      )
+      translateY: contentTranslateY.value
     }],
   }));
 
