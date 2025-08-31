@@ -3,5 +3,10 @@ import LoginScreen from '@/screens/LoginScreen';
 
 export default function Login() {
   const router = useRouter();
-  return <LoginScreen onLoginSuccess={() => router.replace('/(tabs)')} />;
+  return (
+    <LoginScreen
+      onLoginSuccess={() => router.replace('/(tabs)')}
+      onShowRegister={() => router.push('/register')}
+    />
+  );
 }

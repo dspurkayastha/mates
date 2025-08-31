@@ -73,7 +73,7 @@ export default function WelcomeScreen() {
 
   const handleSignUp = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push('/login');
+    router.push('/register');
   };
 
   if (!isAuthenticated) {
