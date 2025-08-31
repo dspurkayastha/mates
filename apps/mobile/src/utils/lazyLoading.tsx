@@ -472,7 +472,7 @@ export const splitBundle = {
   core: () => import('../components/ui'),
 
   // Feature-specific bundles
-  settings: () => import('../screens/SettingsScreen'),
+  settings: () => import('../app/(tabs)/settings'),
   onboarding: () => import('../components/ui/Onboarding'),
 
   // Utility bundles

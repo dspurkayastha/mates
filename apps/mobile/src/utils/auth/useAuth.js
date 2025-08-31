@@ -1,16 +1,17 @@
 import { useCallback, useEffect } from 'react';
-import { useAuthModal, useAuthStore } from './store';
+import { useAuthStore } from './store';
 import { supabase, SUPABASE_ENABLED } from '@/lib/supabase';
+import { useRouter } from 'expo-router';
 
 /**
  * This hook provides authentication functionality.
- * It may be easier to use the `useAuthModal` or `useRequireAuth` hooks
- * instead as those will also handle showing authentication to the user
- * directly.
+ * It may be easier to use the `useRequireAuth` hook
+ * instead as that will handle navigation to the auth flow
+ * automatically.
  */
 export const useAuth = () => {
   const { isReady, auth, setAuth } = useAuthStore();
-  const { isOpen, close, open } = useAuthModal();
+  const router = useRouter();
 
   const initiate = useCallback(() => {
     // Fetch existing session (if any) from Supabase (persisted in AsyncStorage)
@@ -49,18 +50,17 @@ export const useAuth = () => {
   }, []);
 
   const signIn = useCallback(() => {
-    open({ mode: 'signin' });
-  }, [open]);
+    router.push('/login');
+  }, [router]);
   const signUp = useCallback(() => {
-    open({ mode: 'signup' });
-  }, [open]);
+    router.push('/login');
+  }, [router]);
 
   const signOut = useCallback(() => {
     supabase.auth.signOut().finally(() => {
       setAuth(null);
-      close();
     });
-  }, [close]);
+  }, []);
 
   return {
     isReady,
@@ -79,13 +79,13 @@ export const useAuth = () => {
  */
 export const useRequireAuth = (options) => {
   const { isAuthenticated, isReady } = useAuth();
-  const { open } = useAuthModal();
+  const router = useRouter();
 
   useEffect(() => {
     if (!isAuthenticated && isReady) {
-      open({ mode: options?.mode });
+      router.push('/login');
     }
-  }, [isAuthenticated, open, options?.mode, isReady]);
+  }, [isAuthenticated, isReady, router]);
 };
 
 export default useAuth;
