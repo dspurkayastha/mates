@@ -9,70 +9,16 @@ import {
   GlassCard,
   GlassButton,
   Icon,
-  useColors,
+  ListItem,
+  useTheme,
   useTokens
 } from '@/components/ui';
 import * as Haptics from 'expo-haptics';
 
-// Glass Chore item component with iOS 26 styling
-const ChoreItem = ({ icon, name, assignedTo, dueTime, isCompleted, onToggleComplete }) => {
-  const colors = useColors();
-  const tokens = useTokens();
-  
-  return (
-    <GlassCard
-      variant="translucent"
-      size="medium"
-      interactive
-      style={{ marginBottom: tokens.Spacing.md }}
-    >
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: tokens.Spacing.lg
-      }}>
-        <View style={{
-          width: 40,
-          height: 40,
-          borderRadius: 20,
-          backgroundColor: colors.background.secondary,
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginRight: tokens.Spacing.md,
-        }}>
-          <Text style={{ fontSize: 20 }}>{icon}</Text>
-        </View>
-
-        <View style={{ flex: 1 }}>
-          <Text variant="titleMedium" weight="semibold" style={{ marginBottom: 4 }}>
-            {name}
-          </Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-            <Text variant="bodySmall" color="secondary" style={{ marginRight: 12 }}>
-              Assigned to: <Text variant="bodySmall" weight="medium" color="primary">{assignedTo}</Text>
-            </Text>
-            <Text variant="bodySmall" color="secondary">
-              Due: <Text variant="bodySmall" weight="medium" color="primary">{dueTime}</Text>
-            </Text>
-          </View>
-        </View>
-
-        <GlassButton
-          variant={isCompleted ? "success" : "secondary"}
-          buttonStyle="tinted"
-          size="small"
-          onPress={onToggleComplete}
-        >
-          {isCompleted ? '✓ Done' : 'Mark Done'}
-        </GlassButton>
-      </View>
-    </GlassCard>
-  );
-};
-
 // Glass Leaderboard item component
 const LeaderboardItem = ({ rank, name, completedCount, streak }) => {
-  const colors = useColors();
+  const { theme } = useTheme();
+  const colors = theme;
   const tokens = useTokens();
   
   return (
@@ -122,7 +68,8 @@ const LeaderboardItem = ({ rank, name, completedCount, streak }) => {
 
 export default function ChoresScreen() {
   const [activeTab, setActiveTab] = useState('today');
-  const colors = useColors();
+  const { theme } = useTheme();
+  const colors = theme;
   const tokens = useTokens();
 
   // Placeholder chores data
@@ -266,14 +213,16 @@ export default function ChoresScreen() {
               Today's Chores
             </Text>
             {todayChores.map((chore) => (
-              <ChoreItem
+              <ListItem
                 key={chore.id}
-                icon={chore.icon}
-                name={chore.name}
-                assignedTo={chore.assignedTo}
-                dueTime={chore.dueTime}
-                isCompleted={chore.isCompleted}
-                onToggleComplete={() => handleToggleComplete(chore.id)}
+                media={<Text style={{ fontSize: 20 }}>{chore.icon}</Text>}
+                title={chore.name}
+                meta={`Assigned to ${chore.assignedTo} • Due ${chore.dueTime}`}
+                accessory={{
+                  type: 'toggle',
+                  value: chore.isCompleted,
+                  onValueChange: () => handleToggleComplete(chore.id),
+                }}
               />
             ))}
           </View>
@@ -286,14 +235,16 @@ export default function ChoresScreen() {
               This Week's Chores
             </Text>
             {weekChores.map((chore) => (
-              <ChoreItem
+              <ListItem
                 key={chore.id}
-                icon={chore.icon}
-                name={chore.name}
-                assignedTo={chore.assignedTo}
-                dueTime={chore.dueTime}
-                isCompleted={chore.isCompleted}
-                onToggleComplete={() => handleToggleComplete(chore.id)}
+                media={<Text style={{ fontSize: 20 }}>{chore.icon}</Text>}
+                title={chore.name}
+                meta={`Assigned to ${chore.assignedTo} • Due ${chore.dueTime}`}
+                accessory={{
+                  type: 'toggle',
+                  value: chore.isCompleted,
+                  onValueChange: () => handleToggleComplete(chore.id),
+                }}
               />
             ))}
           </View>
