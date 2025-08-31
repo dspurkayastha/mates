@@ -4,6 +4,7 @@
 | --- | --- | --- | --- |
 | `/` | Stack entry | apps/mobile/src/app/index.jsx | Redirects to onboarding or tabs |
 | `/login` | Stack screen | apps/mobile/src/app/login.tsx | Imports `screens/LoginScreen` |
+| `/register` | Stack screen | apps/mobile/src/app/register.tsx | User registration |
 | `/welcome` | Onboarding screen | apps/mobile/src/app/(onboarding)/welcome.jsx | First-run flow |
 | `(tabs)` | Tab layout | apps/mobile/src/app/(tabs)/_layout.jsx | Bottom tab navigator |
 | `/` (Home tab) | Tab screen | apps/mobile/src/app/(tabs)/index.jsx | Dashboard |
