@@ -46,6 +46,9 @@ export const supabase = SUPABASE_ENABLED
         async signInWithOtp() {
           return { error: new Error('Supabase disabled – no credentials') };
         },
+        async signInWithPassword() {
+          return { error: new Error('Supabase disabled – no credentials') };
+        },
       },
     };
 

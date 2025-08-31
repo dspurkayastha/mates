@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import type { GestureResponderEvent } from 'react-native';
 import { View, ViewStyle, Pressable, PressableProps } from 'react-native';
 import Animated, {
   Easing,
@@ -124,15 +125,9 @@ export const Card: React.FC<CardProps> = ({
 
     // Size styles
     const sizeStyles = {
-      small: {
-        padding: tokens.Spacing.md,
-      },
-      medium: {
-        padding: tokens.Spacing.lg,
-      },
-      large: {
-        padding: tokens.Spacing.xl,
-      },
+      small: { padding: tokens.Spacing.md },
+      medium: { padding: tokens.Spacing.lg },
+      large: { padding: tokens.Spacing.xl },
     };
 
     // Variant styles
@@ -213,11 +208,11 @@ export const Card: React.FC<CardProps> = ({
       <AnimatedPressable
         style={[cardStyles, style, animatedStyle]}
         onPress={onPress}
-        onPressIn={(e) => {
+        onPressIn={(e: GestureResponderEvent) => {
           handlePressIn();
           onPressIn?.(e);
         }}
-        onPressOut={(e) => {
+        onPressOut={(e: GestureResponderEvent) => {
           handlePressOut();
           onPressOut?.(e);
         }}

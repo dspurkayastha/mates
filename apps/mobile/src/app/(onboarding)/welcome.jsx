@@ -21,7 +21,7 @@ import * as Haptics from 'expo-haptics';
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const { isAuthenticated, signIn, signUp } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { open: openAuthModal } = useAuthModal();
   const colors = useColors();
   const tokens = useTokens();
@@ -70,7 +70,7 @@ export default function WelcomeScreen() {
 
   const handleSignIn = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    openAuthModal({ mode: 'signin' });
+    router.push('/login');
   };
 
   const handleSignUp = () => {

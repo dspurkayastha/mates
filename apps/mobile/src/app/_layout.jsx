@@ -55,33 +55,23 @@ class ErrorBoundary extends React.Component {
 export default function RootLayout() {
   const { initiate, isReady } = useAuth();
 
-  console.log('RootLayout render:', { isReady });
-
   useEffect(() => {
-    console.log('RootLayout: calling initiate');
     initiate();
   }, [initiate]);
 
   useEffect(() => {
-    console.log('RootLayout: isReady changed to:', isReady);
     if (isReady) {
-      console.log('RootLayout: hiding splash screen');
       SplashScreen.hideAsync();
     }
   }, [isReady]);
 
-  console.log('RootLayout: about to render, isReady:', isReady);
-
   if (!isReady) {
-    console.log('RootLayout: returning null (not ready)');
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Loading...</Text>
       </View>
     );
   }
-
-  console.log('RootLayout: rendering main app');
 
   return (
     <ErrorBoundary>
