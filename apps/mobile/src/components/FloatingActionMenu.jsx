@@ -125,10 +125,10 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
   const menuStyles = [menuItem0Style, menuItem1Style, menuItem2Style, menuItem3Style];
   
   const menuItems = [
+    { icon: 'Vote', label: 'Poll', onPress: onCreatePoll, color: 'info' },
     { icon: 'DollarSign', label: 'Expense', onPress: onAddExpense, color: 'primary' },
     { icon: 'ShoppingCart', label: 'Grocery', onPress: onAddGrocery, color: 'success' },
     { icon: 'SquareCheck', label: 'Chore', onPress: onAddChore, color: 'warning' },
-    { icon: 'Vote', label: 'Poll', onPress: onCreatePoll, color: 'info' },
   ];
   
   return (

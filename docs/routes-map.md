@@ -12,6 +12,8 @@
 | `/chores` | Tab screen | apps/mobile/src/app/(tabs)/chores.jsx | Chores list |
 | `/profile` | Tab screen | apps/mobile/src/app/(tabs)/profile.jsx | User profile |
 | `/settings` | Tab screen (hidden) | apps/mobile/src/app/(tabs)/settings.jsx | Pushed from Home/Profile |
+| `/create-poll` | Stack screen | apps/mobile/src/app/create-poll.tsx | Create poll form |
+| `/poll-results` | Stack screen | apps/mobile/src/app/poll-results.tsx | Active poll results |
 | `*` | Fallback | apps/mobile/src/app/+not-found.tsx | Not found screen |
 | Global `AuthModal` | Modal | apps/mobile/src/utils/auth/useAuthModal.jsx | Reusable auth modal |
 | `mates://auth/callback` | Deep link | apps/mobile/src/utils/auth/DeepLinkHandler.jsx | Supabase magic link handler |

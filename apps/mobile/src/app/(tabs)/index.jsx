@@ -19,6 +19,7 @@ import {
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import FloatingActionMenu from '@/components/FloatingActionMenu';
+import { usePollStore } from '@/utils/pollStore';
 
 // Premium Navigation Card Component - TEMPORARILY DISABLED FOR DEBUGGING
 // const NavigationCard = ({ 
@@ -144,6 +145,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const { width } = Dimensions.get('window');
   const isSmallScreen = width < 380;
+  const { activePoll } = usePollStore();
 
   const handleFabPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -209,7 +211,7 @@ export default function HomeScreen() {
 
   const handleCreatePoll = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    Alert.alert('Create Poll', 'This would open the create poll form');
+    router.push('/create-poll');
   };
 
   return (
@@ -230,6 +232,35 @@ export default function HomeScreen() {
             </Text>
           </View>
         </View>
+
+        {activePoll && (
+          <GlassCard
+            variant="tinted"
+            size="medium"
+            interactive
+            onPress={() => router.push('/poll-results')}
+            style={{ marginBottom: tokens.Spacing.xl }}
+          >
+            <View style={{ padding: tokens.Spacing.lg }}>
+              <Text
+                variant="titleMedium"
+                weight="semibold"
+                style={{ marginBottom: tokens.Spacing.sm }}
+              >
+                {activePoll.question}
+              </Text>
+              <GlassButton
+                variant="primary"
+                buttonStyle="tinted"
+                size="small"
+                onPress={() => router.push('/poll-results')}
+                accessibilityLabel="View poll results"
+              >
+                View Results
+              </GlassButton>
+            </View>
+          </GlassCard>
+        )}
 
         {/* Quick Navigation Grid */}
         <View style={{ marginBottom: tokens.Spacing.xl }}>
