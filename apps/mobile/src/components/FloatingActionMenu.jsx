@@ -11,9 +11,9 @@ import * as Haptics from 'expo-haptics';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
   withTiming,
   interpolate,
+  Easing,
 } from 'react-native-reanimated';
 
 // Premium Floating Action Menu Component
@@ -33,20 +33,25 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
       newState ? Haptics.ImpactFeedbackStyle.Medium : Haptics.ImpactFeedbackStyle.Light
     );
     
-    animation.value = withSpring(newState ? 1 : 0, {
-      damping: 15,
-      stiffness: 150,
+    const duration = newState
+      ? tokens.Animation.duration.in
+      : tokens.Animation.duration.out;
+    const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
+
+    animation.value = withTiming(newState ? 1 : 0, {
+      duration,
+      easing,
     });
-    
+
     rotation.value = withTiming(newState ? 45 : 0, {
-      duration: 200,
+      duration,
+      easing,
     });
   };
-  
+
   const mainButtonStyle = useAnimatedStyle(() => {
-    const rotate = interpolate(rotation.value, [0, 45], [0, 45]);
     return {
-      transform: [{ rotate: `${rotate}deg` }],
+      transform: [{ rotate: `${rotation.value}deg` }],
     };
   });
   

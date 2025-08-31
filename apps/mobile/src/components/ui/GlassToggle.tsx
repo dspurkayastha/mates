@@ -9,9 +9,10 @@ import { TouchableOpacity, ViewStyle } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
+  withTiming,
   interpolate,
   interpolateColor,
+  Easing,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useColors, useTokens } from '../../design-system/ThemeProvider';
@@ -67,7 +68,10 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
 
   // Update toggle position when value changes
   React.useEffect(() => {
-    toggleProgress.value = withSpring(value ? 1 : 0, tokens.SpringAnimations.toggle);
+    toggleProgress.value = withTiming(value ? 1 : 0, {
+      duration: tokens.Animation.duration.in,
+      easing: Easing.bezier(0.2, 0.8, 0.2, 1),
+    });
   }, [value]);
 
   // Get dimensions based on size
@@ -146,14 +150,28 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
   // Handle press in/out for visual feedback
   const handlePressIn = () => {
     if (disabled) return;
-    scale.value = withSpring(0.95, tokens.SpringAnimations.toggle);
-    thumbScale.value = withSpring(1.1, tokens.SpringAnimations.toggle);
+    const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
+    scale.value = withTiming(tokens.Animation.press.scale, {
+      duration: tokens.Animation.duration.in,
+      easing,
+    });
+    thumbScale.value = withTiming(1.1, {
+      duration: tokens.Animation.duration.in,
+      easing,
+    });
   };
 
   const handlePressOut = () => {
     if (disabled) return;
-    scale.value = withSpring(1, tokens.SpringAnimations.toggle);
-    thumbScale.value = withSpring(1, tokens.SpringAnimations.toggle);
+    const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
+    scale.value = withTiming(1, {
+      duration: tokens.Animation.duration.out,
+      easing,
+    });
+    thumbScale.value = withTiming(1, {
+      duration: tokens.Animation.duration.out,
+      easing,
+    });
   };
 
   // Animated styles for track

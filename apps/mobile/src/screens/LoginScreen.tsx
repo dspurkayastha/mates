@@ -14,10 +14,9 @@ import {
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
   withTiming,
   withSequence,
-  interpolate,
+  Easing,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
@@ -85,12 +84,18 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   useEffect(() => {
     const initialize = async () => {
       // Animate logo
-      logoScale.value = withSpring(1, { damping: 20, stiffness: 150 });
+      logoScale.value = withTiming(1, {
+        duration: tokens.Animation.duration.in,
+        easing: Easing.bezier(0.2, 0.8, 0.2, 1),
+      });
       
       // Animate form
       setTimeout(() => {
         formOpacity.value = withTiming(1, { duration: 600 });
-        formTranslateY.value = withSpring(0, { damping: 20, stiffness: 150 });
+        formTranslateY.value = withTiming(0, {
+          duration: tokens.Animation.duration.in,
+          easing: Easing.bezier(0.2, 0.8, 0.2, 1),
+        });
       }, 200);
 
       // Check biometric availability
@@ -148,8 +153,14 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
   const handleBiometricLogin = async () => {
     biometricButtonScale.value = withSequence(
-      withSpring(0.95, { damping: 15 }),
-      withSpring(1, { damping: 15 })
+      withTiming(tokens.Animation.press.scale, {
+        duration: tokens.Animation.duration.in,
+        easing: Easing.bezier(0.2, 0.8, 0.2, 1),
+      }),
+      withTiming(1, {
+        duration: tokens.Animation.duration.out,
+        easing: Easing.bezier(0.2, 0.8, 0.2, 1),
+      })
     );
 
     setShowBiometricPrompt(true);

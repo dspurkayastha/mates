@@ -15,5 +15,4 @@
 | `/create-poll` | Stack screen | apps/mobile/src/app/create-poll.tsx | Create poll form |
 | `/poll-results` | Stack screen | apps/mobile/src/app/poll-results.tsx | Active poll results |
 | `*` | Fallback | apps/mobile/src/app/+not-found.tsx | Not found screen |
-| Global `AuthModal` | Modal | apps/mobile/src/utils/auth/useAuthModal.jsx | Reusable auth modal |
 | `mates://auth/callback` | Deep link | apps/mobile/src/utils/auth/DeepLinkHandler.jsx | Supabase magic link handler |
