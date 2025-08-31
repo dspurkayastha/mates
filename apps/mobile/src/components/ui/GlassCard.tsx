@@ -9,8 +9,9 @@ import { View, ViewStyle, TouchableOpacity, TouchableOpacityProps } from 'react-
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
+  withTiming,
   interpolate,
+  Easing,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useColors, useTokens, withOpacity } from '../../design-system/ThemeProvider';
@@ -85,16 +86,22 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   const shadowOpacity = useSharedValue(1);
   const backgroundOpacity = useSharedValue(1);
 
-  // iOS 26 Spring animation
-  const springConfig = tokens.SpringAnimations.glass;
+  const timingIn = {
+    duration: tokens.Animation.duration.in,
+    easing: Easing.bezier(0.2, 0.8, 0.2, 1),
+  };
+  const timingOut = {
+    duration: tokens.Animation.duration.out,
+    easing: Easing.bezier(0.2, 0.8, 0.2, 1),
+  };
 
   // Handle interactions for interactive cards
   const handlePressIn = () => {
     if (!interactive) return;
 
-    scale.value = withSpring(0.98, springConfig);
-    shadowOpacity.value = withSpring(1.5, springConfig);
-    backgroundOpacity.value = withSpring(0.9, springConfig);
+    scale.value = withTiming(tokens.Animation.press.scale, timingIn);
+    shadowOpacity.value = withTiming(1.5, timingIn);
+    backgroundOpacity.value = withTiming(0.9, timingIn);
 
     if (hapticFeedback) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -104,9 +111,9 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   const handlePressOut = () => {
     if (!interactive) return;
 
-    scale.value = withSpring(1, springConfig);
-    shadowOpacity.value = withSpring(1, springConfig);
-    backgroundOpacity.value = withSpring(1, springConfig);
+    scale.value = withTiming(1, timingOut);
+    shadowOpacity.value = withTiming(1, timingOut);
+    backgroundOpacity.value = withTiming(1, timingOut);
   };
 
   // Animated styles
