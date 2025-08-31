@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "test": "npx jest"
+    "test": "jest"
   },
   "dependencies": {
     "@expo-google-fonts/dev": "^0.4.7",
@@ -56,11 +56,11 @@
     "expo-router": "~5.1.5",
     "expo-secure-store": "~14.2.4",
     "expo-sensors": "~14.1.4",
+    "expo-speech": "~13.1.7",
     "expo-splash-screen": "~0.30.10",
     "expo-status-bar": "~2.2.3",
     "expo-symbols": "~0.4.5",
     "expo-system-ui": "~5.0.11",
-    "expo-speech": "~13.1.7",
     "expo-three": "^8.0.0",
     "expo-updates": "~0.28.17",
     "expo-video": "~2.2.1",

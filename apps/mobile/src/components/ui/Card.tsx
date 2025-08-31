@@ -4,19 +4,19 @@
  * Supports glass variant, subtle shadows, and interaction states
  */
 
+import * as Haptics from 'expo-haptics';
 import React from 'react';
+import { Pressable, PressableProps, View, ViewStyle } from 'react-native';
 import type { GestureResponderEvent } from 'react-native';
-import { View, ViewStyle, Pressable, PressableProps } from 'react-native';
 import Animated, {
   Easing,
-  useSharedValue,
   useAnimatedStyle,
+  useSharedValue,
   withTiming,
-  createAnimatedComponent,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
-import { useColors, useTokens, withOpacity } from '../../design-system/ThemeProvider';
+
 import Text from './Text';
+import { useColors, useTokens, withOpacity } from '../../design-system/ThemeProvider';
 
 // ============================================================================
 // TYPES
@@ -179,14 +179,14 @@ export const Card: React.FC<CardProps> = ({
   // Accessibility
   const getAccessibilityProps = () => {
     const defaultRole = interactive ? 'button' : 'text';
-    const role = accessibilityRole || defaultRole;
+    const role = accessibilityRole ?? defaultRole;
 
     const defaultLabel = interactive
-      ? accessibilityLabel || 'Interactive card'
+      ? (accessibilityLabel ?? 'Interactive card')
       : accessibilityLabel;
 
     const defaultHint = interactive
-      ? accessibilityHint || 'Double tap to interact with this card'
+      ? (accessibilityHint ?? 'Double tap to interact with this card')
       : accessibilityHint;
 
     return {
@@ -202,7 +202,7 @@ export const Card: React.FC<CardProps> = ({
   if (interactive) {
     const { onPress, onPressIn, onPressOut, ...pressableProps } = props as InteractiveCardProps;
     const accessibilityProps = getAccessibilityProps();
-    const AnimatedPressable = createAnimatedComponent(Pressable);
+    const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
     return (
       <AnimatedPressable
