@@ -6,145 +6,105 @@ import {
   ScrollView,
   Dimensions,
   Alert,
+  Pressable,
 } from 'react-native';
-import { 
-  Text, 
-  GlassCard, 
-  GlassButton, 
+import {
+  Text,
   Icon,
-  StatusIndicator,
-  useColors,
-  useTokens 
+  ListItem,
+  Card,
+  useTheme,
+  useTokens,
 } from '@/components/ui';
+import { withOpacity } from '@/design-system/ThemeProvider';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import FloatingActionMenu from '@/components/FloatingActionMenu';
 import { usePollStore } from '@/utils/pollStore';
 
-// Premium Navigation Card Component - TEMPORARILY DISABLED FOR DEBUGGING
-// const NavigationCard = ({ 
-//   title, 
-//   subtitle, 
-//   icon, 
-//   iconColor = "brand", 
-//   onPress,
-//   hasNotification = false,
-//   notificationCount = 0
-// }) => {
-//   const colors = useColors();
-//   const tokens = useTokens();
-//   
-//   return (
-//     <GlassCard
-//       variant="translucent"
-//       size="medium"
-//       interactive
-//       onPress={onPress}
-//       style={{ 
-//         flex: 1,
-//         marginHorizontal: tokens.Spacing.xs,
-//         marginBottom: tokens.Spacing.md
-//       }}
-//     >
-//       <View style={{
-//         padding: tokens.Spacing.lg,
-//         alignItems: 'center',
-//         minHeight: 100,
-//         justifyContent: 'center'
-//       }}>
-//         <View style={{ position: 'relative', marginBottom: tokens.Spacing.sm }}>
-//           <Icon name={icon} size="xl" color={iconColor} />
-//           {hasNotification && (
-//             <View style={{
-//               position: 'absolute',
-//               top: -4,
-//               right: -4,
-//               backgroundColor: colors.semantic.error,
-//               borderRadius: 10,
-//               minWidth: 20,
-//               height: 20,
-//               justifyContent: 'center',
-//               alignItems: 'center',
-//               borderWidth: 2,
-//               borderColor: colors.background.primary
-//             }}>
-//               <Text variant="labelSmall" color="inverse" weight="bold">
-//                 {notificationCount > 9 ? '9+' : notificationCount}
-//               </Text>
-//             </View>
-//           )}
-//         </View>
-//         <Text variant="titleSmall" weight="semibold" align="center" style={{ marginBottom: tokens.Spacing.xs }}>
-//           {title}
-//         </Text>
-//         <Text variant="bodySmall" color="secondary" align="center">
-//           {subtitle}
-//         </Text>
-//       </View>
-//     </GlassCard>
-//   );
-// };
-
-// Temporary simple replacement component for debugging
 const NavigationCard = ({ title, subtitle, icon, onPress }) => {
+  const { theme } = useTheme();
+  const tokens = useTokens();
+
   return (
-    <View style={{ 
-      flex: 1, 
-      height: 100, 
-      backgroundColor: '#f0f0f0', 
-      margin: 8, 
-      borderRadius: 8,
-      alignItems: 'center',
-      justifyContent: 'center'
-    }}>
-      <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{title}</Text>
-      <Text style={{ fontSize: 12, color: '#666' }}>{subtitle}</Text>
-    </View>
+    <Card
+      variant="elevated"
+      interactive
+      onPress={onPress}
+      accessibilityLabel={title}
+      accessibilityHint={subtitle}
+      style={{ flex: 1, marginHorizontal: tokens.Spacing.xs }}
+    >
+      <ListItem
+        title={title}
+        meta={subtitle}
+        density="compact"
+        media={<Icon name={icon} size="lg" color="brand" />}
+        accessory={{ type: 'chevron' }}
+        style={{
+          backgroundColor: theme.background.elevated,
+          borderBottomWidth: 0,
+          marginHorizontal: -tokens.Spacing.lg,
+          marginVertical: -tokens.Spacing.lg,
+        }}
+      />
+    </Card>
   );
 };
 
-const StatusCard = ({ title, children, color, icon, onPress, interactive = false }) => {
-  const colors = useColors();
+const SummaryCard = ({ title, icon, onPress, items }) => {
+  const { theme } = useTheme();
   const tokens = useTokens();
-  
+
   return (
-    <GlassCard 
-      variant="translucent" 
-      size="medium" 
-      interactive={interactive}
-      onPress={interactive ? onPress : undefined}
-      style={{ 
-        marginBottom: tokens.Spacing.lg 
-      }}
+    <Card
+      variant="elevated"
+      interactive={!!onPress}
+      onPress={onPress}
+      accessibilityLabel={title}
+      style={{ marginBottom: tokens.Spacing.lg }}
     >
-      <View style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: tokens.Spacing.md,
-        padding: tokens.Spacing.lg,
-        paddingBottom: 0
-      }}>
-        <Text variant="titleMedium" weight="semibold">{title}</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          {icon && <Icon name={icon} size="lg" color="brand" />}
-          {interactive && <Icon name="ChevronRight" size="sm" color="tertiary" style={{ marginLeft: tokens.Spacing.xs }} />}
-        </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: tokens.Spacing.md,
+        }}
+      >
+        {icon && (
+          <Icon
+            name={icon}
+            size="md"
+            color="brand"
+            style={{ marginRight: tokens.Spacing.sm }}
+          />
+        )}
+        <Text variant="titleMedium" weight="semibold">
+          {title}
+        </Text>
       </View>
-      <View style={{ paddingHorizontal: tokens.Spacing.lg, paddingBottom: tokens.Spacing.lg }}>
-        {children}
-      </View>
-    </GlassCard>
+      {items.map((item, index) => (
+        <ListItem
+          key={index}
+          title={item.title}
+          meta={item.meta}
+          accessory={item.accessory}
+          density="compact"
+          style={[
+            { backgroundColor: theme.background.elevated },
+            index === items.length - 1 && { borderBottomWidth: 0 },
+          ]}
+        />
+      ))}
+    </Card>
   );
 };
 
 export default function HomeScreen() {
   const [houseName] = useState('Our House'); // This would come from API/store in a real app
-  const colors = useColors();
+  const { theme } = useTheme();
   const tokens = useTokens();
   const router = useRouter();
-  const { width } = Dimensions.get('window');
-  const isSmallScreen = width < 380;
   const { activePoll } = usePollStore();
 
   const handleFabPress = () => {
@@ -215,7 +175,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background.primary }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Welcome Header */}
         <View style={{
@@ -233,34 +193,36 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {activePoll && (
-          <GlassCard
-            variant="tinted"
-            size="medium"
-            interactive
-            onPress={() => router.push('/poll-results')}
-            style={{ marginBottom: tokens.Spacing.xl }}
+        <Pressable
+          onPress={() =>
+            router.push(activePoll ? '/poll-results' : '/create-poll')
+          }
+          style={{
+            backgroundColor: withOpacity(theme.interactive.primary, 0.05),
+            borderColor: theme.border.light,
+            borderWidth: StyleSheet.hairlineWidth,
+            borderRadius: tokens.BorderRadius.lg,
+            padding: tokens.Spacing.lg,
+            marginBottom: tokens.Spacing.xl,
+          }}
+          accessibilityRole="button"
+          accessibilityLabel={
+            activePoll ? 'View poll results' : 'Create a poll'
+          }
+        >
+          <Text
+            variant="titleMedium"
+            weight="semibold"
+            style={{ marginBottom: tokens.Spacing.xs }}
           >
-            <View style={{ padding: tokens.Spacing.lg }}>
-              <Text
-                variant="titleMedium"
-                weight="semibold"
-                style={{ marginBottom: tokens.Spacing.sm }}
-              >
-                {activePoll.question}
-              </Text>
-              <GlassButton
-                variant="primary"
-                buttonStyle="tinted"
-                size="small"
-                onPress={() => router.push('/poll-results')}
-                accessibilityLabel="View poll results"
-              >
-                View Results
-              </GlassButton>
-            </View>
-          </GlassCard>
-        )}
+            {activePoll
+              ? activePoll.question
+              : 'Start a poll with your roommates'}
+          </Text>
+          <Text variant="bodySmall" color="secondary">
+            {activePoll ? 'Tap to view results' : 'Tap to create a poll'}
+          </Text>
+        </Pressable>
 
         {/* Quick Navigation Grid */}
         <View style={{ marginBottom: tokens.Spacing.xl }}>
@@ -275,16 +237,12 @@ export default function HomeScreen() {
               subtitle="Track & split costs"
               icon="DollarSign"
               onPress={handleExpensesPress}
-              hasNotification={true}
-              notificationCount={2}
             />
             <NavigationCard
               title="Groceries"
               subtitle="Shopping lists"
               icon="ShoppingCart"
               onPress={handleGroceriesPress}
-              hasNotification={true}
-              notificationCount={5}
             />
           </View>
           
@@ -295,8 +253,6 @@ export default function HomeScreen() {
               subtitle="Household tasks"
               icon="SquareCheck"
               onPress={handleChoresPress}
-              hasNotification={true}
-              notificationCount={3}
             />
             <NavigationCard
               title="Profile"
@@ -318,7 +274,6 @@ export default function HomeScreen() {
               title="Coming Soon"
               subtitle="More features"
               icon="Plus"
-              iconColor="secondary"
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 console.log('Coming soon features');
@@ -334,118 +289,59 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        {/* Active Poll Banner (if exists) */}
-        <GlassCard 
-          variant="filled" 
-          interactive 
-          style={{ 
-            backgroundColor: colors.interactive.primary,
-            marginBottom: tokens.Spacing.lg 
-          }}
-        >
-          <Text variant="titleSmall" color="inverse" align="center">
-            Poll: Dinner tonight? — Vote Now!
-          </Text>
-        </GlassCard>
-
         {/* Status Cards */}
-        <StatusCard 
-          title="Next Rent Due" 
-          icon="DollarSign" 
-          interactive 
+        <SummaryCard
+          title="Next Rent Due"
+          icon="DollarSign"
           onPress={handleViewAllExpenses}
-        >
-          <View style={styles.cardContent}>
-            <Text variant="headlineSmall" color="primary" style={{ marginBottom: tokens.Spacing.xs }}>
-              ₹15,000
-            </Text>
-            <Text variant="bodyMedium" color="secondary" style={{ marginBottom: tokens.Spacing.sm }}>
-              Due in 5 days
-            </Text>
-            <StatusIndicator 
-              variant="warning" 
-              label="2/4 PAID" 
-              size="small"
-            />
-          </View>
-        </StatusCard>
+          items={[
+            {
+              title: '₹15,000',
+              meta: 'Due in 5 days',
+              accessory: { type: 'badge', label: '2/4 PAID', variant: 'warning' },
+            },
+          ]}
+        />
 
-        <StatusCard 
-          title="Groceries" 
-          icon="ShoppingCart" 
-          interactive 
+        <SummaryCard
+          title="Groceries"
+          icon="ShoppingCart"
           onPress={handleViewAllGroceries}
-        >
-          <View style={styles.cardContent}>
-            <Text variant="bodyMedium" color="secondary" style={{ marginBottom: tokens.Spacing.sm }}>
-              Current status:
-            </Text>
-            <View style={styles.bulletList}>
-              <Text variant="bodyMedium" color="primary" style={{ marginBottom: tokens.Spacing.xs }}>
-                • 2 items out
-              </Text>
-              <Text variant="bodyMedium" color="primary">
-                • 3 items running low
-              </Text>
-            </View>
-          </View>
-        </StatusCard>
+          items={[
+            { title: '2 items out' },
+            { title: '3 items running low' },
+          ]}
+        />
 
-        <StatusCard 
-          title="Today's Chores" 
-          icon="SquareCheck" 
-          interactive 
+        <SummaryCard
+          title="Today's Chores"
+          icon="SquareCheck"
           onPress={handleViewAllChores}
-        >
-          <View style={styles.cardContent}>
-            <Text variant="bodyMedium" color="secondary" style={{ marginBottom: tokens.Spacing.sm }}>
-              Your tasks:
-            </Text>
-            <View style={styles.bulletList}>
-              <Text variant="bodyMedium" color="primary" style={{ marginBottom: tokens.Spacing.xs }}>
-                • Dishes (You)
-              </Text>
-              <Text variant="bodyMedium" color="primary">
-                • Take out trash (Roommate)
-              </Text>
-            </View>
-          </View>
-        </StatusCard>
+          items={[
+            { title: 'Dishes', meta: 'You' },
+            { title: 'Take out trash', meta: 'Roommate' },
+          ]}
+        />
 
-        <StatusCard title="Who Owes What" icon="DollarSign" interactive onPress={handleViewAllExpenses}>
-          <View style={styles.cardContent}>
-            <Text variant="bodyMedium" color="secondary" style={{ marginBottom: tokens.Spacing.sm }}>
-              This month:
-            </Text>
-            <View style={styles.bulletList}>
-              <Text variant="bodyMedium" color="primary" style={{ marginBottom: tokens.Spacing.xs }}>
-                • You owe: ₹400
-              </Text>
-              <Text variant="bodyMedium" color="primary">
-                • You are owed: ₹0
-              </Text>
-            </View>
-          </View>
-        </StatusCard>
+        <SummaryCard
+          title="Who Owes What"
+          icon="DollarSign"
+          onPress={handleViewAllExpenses}
+          items={[
+            { title: 'You owe', meta: '₹400' },
+            { title: 'You are owed', meta: '₹0' },
+          ]}
+        />
 
-        <StatusCard title="House Rules" icon="House">
-          <View style={styles.cardContent}>
-            <Text variant="bodyMedium" color="secondary" style={{ marginBottom: tokens.Spacing.sm }}>
-              Pinned rules:
-            </Text>
-            <View style={styles.bulletList}>
-              <Text variant="bodyMedium" color="primary" style={{ marginBottom: tokens.Spacing.xs }}>
-                • Quiet hours after 11pm
-              </Text>
-              <Text variant="bodyMedium" color="primary" style={{ marginBottom: tokens.Spacing.xs }}>
-                • Clean kitchen after use
-              </Text>
-              <Text variant="bodyMedium" color="primary">
-                • Guests need 24h notice
-              </Text>
-            </View>
-          </View>
-        </StatusCard>
+        <SummaryCard
+          title="House Rules"
+          icon="House"
+          items={[
+            { title: 'Quiet hours after 11pm' },
+            { title: 'Clean kitchen after use' },
+            { title: 'Guests need 24h notice' },
+          ]}
+        />
 
         {/* Spacer for FAB */}
         <View style={{ height: tokens.Spacing['4xl'] }} />
@@ -470,19 +366,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-  },
-  cardContent: {
-    paddingTop: 4,
-  },
-  statusBadge: {
-    borderRadius: 12,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    alignSelf: 'flex-start',
-    marginTop: 4,
-  },
-  bulletList: {
-    marginTop: 4,
   },
   fab: {
     position: 'absolute',
