@@ -33,6 +33,7 @@ import {
   BarChart,
   MetricsGrid,
 } from '../components/ui';
+import SectionHeader from '../components/SectionHeader';
 
 // ============================================================================
 // TYPES
@@ -555,43 +556,27 @@ export const AnalyticsScreen: React.FC = () => {
           />
 
           {/* Insights Card */}
-          <GlassCard
-            variant="translucent"
-            size="large"
-            style={{
-              padding: tokens.Spacing.lg,
-              marginBottom: tokens.Spacing.lg,
-            }}
-            accessible={true}
-            accessibilityRole="text"
-            accessibilityLabel={generateAccessibilityLabel.status('insight', 'Spending insights and recommendations')}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginBottom: tokens.Spacing.md,
-              }}
-            >
-              <Icon
-                name="Lightbulb"
-                size="md"
-                color="warning"
-                style={{ marginRight: tokens.Spacing.sm }}
-              />
-              <Text
-                variant="titleMedium"
-                color="primary"
-                weight="semibold"
-              >
-                Insights & Recommendations
-              </Text>
-            </View>
+        <GlassCard
+          variant="translucent"
+          size="large"
+          style={{
+            padding: tokens.Spacing.lg,
+            marginBottom: tokens.Spacing.lg,
+          }}
+          accessible={true}
+          accessibilityRole="text"
+          accessibilityLabel={generateAccessibilityLabel.status('insight', 'Spending insights and recommendations')}
+        >
+          <SectionHeader
+            title="Insights & Recommendations"
+            icon={<Icon name="Lightbulb" size="md" color="warning" />}
+            style={{ marginBottom: tokens.Spacing.md }}
+          />
 
-            <View style={{ gap: tokens.Spacing.sm }}>
-              <Text variant="bodyMedium" color="secondary">
-                • Your food expenses increased by 15% this month. Consider meal planning to reduce costs.
-              </Text>
+          <View style={{ gap: tokens.Spacing.sm }}>
+            <Text variant="bodyMedium" color="secondary">
+              • Your food expenses increased by 15% this month. Consider meal planning to reduce costs.
+            </Text>
               <Text variant="bodyMedium" color="secondary">
                 • You're spending 23% less on transport compared to last month. Great job!
               </Text>
@@ -609,14 +594,10 @@ export const AnalyticsScreen: React.FC = () => {
               padding: tokens.Spacing.lg,
             }}
           >
-            <Text
-              variant="titleMedium"
-              color="primary"
-              weight="semibold"
+            <SectionHeader
+              title="Export Data"
               style={{ marginBottom: tokens.Spacing.md }}
-            >
-              Export Data
-            </Text>
+            />
 
             <View
               style={{

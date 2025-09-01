@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Text, GlassInput, GlassButton, useColors, useTokens } from '@/components/ui';
+import { GlassInput, GlassButton, useTheme, useTokens } from '@/components/ui';
+import TopBar from '@/components/TopBar';
 import { usePollStore } from '@/utils/pollStore';
 
 export default function CreatePollScreen() {
   const [question, setQuestion] = useState('');
   const { createPoll } = usePollStore();
   const router = useRouter();
-  const colors = useColors();
+  const { theme } = useTheme();
   const tokens = useTokens();
 
   const handleCreate = () => {
@@ -18,37 +19,27 @@ export default function CreatePollScreen() {
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: colors.background.primary,
-        padding: tokens.Spacing.lg,
-      }}
-    >
-      <Text
-        variant="titleLarge"
-        weight="bold"
-        style={{ marginBottom: tokens.Spacing.lg }}
-      >
-        Create Poll
-      </Text>
-      <GlassInput
-        placeholder="Poll question"
-        value={question}
-        onChangeText={setQuestion}
-        variant="default"
-        size="large"
-        style={{ marginBottom: tokens.Spacing.lg }}
-      />
-      <GlassButton
-        variant="primary"
-        buttonStyle="filled"
-        size="large"
-        onPress={handleCreate}
-        disabled={!question}
-      >
-        Create
-      </GlassButton>
+    <View style={{ flex: 1, backgroundColor: theme.background.primary }}>
+      <TopBar title="Create Poll" onBackPress={() => router.back()} />
+      <View style={{ flex: 1, padding: tokens.Spacing.lg }}>
+        <GlassInput
+          placeholder="Poll question"
+          value={question}
+          onChangeText={setQuestion}
+          variant="default"
+          size="large"
+          style={{ marginBottom: tokens.Spacing.lg }}
+        />
+        <GlassButton
+          variant="primary"
+          buttonStyle="filled"
+          size="large"
+          onPress={handleCreate}
+          disabled={!question}
+        >
+          Create
+        </GlassButton>
+      </View>
     </View>
   );
 }
