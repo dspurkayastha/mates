@@ -68,18 +68,6 @@ export default function ChoresScreen() {
     console.log('Add new chore');
   }, []);
 
-  if (isLoading) {
-    return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: theme.background.primary }}>
-        <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
-          {[...Array(5)].map((_, i) => (
-            <LoadingSkeleton key={i} height={72} style={{ marginBottom: tokens.Spacing.md }} />
-          ))}
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
-
   const renderChore = React.useCallback(
     ({ item }: { item: Chore }) => (
       <ListItem
@@ -191,21 +179,35 @@ export default function ChoresScreen() {
     [handleAddChore, tokens.Spacing.lg]
   );
 
+  const content = isLoading ? (
+    <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
+      {[...Array(5)].map((_, i) => (
+        <LoadingSkeleton
+          key={i}
+          height={72}
+          style={{ marginBottom: tokens.Spacing.md }}
+        />
+      ))}
+    </ScrollView>
+  ) : (
+    <FlashList
+      data={data}
+      key={activeTab}
+      keyExtractor={keyExtractor}
+      renderItem={renderItem}
+      estimatedItemSize={72}
+      ListHeaderComponent={renderHeader}
+      ListFooterComponent={renderFooter}
+      contentContainerStyle={{
+        paddingHorizontal: tokens.Spacing.lg,
+        paddingBottom: tokens.Spacing.lg,
+      }}
+    />
+  );
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.background.primary }}>
-      <FlashList
-        data={data}
-        key={activeTab}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        estimatedItemSize={72}
-        ListHeaderComponent={renderHeader}
-        ListFooterComponent={renderFooter}
-        contentContainerStyle={{
-          paddingHorizontal: tokens.Spacing.lg,
-          paddingBottom: tokens.Spacing.lg,
-        }}
-      />
+      {content}
     </SafeAreaView>
   );
 }
