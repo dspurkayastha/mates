@@ -1,9 +1,7 @@
+import * as Haptics from 'expo-haptics';
 import React, { useState } from 'react';
-import {
-  View,
-  SafeAreaView,
-  ScrollView,
-} from 'react-native';
+import { ScrollView, SafeAreaView, View } from 'react-native';
+
 import {
   Text,
   GlassCard,
@@ -12,9 +10,8 @@ import {
   ListItem,
   Badge,
   useTheme,
-  useTokens
+  useTokens,
 } from '../../components/ui';
-import * as Haptics from 'expo-haptics';
 
 export default function ExpensesScreen() {
   const [activeTab, setActiveTab] = useState('all');
@@ -99,22 +96,33 @@ export default function ExpensesScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
       <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
         {/* Header */}
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginBottom: tokens.Spacing.lg,
-          paddingTop: tokens.Spacing.sm
-        }}>
-          <Icon name="DollarSign" size="xl" color="brand" style={{ marginRight: tokens.Spacing.sm }} />
-          <Text variant="headlineMedium" weight="bold">Expenses</Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: tokens.Spacing.lg,
+            paddingTop: tokens.Spacing.sm,
+          }}
+        >
+          <Icon
+            name="DollarSign"
+            size="xl"
+            color="brand"
+            style={{ marginRight: tokens.Spacing.sm }}
+          />
+          <Text variant="headlineMedium" weight="bold">
+            Expenses
+          </Text>
         </View>
 
         {/* Glass Tabs */}
-        <View style={{
-          flexDirection: 'row',
-          marginBottom: tokens.Spacing.lg,
-          gap: tokens.Spacing.sm
-        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            marginBottom: tokens.Spacing.lg,
+            gap: tokens.Spacing.sm,
+          }}
+        >
           <GlassButton
             variant={activeTab === 'all' ? 'primary' : 'secondary'}
             buttonStyle={activeTab === 'all' ? 'tinted' : 'outlined'}
@@ -167,18 +175,10 @@ export default function ExpensesScreen() {
                 }
                 accessory={
                   <View style={{ alignItems: 'flex-end' }}>
-                    <Text
-                      variant="bodyMedium"
-                      weight="medium"
-                      style={{ textAlign: 'right' }}
-                    >
+                    <Text variant="bodyMedium" weight="medium" style={{ textAlign: 'right' }}>
                       ₹{transaction.amount}
                     </Text>
-                    <Badge
-                      variant={badge.variant}
-                      quiet
-                      style={{ marginTop: tokens.Spacing.xs }}
-                    >
+                    <Badge variant={badge.variant} quiet style={{ marginTop: tokens.Spacing.xs }}>
                       {badge.label}
                     </Badge>
                   </View>
@@ -190,62 +190,92 @@ export default function ExpensesScreen() {
         </View>
 
         {/* Summary Section */}
-        <GlassCard
-          variant="translucent"
-          size="large"
-          style={{ marginBottom: tokens.Spacing.lg }}
-        >
+        <GlassCard variant="translucent" size="large" style={{ marginBottom: tokens.Spacing.lg }}>
           <View style={{ padding: tokens.Spacing.lg }}>
-            <Text variant="titleLarge" weight="semibold" style={{ marginBottom: tokens.Spacing.md }}>
+            <Text
+              variant="titleLarge"
+              weight="semibold"
+              style={{ marginBottom: tokens.Spacing.md }}
+            >
               August Summary
             </Text>
 
-            <View style={{
-              backgroundColor: colors.background.secondary,
-              borderRadius: tokens.BorderRadius.md,
-              padding: tokens.Spacing.md
-            }}>
-              <View style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginBottom: tokens.Spacing.sm
-              }}>
-                <Text variant="bodyMedium" color="secondary">Total Expenses:</Text>
-                <Text variant="bodyMedium" weight="medium">₹6,300</Text>
+            <View
+              style={{
+                backgroundColor: colors.background.secondary,
+                borderRadius: tokens.BorderRadius.md,
+                padding: tokens.Spacing.md,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  marginBottom: tokens.Spacing.sm,
+                }}
+              >
+                <Text variant="bodyMedium" color="secondary">
+                  Total Expenses:
+                </Text>
+                <Text variant="bodyMedium" weight="medium">
+                  ₹6,300
+                </Text>
               </View>
 
-              <View style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginBottom: tokens.Spacing.sm
-              }}>
-                <Text variant="bodyMedium" color="secondary">You paid:</Text>
-                <Text variant="bodyMedium" weight="medium">₹3,650</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  marginBottom: tokens.Spacing.sm,
+                }}
+              >
+                <Text variant="bodyMedium" color="secondary">
+                  You paid:
+                </Text>
+                <Text variant="bodyMedium" weight="medium">
+                  ₹3,650
+                </Text>
               </View>
 
-              <View style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginBottom: tokens.Spacing.sm
-              }}>
-                <Text variant="bodyMedium" color="secondary">You owe:</Text>
-                <Text variant="bodyMedium" weight="medium">₹400</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  marginBottom: tokens.Spacing.sm,
+                }}
+              >
+                <Text variant="bodyMedium" color="secondary">
+                  You owe:
+                </Text>
+                <Text variant="bodyMedium" weight="medium">
+                  ₹400
+                </Text>
               </View>
 
-              <View style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginBottom: tokens.Spacing.sm
-              }}>
-                <Text variant="bodyMedium" color="secondary">You are owed:</Text>
-                <Text variant="bodyMedium" weight="medium">₹850</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  marginBottom: tokens.Spacing.sm,
+                }}
+              >
+                <Text variant="bodyMedium" color="secondary">
+                  You are owed:
+                </Text>
+                <Text variant="bodyMedium" weight="medium">
+                  ₹850
+                </Text>
               </View>
 
-              <View style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between'
-              }}>
-                <Text variant="bodyMedium" color="secondary">Net balance:</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Text variant="bodyMedium" color="secondary">
+                  Net balance:
+                </Text>
                 <Text variant="bodyMedium" weight="bold" color="success">
                   +₹450
                 </Text>
@@ -255,12 +285,14 @@ export default function ExpensesScreen() {
         </GlassCard>
 
         {/* Glass Action Buttons */}
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          marginBottom: tokens.Spacing.lg,
-          gap: tokens.Spacing.md
-        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginBottom: tokens.Spacing.lg,
+            gap: tokens.Spacing.md,
+          }}
+        >
           <GlassButton
             variant="success"
             buttonStyle="tinted"
@@ -290,4 +322,3 @@ export default function ExpensesScreen() {
     </SafeAreaView>
   );
 }
-

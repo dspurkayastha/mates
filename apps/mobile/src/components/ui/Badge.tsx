@@ -5,9 +5,10 @@
  */
 
 import React from 'react';
-import { View, ViewStyle, StyleSheet } from 'react-native';
-import { useTheme, useTokens } from '../../design-system/ThemeProvider';
+import { StyleSheet, View, ViewStyle } from 'react-native';
+
 import Text from './Text';
+import { useTheme, useTokens } from '../../design-system/ThemeProvider';
 
 // ============================================================================
 // TYPES
@@ -89,8 +90,7 @@ export const Badge: React.FC<BadgeProps> = ({
     borderWidth: quiet ? StyleSheet.hairlineWidth : 0,
   };
 
-  const a11yLabel =
-    accessibilityLabel || (typeof children === 'string' ? children : undefined);
+  const a11yLabel = accessibilityLabel ?? (typeof children === 'string' ? children : undefined);
 
   return (
     <View
