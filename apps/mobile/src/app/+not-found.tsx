@@ -8,9 +8,10 @@ import {
   useSitemap,
 } from 'expo-router';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ErrorBoundaryWrapper } from '../../__create/SharedErrorBoundary';
+import Button from '../components/Button';
 
 interface ParentSitemap {
   expoPages?: Array<{
@@ -148,12 +149,7 @@ function NotFoundScreen() {
                     </Text>
                   </View>
                   <View style={styles.createPageButtonContainer}>
-                    <TouchableOpacity
-                      onPress={() => handleCreatePage()}
-                      style={styles.createPageButton}
-                    >
-                      <Text style={styles.createPageButtonText}>Create Screen</Text>
-                    </TouchableOpacity>
+                    <Button onPress={() => handleCreatePage()}>Create Screen</Button>
                   </View>
                 </View>
               </View>
@@ -342,17 +338,6 @@ const styles = StyleSheet.create({
   createPageButtonContainer: {
     alignItems: 'flex-start',
     justifyContent: 'center',
-  },
-  createPageButton: {
-    backgroundColor: '#000',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 6,
-  },
-  createPageButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '500',
   },
 
   pagesContainer: {
