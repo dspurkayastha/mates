@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import {
   type RelativePathString,
   type SitemapType,
@@ -116,9 +115,14 @@ function NotFoundScreen() {
       <SafeAreaView style={styles.safeArea}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
           <View style={styles.header}>
-            <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={18} color="#666" />
-            </TouchableOpacity>
+            <Button
+              style={styles.backButton}
+              variant="secondary"
+              size="sm"
+              onPress={handleBack}
+            >
+              Back
+            </Button>
             <View style={styles.pathContainer}>
               <View style={styles.pathPrefix}>
                 <Text style={styles.pathPrefixText}>/</Text>
@@ -149,7 +153,7 @@ function NotFoundScreen() {
                     </Text>
                   </View>
                   <View style={styles.createPageButtonContainer}>
-                    <Button onPress={() => handleCreatePage()}>Create Screen</Button>
+                    <Button onPress={handleCreatePage}>Create Screen</Button>
                   </View>
                 </View>
               </View>
@@ -161,13 +165,14 @@ function NotFoundScreen() {
                 <View style={styles.pagesListContainer}>
                   <Text style={styles.pagesLabel}>MOBILE</Text>
                   {((sitemap as ParentSitemap).expoPages || []).map((route, index: number) => (
-                    <TouchableOpacity
+                    <Button
                       key={route.id}
-                      onPress={() => handleNavigate(route.cleanRoute || '')}
                       style={styles.pageButton}
+                      variant="secondary"
+                      onPress={() => handleNavigate(route.cleanRoute || '')}
                     >
-                      <Text style={styles.routeName}>{route.name}</Text>
-                    </TouchableOpacity>
+                      {route.name}
+                    </Button>
                   ))}
                 </View>
               </View>
@@ -190,13 +195,14 @@ function NotFoundScreen() {
                             ? 'Homepage'
                             : childUrl.replace(/^\//, '').replace(/^\(tabs\)\//, '');
                         return (
-                          <TouchableOpacity
+                          <Button
                             key={childRoute.contextKey}
-                            onPress={() => handleNavigate(childUrl)}
                             style={styles.pageButton}
+                            variant="secondary"
+                            onPress={() => handleNavigate(childUrl)}
                           >
-                            <Text style={styles.routeName}>{displayPath}</Text>
-                          </TouchableOpacity>
+                            {displayPath}
+                          </Button>
                         );
                       });
                     }
@@ -204,13 +210,14 @@ function NotFoundScreen() {
                     const displayPath = url === '/' ? 'Homepage' : url.replace(/^\//, '');
 
                     return (
-                      <TouchableOpacity
+                      <Button
                         key={route.contextKey}
-                        onPress={() => handleNavigate(url)}
                         style={styles.pageButton}
+                        variant="secondary"
+                        onPress={() => handleNavigate(url)}
                       >
-                        <Text style={styles.routeName}>{displayPath}</Text>
-                      </TouchableOpacity>
+                        {displayPath}
+                      </Button>
                     );
                   })}
                 </View>
@@ -368,15 +375,6 @@ const styles = StyleSheet.create({
     borderColor: '#e5e5e5',
     boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
     elevation: 1,
-  },
-  routeName: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#111',
-  },
-  routePath: {
-    fontSize: 14,
-    color: '#999',
   },
 
   routesContainer: {
