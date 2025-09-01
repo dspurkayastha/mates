@@ -4,21 +4,14 @@ import {
   SafeAreaView,
   ScrollView,
   Image,
-  Alert,
-  Pressable,
-  StyleSheet,
+  Alert
 } from 'react-native';
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
 import {
   Text,
-  Badge,
   ListItem,
   Icon,
+  Button,
+  Card,
   useTheme,
   useTokens,
 } from '@/components/ui';
@@ -31,45 +24,16 @@ import * as Haptics from 'expo-haptics';
 // -----------------------------------------------------------------------------
 
 const ActionChip = ({ label, onPress }) => {
-  const { accessibility } = useTheme();
   const tokens = useTokens();
-
-  const scale = useSharedValue(1);
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
-
-  const handlePressIn = () => {
-    if (accessibility.isReduceMotionEnabled) return;
-    scale.value = withTiming(tokens.Animation.press.scale, {
-      duration: tokens.Animation.duration.in,
-      easing,
-    });
-  };
-
-  const handlePressOut = () => {
-    if (accessibility.isReduceMotionEnabled) return;
-    scale.value = withTiming(1, {
-      duration: tokens.Animation.duration.out,
-      easing,
-    });
-  };
-
-  const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
   return (
-    <AnimatedPressable
+    <Button
+      variant="secondary"
+      size="sm"
       onPress={onPress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      style={[{ marginRight: tokens.Spacing.sm }, animatedStyle]}
-      accessibilityRole="button"
-      accessibilityLabel={label}
+      style={{ marginRight: tokens.Spacing.sm }}
     >
-      <Badge>{label}</Badge>
-    </AnimatedPressable>
+      {label}
+    </Button>
   );
 };
 
@@ -264,14 +228,7 @@ export default function ProfileScreen() {
             Management
           </Text>
 
-          <View
-            style={{
-              borderWidth: StyleSheet.hairlineWidth,
-              borderColor: theme.border.light,
-              borderRadius: tokens.BorderRadius.lg,
-              overflow: 'hidden',
-            }}
-          >
+          <Card variant="outlined" contentStyle={{ padding: 0 }}>
             <ListItem
               title="Manage House"
               meta="Invite members, house settings"
@@ -341,10 +298,9 @@ export default function ProfileScreen() {
               )}
               onPress={handleSignOut}
             />
-          </View>
+          </Card>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
