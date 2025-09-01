@@ -1,10 +1,5 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Alert,
-  SafeAreaView,
-  ScrollView,
-} from 'react-native';
+import React from 'react';
+import { View, Alert, SafeAreaView, ScrollView } from 'react-native';
 import {
   Text,
   GlassCard,
@@ -12,10 +7,12 @@ import {
   ListItem,
   Badge,
   Button,
+  LoadingSkeleton,
   useTheme,
-  useTokens
+  useTokens,
 } from '@/components/ui';
 import * as Haptics from 'expo-haptics';
+import { useGroceries, useUpdateGrocery } from '@/hooks';
 
 // Section header component
 const SectionHeader = ({ title, count, variant = 'neutral' }) => {
@@ -42,18 +39,9 @@ export default function GroceriesScreen() {
   const { theme } = useTheme();
   const colors = theme;
   const tokens = useTokens();
-  
-  // Placeholder grocery items
-  const [groceryItems, setGroceryItems] = useState([
-    { id: '1', name: 'Milk', status: 'out', addedBy: 'You', notes: '1L, Amul' },
-    { id: '2', name: 'Bread', status: 'low', addedBy: 'Roommate', notes: 'Brown bread preferred' },
-    { id: '3', name: 'Eggs', status: 'out', addedBy: 'You', notes: '1 dozen' },
-    { id: '4', name: 'Rice', status: 'needed', addedBy: 'Roommate', notes: '5kg bag' },
-    { id: '5', name: 'Onions', status: 'needed', addedBy: 'You', notes: '1kg' },
-    { id: '6', name: 'Toilet Paper', status: 'low', addedBy: 'Roommate', notes: '' },
-    { id: '7', name: 'Tomatoes', status: 'bought', addedBy: 'You', notes: '500g' },
-    { id: '8', name: 'Dish Soap', status: 'bought', addedBy: 'Roommate', notes: 'Any brand' },
-  ]);
+
+  const { data: groceryItems = [], isLoading } = useGroceries();
+  const updateGrocery = useUpdateGrocery();
 
   const handleMarkBought = (id) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -65,20 +53,12 @@ export default function GroceriesScreen() {
             'Expense Details',
             'This would open the expense form with this grocery item pre-filled',
           );
-          // Update item status
-          setGroceryItems((prevItems) =>
-            prevItems.map((item) => (item.id === id ? { ...item, status: 'bought' } : item)),
-          );
+          updateGrocery.mutate({ id, status: 'bought' });
         },
       },
       {
         text: 'Just Mark as Bought',
-        onPress: () => {
-          // Just update the status without creating an expense
-          setGroceryItems((prevItems) =>
-            prevItems.map((item) => (item.id === id ? { ...item, status: 'bought' } : item)),
-          );
-        },
+        onPress: () => updateGrocery.mutate({ id, status: 'bought' }),
       },
       {
         text: 'Cancel',
@@ -106,6 +86,18 @@ export default function GroceriesScreen() {
         return 'info';
     }
   };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
+        <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
+          {[...Array(5)].map((_, i) => (
+            <LoadingSkeleton key={i} height={72} style={{ marginBottom: tokens.Spacing.md }} />
+          ))}
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
   // Filter items by status
   const outItems = groceryItems.filter((item) => item.status === 'out');

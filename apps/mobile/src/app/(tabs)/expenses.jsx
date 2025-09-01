@@ -9,9 +9,11 @@ import {
   Icon,
   ListItem,
   Badge,
+  LoadingSkeleton,
   useTheme,
   useTokens,
 } from '../../components/ui';
+import { useExpenses } from '../../hooks';
 
 export default function ExpensesScreen() {
   const [activeTab, setActiveTab] = useState('all');
@@ -19,45 +21,7 @@ export default function ExpensesScreen() {
   const colors = theme;
   const tokens = useTokens();
 
-  // Placeholder transactions
-  const transactions = [
-    {
-      id: '1',
-      title: 'Grocery Shopping',
-      date: 'August 20, 2025',
-      paidBy: 'You',
-      sharedWith: 'All roommates',
-      amount: '2,450',
-      status: 'PENDING',
-    },
-    {
-      id: '2',
-      title: 'Electricity Bill',
-      date: 'August 15, 2025',
-      paidBy: 'Roommate',
-      sharedWith: 'All roommates',
-      amount: '1,800',
-      status: 'SETTLED',
-    },
-    {
-      id: '3',
-      title: 'Internet Bill',
-      date: 'August 10, 2025',
-      paidBy: 'You',
-      sharedWith: 'All roommates',
-      amount: '1,200',
-      status: 'OWED',
-    },
-    {
-      id: '4',
-      title: 'Dinner Takeout',
-      date: 'August 5, 2025',
-      paidBy: 'Roommate',
-      sharedWith: 'You, Roommate',
-      amount: '850',
-      status: 'OWE',
-    },
-  ];
+  const { data: transactions = [], isLoading } = useExpenses();
 
   const getBadgeProps = (status) => {
     switch (status) {
@@ -91,6 +55,23 @@ export default function ExpensesScreen() {
     // This would open the expense form
     console.log('Open add expense form');
   };
+
+  const filtered =
+    activeTab === 'all'
+      ? transactions
+      : transactions.filter((t) => t.status === activeTab.toUpperCase());
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
+        <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
+          {[...Array(4)].map((_, i) => (
+            <LoadingSkeleton key={i} height={72} style={{ marginBottom: tokens.Spacing.md }} />
+          ))}
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
@@ -156,7 +137,7 @@ export default function ExpensesScreen() {
 
         {/* Transaction List */}
         <View style={{ marginBottom: tokens.Spacing.lg }}>
-          {transactions.map((transaction) => {
+          {filtered.map((transaction) => {
             const badge = getBadgeProps(transaction.status);
             return (
               <ListItem

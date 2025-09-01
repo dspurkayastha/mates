@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, View } from 'react-native';
+import { SafeAreaView, View, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import {
   Text,
@@ -7,19 +7,13 @@ import {
   ListItem,
   Button,
   SegmentedControl,
+  LoadingSkeleton,
   useTheme,
   useTokens,
 } from '@/components/ui';
 import * as Haptics from 'expo-haptics';
-
-interface Chore {
-  id: string;
-  icon: string;
-  name: string;
-  assignedTo: string;
-  dueTime: string;
-  isCompleted: boolean;
-}
+import { useChores, useToggleChore, Chore } from '@/hooks';
+import { isToday, isThisWeek } from 'date-fns';
 
 interface Leader {
   id: string;
@@ -39,76 +33,52 @@ export default function ChoresScreen() {
   const tokens = useTokens();
   const [activeTab, setActiveTab] = React.useState<'today' | 'week' | 'leaderboard'>('today');
 
-  const todayChores: Chore[] = [
-    {
-      id: '1',
-      icon: '🧹',
-      name: 'Sweep Living Room',
-      assignedTo: 'You',
-      dueTime: 'Today, 6 PM',
-      isCompleted: false,
-    },
-    {
-      id: '2',
-      icon: '🍽️',
-      name: 'Wash Dishes',
-      assignedTo: 'You',
-      dueTime: 'Today, 9 PM',
-      isCompleted: true,
-    },
-    {
-      id: '3',
-      icon: '🗑️',
-      name: 'Take Out Trash',
-      assignedTo: 'Roommate',
-      dueTime: 'Today, 8 PM',
-      isCompleted: false,
-    },
-  ];
+  const { data: chores = [], isLoading } = useChores();
+  const toggleChore = useToggleChore();
 
-  const weekChores: Chore[] = [
-    {
-      id: '4',
-      icon: '🧼',
-      name: 'Clean Bathroom',
-      assignedTo: 'You',
-      dueTime: 'Tomorrow, 11 AM',
-      isCompleted: false,
-    },
-    {
-      id: '5',
-      icon: '👕',
-      name: 'Do Laundry',
-      assignedTo: 'Roommate',
-      dueTime: 'Wednesday, 5 PM',
-      isCompleted: false,
-    },
-    {
-      id: '6',
-      icon: '🧽',
-      name: 'Clean Kitchen',
-      assignedTo: 'Roommate',
-      dueTime: 'Friday, 7 PM',
-      isCompleted: false,
-    },
-  ];
+  const todayChores = chores.filter((c) => isToday(new Date(c.dueTime)));
+  const weekChores = chores.filter((c) => isThisWeek(new Date(c.dueTime)));
+  const leaderboard = React.useMemo(() => {
+    const counts: Record<string, number> = {};
+    chores.forEach((c) => {
+      if (c.isCompleted) {
+        counts[c.assignedTo] = (counts[c.assignedTo] || 0) + 1;
+      }
+    });
+    return Object.entries(counts)
+      .map(([name, completedCount], index) => ({
+        id: String(index),
+        name,
+        completedCount,
+        streak: 0,
+      }))
+      .sort((a, b) => b.completedCount - a.completedCount);
+  }, [chores]);
 
-  const leaderboard: Leader[] = [
-    { id: '1', name: 'Roommate', completedCount: 8, streak: 5 },
-    { id: '2', name: 'You', completedCount: 6, streak: 3 },
-    { id: '3', name: 'Roommate 2', completedCount: 4, streak: 2 },
-    { id: '4', name: 'Roommate 3', completedCount: 3, streak: 1 },
-  ];
-
-  const handleToggleComplete = React.useCallback((id: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    console.log('Toggle complete for chore:', id);
-  }, []);
+  const handleToggleComplete = React.useCallback(
+    (id: string, current: boolean) => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      toggleChore.mutate({ id, isCompleted: !current });
+    },
+    [toggleChore],
+  );
 
   const handleAddChore = React.useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     console.log('Add new chore');
   }, []);
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: theme.background.primary }}>
+        <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
+          {[...Array(5)].map((_, i) => (
+            <LoadingSkeleton key={i} height={72} style={{ marginBottom: tokens.Spacing.md }} />
+          ))}
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
   const renderChore = React.useCallback(
     ({ item }: { item: Chore }) => (
@@ -119,7 +89,7 @@ export default function ChoresScreen() {
         accessory={{
           type: 'toggle',
           value: item.isCompleted,
-          onValueChange: () => handleToggleComplete(item.id),
+          onValueChange: () => handleToggleComplete(item.id, item.isCompleted),
         }}
       />
     ),
