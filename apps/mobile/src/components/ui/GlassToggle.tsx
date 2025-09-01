@@ -15,7 +15,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { useColors, useTokens } from '../../design-system/ThemeProvider';
+import { useColors, useTokens, useTheme } from '../../design-system/ThemeProvider';
 import GlassView from './GlassView';
 
 // ============================================================================
@@ -57,22 +57,28 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
   accessibilityHint,
   testID,
 }) => {
+  const { accessibility } = useTheme();
   const colors = useColors();
   const tokens = useTokens();
   const isDark = colors.background.primary === tokens.BaseColors.neutral[950];
 
   // Animation values
-  const toggleProgress = useSharedValue(value ? 1 : 0);
+  const progress = useSharedValue(value ? 1 : 0);
   const scale = useSharedValue(1);
   const thumbScale = useSharedValue(1);
 
   // Update toggle position when value changes
   React.useEffect(() => {
-    toggleProgress.value = withTiming(value ? 1 : 0, {
-      duration: tokens.Animation.duration.in,
-      easing: Easing.bezier(0.2, 0.8, 0.2, 1),
-    });
-  }, [value]);
+    const toValue = value ? 1 : 0;
+    if (accessibility.isReduceMotionEnabled) {
+      progress.value = toValue;
+    } else {
+      progress.value = withTiming(toValue, {
+        duration: value ? tokens.Animation.duration.in : tokens.Animation.duration.out,
+        easing: Easing.bezier(0.2, 0.8, 0.2, 1),
+      });
+    }
+  }, [value, accessibility.isReduceMotionEnabled]);
 
   // Get dimensions based on size
   const getDimensions = () => {
@@ -105,6 +111,8 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
   };
 
   const dimensions = getDimensions();
+  const minX = 0;
+  const maxX = dimensions.width - dimensions.thumbSize - dimensions.padding * 2;
 
   // Get colors based on variant
   const getVariantColors = () => {
@@ -149,7 +157,7 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
 
   // Handle press in/out for visual feedback
   const handlePressIn = () => {
-    if (disabled) return;
+    if (disabled || accessibility.isReduceMotionEnabled) return;
     const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
     scale.value = withTiming(tokens.Animation.press.scale, {
       duration: tokens.Animation.duration.in,
@@ -162,7 +170,7 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
   };
 
   const handlePressOut = () => {
-    if (disabled) return;
+    if (disabled || accessibility.isReduceMotionEnabled) return;
     const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
     scale.value = withTiming(1, {
       duration: tokens.Animation.duration.out,
@@ -175,41 +183,48 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
   };
 
   // Animated styles for track
-  const animatedTrackStyle = useAnimatedStyle(() => {
-    const backgroundColor = interpolateColor(
-      toggleProgress.value,
-      [0, 1],
-      [String(tokens.GlassmorphismTokens.tintColors.neutral), String(variantColors.activeTint)],
-    );
+  const animatedTrackStyle = useAnimatedStyle(
+    () => {
+      const backgroundColor = interpolateColor(
+        progress.value,
+        [0, 1],
+        [String(tokens.GlassmorphismTokens.tintColors.neutral), String(variantColors.activeTint)],
+      );
 
-    return {
-      backgroundColor,
-      transform: [{ scale: scale.value }],
-    };
-  });
+      return {
+        backgroundColor,
+        transform: accessibility.isReduceMotionEnabled ? [] : [{ scale: scale.value }],
+      };
+    },
+    [accessibility.isReduceMotionEnabled],
+  );
 
   // Animated styles for thumb
-  const animatedThumbStyle = useAnimatedStyle(() => {
-    const translateX = interpolate(
-      toggleProgress.value,
-      [0, 1],
-      [0, dimensions.width - dimensions.thumbSize - dimensions.padding * 2],
-    );
+  const animatedThumbStyle = useAnimatedStyle(
+    () => {
+      const translateX = interpolate(progress.value, [0, 1], [minX, maxX]);
 
-    const backgroundColor = interpolateColor(
-      toggleProgress.value,
-      [0, 1],
-      [
-        String(isDark ? colors.background.elevated : colors.background.primary),
-        String(colors.background.primary),
-      ],
-    );
+      const backgroundColor = interpolateColor(
+        progress.value,
+        [0, 1],
+        [
+          String(isDark ? colors.background.elevated : colors.background.primary),
+          String(colors.background.primary),
+        ],
+      );
 
-    return {
-      transform: [{ translateX }, { scale: thumbScale.value }],
-      backgroundColor,
-    };
-  });
+      const transforms = [{ translateX }];
+      if (!accessibility.isReduceMotionEnabled) {
+        transforms.push({ scale: thumbScale.value });
+      }
+
+      return {
+        transform: transforms,
+        backgroundColor,
+      };
+    },
+    [accessibility.isReduceMotionEnabled],
+  );
 
   // Track container style
   const trackStyle: ViewStyle = {
