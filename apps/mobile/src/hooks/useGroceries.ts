@@ -79,3 +79,36 @@ export function useUpdateGrocery() {
     },
   });
 }
+
+export function useAddGrocery() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (grocery: Omit<Grocery, 'id'>) => {
+      const { data, error } = await supabase
+        .from('groceries')
+        .insert(grocery)
+        .select()
+        .single();
+      if (error) throw error;
+      return data as Grocery;
+    },
+    onMutate: async (grocery) => {
+      await queryClient.cancelQueries({ queryKey: ['groceries'] });
+      const previous = queryClient.getQueryData<Grocery[]>(['groceries']);
+      queryClient.setQueryData<Grocery[]>(['groceries'], (old = []) => [
+        { ...(grocery as any), id: Math.random().toString() },
+        ...old,
+      ]);
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['groceries'], context.previous);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['groceries'] });
+    },
+  });
+}

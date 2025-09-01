@@ -1,18 +1,19 @@
-import React from 'react';
-import { View, Alert, SafeAreaView, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Alert, SafeAreaView, ScrollView, TextInput, StyleSheet } from 'react-native';
 import {
   Text,
-  Card,
   Icon,
   ListItem,
   Badge,
   Button,
   LoadingSkeleton,
+  GlassModal,
   useTheme,
   useTokens,
 } from '@/components/ui';
 import * as Haptics from 'expo-haptics';
-import { useGroceries, useUpdateGrocery } from '@/hooks';
+import { withOpacity } from '@/design-system/ThemeProvider';
+import { useGroceries, useUpdateGrocery, useAddGrocery } from '@/hooks';
 
 // Section header component
 const SectionHeader = ({ title, count, variant = 'neutral' }) => {
@@ -27,7 +28,7 @@ const SectionHeader = ({ title, count, variant = 'neutral' }) => {
         paddingHorizontal: tokens.Spacing.sm,
       }}
     >
-      <Text variant="titleLarge" weight="semibold" style={{ marginRight: tokens.Spacing.sm }}>
+      <Text variant="titleMedium" weight="semibold" style={{ marginRight: tokens.Spacing.sm }}>
         {title}
       </Text>
       <Badge variant={variant}>{count}</Badge>
@@ -42,6 +43,11 @@ export default function GroceriesScreen() {
 
   const { data: groceryItems = [], isLoading } = useGroceries();
   const updateGrocery = useUpdateGrocery();
+  const addGrocery = useAddGrocery();
+
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [itemName, setItemName] = useState('');
+  const [itemNotes, setItemNotes] = useState('');
 
   const handleMarkBought = (id) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -69,21 +75,31 @@ export default function GroceriesScreen() {
 
   const handleAddItem = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Alert.alert('Add Item', 'This would open the add grocery item form');
+    setModalVisible(true);
+  };
+
+  const handleSubmitItem = () => {
+    if (!itemName.trim()) return;
+    addGrocery.mutate(
+      { name: itemName.trim(), status: 'needed', notes: itemNotes, addedBy: 'You' },
+      {
+        onSuccess: () => {
+          setModalVisible(false);
+          setItemName('');
+          setItemNotes('');
+        },
+      },
+    );
   };
 
   const getStatusVariant = (status) => {
     switch (status) {
       case 'out':
-        return 'error';
+        return 'danger';
       case 'low':
-        return 'warning';
-      case 'needed':
-        return 'info';
-      case 'bought':
-        return 'success';
+        return 'warn';
       default:
-        return 'info';
+        return 'neutral';
     }
   };
 
@@ -122,17 +138,22 @@ export default function GroceriesScreen() {
           <Text variant="headlineMedium" weight="bold">Groceries</Text>
         </View>
 
-        {/* Glass Attention Banner */}
+        {/* Attention Banner */}
         {attentionCount > 0 && (
-          <Card
-            variant="glass"
-            contentStyle={{ backgroundColor: colors.status.warning, padding: tokens.Spacing.md }}
-            style={{ marginBottom: tokens.Spacing.lg }}
+          <View
+            style={{
+              backgroundColor: withOpacity(colors.interactive.primary, 0.03),
+              borderWidth: StyleSheet.hairlineWidth,
+              borderColor: colors.border.light,
+              borderRadius: tokens.BorderRadius.lg,
+              padding: tokens.Spacing.md,
+              marginBottom: tokens.Spacing.lg,
+            }}
           >
-            <Text variant="titleSmall" weight="semibold" color="inverse" align="center">
+            <Text variant="titleSmall" weight="semibold" align="center">
               {attentionCount} items need attention!
             </Text>
-          </Card>
+          </View>
         )}
 
         {/* Out Items Section */}
@@ -201,7 +222,7 @@ export default function GroceriesScreen() {
         {/* Bought Items Section */}
         {boughtItems.length > 0 && (
           <View style={{ marginBottom: tokens.Spacing.xl }}>
-            <SectionHeader title="Recently Bought" count={boughtItems.length} variant="positive" />
+            <SectionHeader title="Recently Bought" count={boughtItems.length} />
             {boughtItems.map((item) => (
               <ListItem
                 key={item.id}
@@ -209,11 +230,11 @@ export default function GroceriesScreen() {
                 meta={`Added by ${item.addedBy}`}
                 media={<Icon name="ShoppingCart" size="lg" color="brand" />}
                 accessory={{
-                  type: 'badge',
-                  label: item.status.toUpperCase(),
-                  variant: getStatusVariant(item.status),
+                  type: 'toggle',
+                  value: true,
+                  onValueChange: (val) =>
+                    updateGrocery.mutate({ id: item.id, status: val ? 'bought' : 'needed' }),
                 }}
-                onPress={() => handleMarkBought(item.id)}
               />
             ))}
           </View>
@@ -234,6 +255,60 @@ export default function GroceriesScreen() {
         {/* Spacer for bottom tabs */}
         <View style={{ height: 80 }} />
       </ScrollView>
+
+      <GlassModal
+        visible={isModalVisible}
+        onClose={() => setModalVisible(false)}
+        contentStyle={{ padding: tokens.Spacing.lg }}
+      >
+        <Text variant="titleMedium" weight="semibold" style={{ marginBottom: tokens.Spacing.md }}>
+          Add Grocery Item
+        </Text>
+        <TextInput
+          value={itemName}
+          onChangeText={setItemName}
+          placeholder="Item name"
+          placeholderTextColor={colors.text.secondary}
+          style={{
+            borderWidth: StyleSheet.hairlineWidth,
+            borderColor: colors.border.light,
+            borderRadius: tokens.BorderRadius.lg,
+            padding: tokens.Spacing.md,
+            backgroundColor: withOpacity(colors.interactive.primary, 0.03),
+            color: colors.text.primary,
+            marginBottom: tokens.Spacing.md,
+          }}
+          accessibilityLabel="Item name"
+        />
+        <TextInput
+          value={itemNotes}
+          onChangeText={setItemNotes}
+          placeholder="Notes"
+          placeholderTextColor={colors.text.secondary}
+          multiline
+          style={{
+            borderWidth: StyleSheet.hairlineWidth,
+            borderColor: colors.border.light,
+            borderRadius: tokens.BorderRadius.lg,
+            padding: tokens.Spacing.md,
+            backgroundColor: withOpacity(colors.interactive.primary, 0.03),
+            color: colors.text.primary,
+            marginBottom: tokens.Spacing.lg,
+          }}
+          accessibilityLabel="Notes"
+        />
+        <Button
+          variant="primary"
+          fullWidth
+          onPress={handleSubmitItem}
+          style={{ marginBottom: tokens.Spacing.sm }}
+        >
+          Save
+        </Button>
+        <Button variant="secondary" fullWidth onPress={() => setModalVisible(false)}>
+          Cancel
+        </Button>
+      </GlassModal>
     </SafeAreaView>
   );
 }
