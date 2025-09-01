@@ -5,7 +5,7 @@ import { useTheme, useTokens } from '../../design-system/ThemeProvider';
 import Text from './Text';
 import Icon from './Icon';
 import GlassToggle from './GlassToggle';
-import StatusIndicator from './StatusIndicator';
+import Badge from './Badge';
 
 // ============================================================================
 // TYPES
@@ -91,14 +91,20 @@ export const ListItem: React.FC<ListItemProps> = ({
             accessibilityLabel={`${title} toggle`}
           />
         );
-      case 'badge':
+      case 'badge': {
+        const variantMap: Record<BadgeVariant, React.ComponentProps<typeof Badge>['variant']> = {
+          success: 'positive',
+          warning: 'warn',
+          error: 'danger',
+          info: 'neutral',
+          neutral: 'neutral',
+        };
         return (
-          <StatusIndicator
-            variant={accessory.variant || 'neutral'}
-            label={accessory.label}
-            size="small"
-          />
+          <Badge variant={variantMap[accessory.variant || 'neutral']}>
+            {accessory.label}
+          </Badge>
         );
+      }
       default:
         return null;
     }
