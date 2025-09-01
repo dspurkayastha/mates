@@ -5,6 +5,9 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import supabase, { SUPABASE_ENABLED } from '../lib/supabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+const client = supabase as SupabaseClient;
 
 export interface Expense {
   id: string;
@@ -20,7 +23,7 @@ export function useExpenses() {
   const query = useQuery<Expense[]>({
     queryKey: ['expenses'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('expenses')
         .select('*')
         .order('created_at', { ascending: false });
@@ -32,7 +35,7 @@ export function useExpenses() {
 
   useEffect(() => {
     if (!SUPABASE_ENABLED) return;
-    const channel = supabase
+    const channel = client
       .channel('public:expenses')
       .on(
         'postgres_changes',
@@ -41,7 +44,7 @@ export function useExpenses() {
       )
       .subscribe();
     return () => {
-      supabase.removeChannel(channel);
+      client.removeChannel(channel);
     };
   }, [queryClient]);
 
@@ -53,7 +56,7 @@ export function useAddExpense() {
 
   return useMutation({
     mutationFn: async (expense: Omit<Expense, 'id'>) => {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('expenses')
         .insert(expense)
         .select()

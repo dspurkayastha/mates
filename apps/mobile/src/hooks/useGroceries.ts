@@ -5,6 +5,9 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import supabase, { SUPABASE_ENABLED } from '../lib/supabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+const client = supabase as SupabaseClient;
 
 export interface Grocery {
   id: string;
@@ -20,7 +23,7 @@ export function useGroceries() {
   const query = useQuery<Grocery[]>({
     queryKey: ['groceries'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('groceries')
         .select('*')
         .order('created_at', { ascending: false });
@@ -32,7 +35,7 @@ export function useGroceries() {
 
   useEffect(() => {
     if (!SUPABASE_ENABLED) return;
-    const channel = supabase
+    const channel = client
       .channel('public:groceries')
       .on(
         'postgres_changes',
@@ -41,7 +44,7 @@ export function useGroceries() {
       )
       .subscribe();
     return () => {
-      supabase.removeChannel(channel);
+      client.removeChannel(channel);
     };
   }, [queryClient]);
 
@@ -52,7 +55,7 @@ export function useUpdateGrocery() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (grocery: Partial<Grocery> & { id: string }) => {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('groceries')
         .update(grocery)
         .eq('id', grocery.id)

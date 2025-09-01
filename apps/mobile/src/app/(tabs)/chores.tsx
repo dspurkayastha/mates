@@ -111,7 +111,7 @@ export default function ChoresScreen() {
     [theme.interactive.primary, tokens.Spacing]
   );
 
-  const data =
+  const data: any[] =
     activeTab === 'today' ? todayChores : activeTab === 'week' ? weekChores : leaderboard;
   const renderItem = activeTab === 'leaderboard' ? renderLeader : renderChore;
   const keyExtractor = React.useCallback((item: { id: string }) => item.id, []);
@@ -144,11 +144,11 @@ export default function ChoresScreen() {
             Chores
           </Text>
         </View>
-        <SegmentedControl
-          segments={segments}
-          value={activeTab}
-          onChange={setActiveTab}
-        />
+          <SegmentedControl
+            segments={segments}
+            value={activeTab}
+            onChange={(v) => setActiveTab(v as 'today' | 'week' | 'leaderboard')}
+          />
         <Text
           variant="titleLarge"
           weight="semibold"
@@ -191,10 +191,10 @@ export default function ChoresScreen() {
     </ScrollView>
   ) : (
     <FlashList
-      data={data}
+      data={data as any[]}
       key={activeTab}
-      keyExtractor={keyExtractor}
-      renderItem={renderItem}
+      keyExtractor={keyExtractor as any}
+      renderItem={renderItem as any}
       estimatedItemSize={72}
       ListHeaderComponent={renderHeader}
       ListFooterComponent={renderFooter}

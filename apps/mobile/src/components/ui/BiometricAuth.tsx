@@ -570,7 +570,6 @@ export const BiometricSetup: React.FC<BiometricSetupProps> = ({
           onPress={handleSetup}
           loading={isLoading}
           disabled={!capabilities?.isAvailable}
-          gradient
           accessibilityLabel="Enable biometric authentication"
         >
           Enable

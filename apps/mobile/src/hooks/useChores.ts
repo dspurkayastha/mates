@@ -5,6 +5,9 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import supabase, { SUPABASE_ENABLED } from '../lib/supabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+const client = supabase as SupabaseClient;
 
 export interface Chore {
   id: string;
@@ -21,7 +24,7 @@ export function useChores() {
   const query = useQuery<Chore[]>({
     queryKey: ['chores'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('chores')
         .select('*')
         .order('dueTime', { ascending: true });
@@ -33,7 +36,7 @@ export function useChores() {
 
   useEffect(() => {
     if (!SUPABASE_ENABLED) return;
-    const channel = supabase
+    const channel = client
       .channel('public:chores')
       .on(
         'postgres_changes',
@@ -42,7 +45,7 @@ export function useChores() {
       )
       .subscribe();
     return () => {
-      supabase.removeChannel(channel);
+      client.removeChannel(channel);
     };
   }, [queryClient]);
 
@@ -53,7 +56,7 @@ export function useToggleChore() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, isCompleted }: { id: string; isCompleted: boolean }) => {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('chores')
         .update({ isCompleted })
         .eq('id', id)

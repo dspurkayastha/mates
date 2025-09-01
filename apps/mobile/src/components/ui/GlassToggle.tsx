@@ -213,7 +213,7 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
         ],
       );
 
-      const transforms = [{ translateX }];
+      const transforms: any[] = [{ translateX }];
       if (!accessibility.isReduceMotionEnabled) {
         transforms.push({ scale: thumbScale.value });
       }
@@ -249,7 +249,7 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       disabled={disabled}
-      style={[{ alignSelf: 'flex-start' }, style]}
+      style={[{ alignSelf: 'flex-start' as const }, style]}
       accessible={true}
       accessibilityRole="switch"
       accessibilityState={{ checked: value }}

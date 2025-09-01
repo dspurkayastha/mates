@@ -273,20 +273,19 @@ const OnboardingStepComponent: React.FC<OnboardingStepComponentProps> = ({
           size="large"
           onPress={step.actions?.primary?.onPress || onNext}
           rightIcon={
-            currentIndex === totalSteps - 1 
+            currentIndex === totalSteps - 1
               ? <Icon name="Check" size="sm" color="inverse" />
               : <Icon name="ArrowRight" size="sm" color="inverse" />
           }
           style={{ flex: 1 }}
-          gradient
           accessibilityHint={
-            currentIndex === totalSteps - 1 
-              ? "Complete onboarding" 
-              : "Go to next step"
+            currentIndex === totalSteps - 1
+              ? 'Complete onboarding'
+              : 'Go to next step'
           }
         >
-          {step.actions?.primary?.label || 
-           (currentIndex === totalSteps - 1 ? "Get Started" : "Next")}
+          {step.actions?.primary?.label ||
+            (currentIndex === totalSteps - 1 ? 'Get Started' : 'Next')}
         </Button>
       </View>
     </Animated.View>

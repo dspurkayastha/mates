@@ -15,6 +15,69 @@ interface SegmentedControlProps {
   onChange: (value: string) => void;
 }
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+interface SegmentButtonProps {
+  seg: Segment;
+  active: boolean;
+  onChange: (value: string) => void;
+  accessibility: ReturnType<typeof useTheme>['accessibility'];
+  tokens: ReturnType<typeof useTokens>;
+}
+
+const SegmentButton: React.FC<SegmentButtonProps> = ({ seg, active, onChange, accessibility, tokens }) => {
+  const scale = useSharedValue(1);
+  const animatedSegmentStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePressIn = () => {
+    if (accessibility.isReduceMotionEnabled) return;
+    const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
+    scale.value = withTiming(tokens.Animation.press.scale, {
+      duration: tokens.Animation.duration.in,
+      easing,
+    });
+  };
+
+  const handlePressOut = () => {
+    if (accessibility.isReduceMotionEnabled) return;
+    const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
+    scale.value = withTiming(1, {
+      duration: tokens.Animation.duration.out,
+      easing,
+    });
+  };
+
+  return (
+    <AnimatedPressable
+      onPress={() => onChange(seg.value)}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={[
+        {
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingVertical: tokens.Spacing.sm,
+        },
+        animatedSegmentStyle,
+      ]}
+      accessibilityRole="tab"
+      accessibilityState={{ selected: active }}
+      accessibilityLabel={seg.label}
+    >
+      <Text
+        variant="labelLarge"
+        weight={active ? 'semibold' : 'normal'}
+        color={active ? 'brand' : 'primary'}
+      >
+        {seg.label}
+      </Text>
+    </AnimatedPressable>
+  );
+};
+
 const SegmentedControl: React.FC<SegmentedControlProps> = ({ segments, value, onChange }) => {
   const { theme, accessibility } = useTheme();
   const tokens = useTokens();
@@ -42,8 +105,6 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({ segments, value, on
     transform: [{ translateX: indicatorX.value }],
   }));
 
-  const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
   return (
     <View
       style={{
@@ -67,7 +128,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({ segments, value, on
               left: padding,
               bottom: padding,
               width: segmentWidth,
-              backgroundColor: withOpacity(theme.interactive.primary, 0.1),
+              backgroundColor: withOpacity(theme.interactive.primary, 0.08),
               borderRadius: tokens.BorderRadius.md,
               borderWidth: StyleSheet.hairlineWidth,
               borderColor: theme.border.light,
@@ -76,57 +137,16 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({ segments, value, on
           ]}
         />
       )}
-      {segments.map((seg) => {
-        const active = seg.value === value;
-        const scale = useSharedValue(1);
-        const animatedSegmentStyle = useAnimatedStyle(() => ({
-          transform: [{ scale: scale.value }],
-        }));
-        const handlePressIn = () => {
-          if (accessibility.isReduceMotionEnabled) return;
-          const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
-          scale.value = withTiming(tokens.Animation.press.scale, {
-            duration: tokens.Animation.duration.in,
-            easing,
-          });
-        };
-        const handlePressOut = () => {
-          if (accessibility.isReduceMotionEnabled) return;
-          const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
-          scale.value = withTiming(1, {
-            duration: tokens.Animation.duration.out,
-            easing,
-          });
-        };
-        return (
-          <AnimatedPressable
-            key={seg.value}
-            onPress={() => onChange(seg.value)}
-            onPressIn={handlePressIn}
-            onPressOut={handlePressOut}
-            style={[
-              {
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-                paddingVertical: tokens.Spacing.sm,
-              },
-              animatedSegmentStyle,
-            ]}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: active }}
-            accessibilityLabel={seg.label}
-          >
-            <Text
-              variant="labelLarge"
-              weight={active ? 'semibold' : 'regular'}
-              color={active ? 'brand' : 'primary'}
-            >
-              {seg.label}
-            </Text>
-          </AnimatedPressable>
-        );
-      })}
+      {segments.map((seg) => (
+        <SegmentButton
+          key={seg.value}
+          seg={seg}
+          active={seg.value === value}
+          onChange={onChange}
+          accessibility={accessibility}
+          tokens={tokens}
+        />
+      ))}
     </View>
   );
 };
