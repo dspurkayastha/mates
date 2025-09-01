@@ -1,20 +1,21 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { View, Platform } from 'react-native';
-import { 
-  HomeIcon, 
-  DollarSignIcon, 
-  ShoppingCartIcon, 
-  CheckSquareIcon, 
-  SettingsIcon,
+import { View, Platform, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  HomeIcon,
+  DollarSignIcon,
+  ShoppingCartIcon,
+  CheckSquareIcon,
   UserIcon,
-  useColors,
-  useTokens 
+  useTheme,
+  useTokens,
 } from '@/components/ui';
+import { withOpacity } from '@/design-system/ThemeProvider';
 
 // Premium tab bar icon component with enhanced styling
 function TabBarIcon({ focused, IconComponent, hasNotification = false }) {
-  const colors = useColors();
+  const { theme } = useTheme();
   const tokens = useTokens();
   
   return (
@@ -26,59 +27,61 @@ function TabBarIcon({ focused, IconComponent, hasNotification = false }) {
         position: 'relative',
       }}
     >
-      <IconComponent 
-        size="md" 
-        color={focused ? colors.interactive.primary : colors.text.secondary} 
+      <IconComponent
+        size="md"
+        color={focused ? theme.interactive.primary : theme.text.secondary}
       />
       {hasNotification && (
-        <View style={{
-          position: 'absolute',
-          top: -2,
-          right: -6,
-          width: 8,
-          height: 8,
-          borderRadius: 4,
-          backgroundColor: colors.status.error,
-          borderWidth: 1,
-          borderColor: colors.background.elevated,
-        }} />
+        <View
+          style={{
+            position: 'absolute',
+            top: -tokens.Spacing.xs,
+            right: -tokens.Spacing.xs,
+            width: tokens.Spacing.sm,
+            height: tokens.Spacing.sm,
+            borderRadius: tokens.BorderRadius.full,
+            backgroundColor: theme.status.error,
+            borderWidth: StyleSheet.hairlineWidth,
+            borderColor: theme.background.elevated,
+          }}
+        />
       )}
     </View>
   );
 }
 
 export default function TabsLayout() {
-  const colors = useColors();
+  const { theme } = useTheme();
   const tokens = useTokens();
+  const insets = useSafeAreaInsets();
   
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.interactive.primary,
-        tabBarInactiveTintColor: colors.text.secondary,
+        tabBarActiveTintColor: theme.interactive.primary,
+        tabBarInactiveTintColor: theme.text.secondary,
         tabBarStyle: {
-          height: Platform.OS === 'ios' ? 85 : 65,
-          paddingBottom: Platform.OS === 'ios' ? 25 : 8,
-          paddingTop: 12,
-          backgroundColor: colors.background.elevated,
-          borderTopWidth: 0,
-          borderTopLeftRadius: 25,
-          borderTopRightRadius: 25,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.1,
-          shadowRadius: 12,
-          elevation: 12,
+          ...tokens.Shadows.lg,
+          height: tokens.Spacing['6xl'] + insets.bottom,
+          paddingBottom: insets.bottom + tokens.Spacing.sm,
+          paddingTop: tokens.Spacing.sm,
+          backgroundColor: withOpacity(theme.interactive.primary, 0.03),
+          borderTopWidth: StyleSheet.hairlineWidth,
+          borderTopColor: theme.border.light,
+          borderTopLeftRadius: tokens.BorderRadius.xl,
+          borderTopRightRadius: tokens.BorderRadius.xl,
           position: 'absolute',
         },
         tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
-          marginTop: 4,
+          fontSize: tokens.Typography.label.small.fontSize,
+          lineHeight: tokens.Typography.label.small.lineHeight,
+          fontWeight: tokens.Typography.label.small.fontWeight,
+          marginTop: tokens.Spacing.xs,
+          color: theme.text.secondary,
         },
         tabBarIconStyle: {
-          marginTop: 4,
+          marginTop: tokens.Spacing.xs,
         },
       }}
     >
