@@ -3,7 +3,11 @@ import { useAuth } from '../utils/auth/useAuth';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, onlineManager } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 import { DeepLinkHandler } from '../utils/auth/DeepLinkHandler';
 import { ThemeProvider } from '../components/ui';
 import { View, Text } from 'react-native';
@@ -14,12 +18,14 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes
-      cacheTime: 1000 * 60 * 30, // 30 minutes
+      gcTime: 1000 * 60 * 60 * 24,
       retry: 1,
       refetchOnWindowFocus: false,
     },
   },
 });
+
+const persister = createAsyncStoragePersister({ storage: AsyncStorage });
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -56,6 +62,10 @@ export default function RootLayout() {
 
   useEffect(() => {
     initiate();
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      onlineManager.setOnline(!!state.isConnected);
+    });
+    return unsubscribe;
   }, [initiate]);
 
   useEffect(() => {
@@ -75,7 +85,7 @@ export default function RootLayout() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
+        <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
           <GestureHandlerRootView style={{ flex: 1 }}>
             {/* Deep Link Handler for Supabase Magic Links */}
             <DeepLinkHandler />
@@ -83,7 +93,7 @@ export default function RootLayout() {
               <Stack.Screen name="index" />
             </Stack>
           </GestureHandlerRootView>
-        </QueryClientProvider>
+        </PersistQueryClientProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
