@@ -64,5 +64,7 @@ export { default as GlassModal } from './GlassModal';
 // Re-export design system providers for convenience
 export { ThemeProvider, useTheme, useColors, useTokens } from '../../design-system/ThemeProvider';
 
+export { default as SegmentedControl } from './SegmentedControl';
+
 // Export types for TypeScript users
 export type { Theme, ColorScheme } from '../../design-system/ThemeProvider';

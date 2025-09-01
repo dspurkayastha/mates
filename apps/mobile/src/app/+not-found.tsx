@@ -7,19 +7,20 @@ import {
   useRouter,
   useSitemap,
 } from 'expo-router';
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { ErrorBoundaryWrapper } from '../../__create/SharedErrorBoundary';
 import Button from '../components/Button';
 
 interface ParentSitemap {
-  expoPages?: Array<{
+  expoPages?: {
     id: string;
     name: string;
     filePath: string;
     cleanRoute?: string;
-  }>;
+  }[];
 }
 
 function NotFoundScreen() {
@@ -29,7 +30,7 @@ function NotFoundScreen() {
   const [sitemap, setSitemap] = useState<SitemapType | ParentSitemap | null>(expoSitemap);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+    if (typeof window !== 'undefined' && window.parent !== window) {
       const handler = (event: MessageEvent) => {
         if (event.data.type === 'sandbox:sitemap') {
           window.removeEventListener('message', handler);
@@ -41,7 +42,7 @@ function NotFoundScreen() {
         {
           type: 'sandbox:sitemap',
         },
-        '*'
+        '*',
       );
       window.addEventListener('message', handler);
 
@@ -52,7 +53,7 @@ function NotFoundScreen() {
   }, []);
 
   const isExpoSitemap = sitemap === expoSitemap;
-  const missingPath = params['not-found']?.[0] || '';
+  const missingPath = params['not-found']?.[0] ?? '';
 
   const availableRoutes = useMemo(() => {
     return (
@@ -62,8 +63,8 @@ function NotFoundScreen() {
           child.contextKey !== './auth.jsx' &&
           child.contextKey !== './auth.web.jsx' &&
           child.contextKey !== './+not-found.tsx' &&
-          child.contextKey !== 'expo-router/build/views/Sitemap.js'
-      ) || []
+          child.contextKey !== 'expo-router/build/views/Sitemap.js',
+      ) ?? []
     );
   }, [expoSitemap]);
 
@@ -74,7 +75,7 @@ function NotFoundScreen() {
       const hasTabsIndex = expoSitemap?.children?.some(
         (child) =>
           child.contextKey === './(tabs)/_layout.jsx' &&
-          child.children.some((child) => child.contextKey === './(tabs)/index.jsx')
+          child.children.some((child) => child.contextKey === './(tabs)/index.jsx'),
       );
       if (isExpoSitemap) {
         if (hasTabsIndex) {
@@ -99,14 +100,14 @@ function NotFoundScreen() {
   };
 
   const handleCreatePage = useCallback(() => {
-    if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+    if (typeof window !== 'undefined' && window.parent !== window) {
       window.parent.postMessage(
         {
           type: 'sandbox:web:create',
           path: missingPath,
           view: 'mobile',
         },
-        '*'
+        '*',
       );
     }
   }, [missingPath]);
@@ -139,7 +140,7 @@ function NotFoundScreen() {
               project. But no worries, you've got options!
             </Text>
 
-            {typeof window !== 'undefined' && window.parent && window.parent !== window && (
+            {typeof window !== 'undefined' && window.parent !== window && (
               <View style={styles.createPageContainer}>
                 <View style={styles.createPageContent}>
                   <View style={styles.createPageTextContainer}>
@@ -160,10 +161,10 @@ function NotFoundScreen() {
               <View style={styles.pagesContainer}>
                 <View style={styles.pagesListContainer}>
                   <Text style={styles.pagesLabel}>MOBILE</Text>
-                  {((sitemap as ParentSitemap).expoPages || []).map((route, index: number) => (
+                  {((sitemap as ParentSitemap).expoPages ?? []).map((route, _index: number) => (
                     <TouchableOpacity
                       key={route.id}
-                      onPress={() => handleNavigate(route.cleanRoute || '')}
+                      onPress={() => handleNavigate(route.cleanRoute ?? '')}
                       style={styles.pageButton}
                     >
                       <Text style={styles.routeName}>{route.name}</Text>
@@ -175,16 +176,16 @@ function NotFoundScreen() {
               <View style={styles.pagesContainer}>
                 <View style={styles.pagesListContainer}>
                   <Text style={styles.pagesLabel}>MOBILE</Text>
-                  {(availableRoutes as SitemapType[]).map((route: SitemapType, index: number) => {
+                  {(availableRoutes as SitemapType[]).map((route: SitemapType, _index: number) => {
                     const url =
-                      typeof route.href === 'string' ? route.href : route.href?.pathname || '/';
+                      typeof route.href === 'string' ? route.href : (route.href?.pathname ?? '/');
 
                     if (url === '/(tabs)' && route.children) {
                       return route.children.map((childRoute: SitemapType) => {
                         const childUrl =
                           typeof childRoute.href === 'string'
                             ? childRoute.href
-                            : childRoute.href.pathname || '/';
+                            : (childRoute.href.pathname ?? '/');
                         const displayPath =
                           childUrl === '/(tabs)'
                             ? 'Homepage'

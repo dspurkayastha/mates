@@ -5,15 +5,16 @@
  */
 
 import React from 'react';
-import { View, ViewStyle, StyleSheet } from 'react-native';
-import { useTheme, useTokens } from '../../design-system/ThemeProvider';
+import { StyleSheet, View, ViewStyle } from 'react-native';
+
 import Text from './Text';
+import { useTheme, useTokens } from '../../design-system/ThemeProvider';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-type BadgeVariant = 'neutral' | 'positive' | 'warn' | 'danger';
+type BadgeVariant = 'neutral' | 'positive' | 'warn' | 'danger' | 'brand';
 
 interface BadgeProps {
   variant?: BadgeVariant;
@@ -56,6 +57,11 @@ export const Badge: React.FC<BadgeProps> = ({
   let textColor: string = theme.text.secondary;
 
   switch (variant) {
+    case 'brand':
+      backgroundColor = quiet ? 'transparent' : theme.interactive.primary;
+      borderColor = quiet ? theme.interactive.primary : 'transparent';
+      textColor = quiet ? theme.interactive.primary : theme.text.inverse;
+      break;
     case 'positive':
       backgroundColor = quiet ? 'transparent' : theme.status.successBackground;
       borderColor = quiet ? theme.status.success : 'transparent';
@@ -84,8 +90,7 @@ export const Badge: React.FC<BadgeProps> = ({
     borderWidth: quiet ? StyleSheet.hairlineWidth : 0,
   };
 
-  const a11yLabel =
-    accessibilityLabel || (typeof children === 'string' ? children : undefined);
+  const a11yLabel = accessibilityLabel ?? (typeof children === 'string' ? children : undefined);
 
   return (
     <View
