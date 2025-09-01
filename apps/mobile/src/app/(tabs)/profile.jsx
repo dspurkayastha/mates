@@ -23,6 +23,7 @@ import {
   useTokens,
 } from '@/components/ui';
 import { useRouter } from 'expo-router';
+import { useAuth } from '@/utils/auth/useAuth';
 import * as Haptics from 'expo-haptics';
 
 // -----------------------------------------------------------------------------
@@ -151,6 +152,7 @@ export default function ProfileScreen() {
   const { theme } = useTheme();
   const tokens = useTokens();
   const router = useRouter();
+  const { signOut } = useAuth();
 
   const [user] = useState({
     name: 'Alex Smith',
@@ -194,6 +196,11 @@ export default function ProfileScreen() {
         onPress: () => Alert.alert('Account Deleted'),
       },
     ]);
+  };
+
+  const handleSignOut = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    signOut();
   };
 
   const iconContainer = (name, bgColor, iconColor) => (
@@ -322,6 +329,17 @@ export default function ProfileScreen() {
                 theme.status.error,
               )}
               onPress={handleDeleteAccount}
+            />
+
+            <ListItem
+              title="Sign Out"
+              meta="Leave this account"
+              media={iconContainer(
+                'LogOut',
+                theme.status.errorBackground,
+                theme.status.error,
+              )}
+              onPress={handleSignOut}
             />
           </View>
         </View>
