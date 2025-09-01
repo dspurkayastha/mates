@@ -19,12 +19,21 @@ import { useTheme, useTokens } from '../../design-system/ThemeProvider';
 
 type Density = 'comfortable' | 'compact';
 
+// UI Badge variants (current refactor)
 type BadgeVariant = 'neutral' | 'positive' | 'warn' | 'danger' | 'brand';
+
+// Legacy/domain variants seen in older branches (mapped to UI variants)
+type DomainBadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral';
 
 type ListItemAccessoryBase =
   | { type: 'chevron' }
   | { type: 'toggle'; value: boolean; onValueChange: (val: boolean) => void }
-  | { type: 'badge'; label: string; variant?: BadgeVariant; quiet?: boolean };
+  | {
+      type: 'badge';
+      label: string;
+      variant?: BadgeVariant | DomainBadgeVariant;
+      quiet?: boolean;
+    };
 
 type ListItemAccessory = ListItemAccessoryBase | React.ReactNode;
 
@@ -87,11 +96,16 @@ export const ListItem: React.FC<ListItemProps> = ({
 
   const renderAccessory = () => {
     if (!accessory) return null;
-    if (React.isValidElement(accessory)) return accessory;
-    if (typeof accessory === 'object' && 'type' in accessory) {
+
+    // Allow callers to pass a fully-formed element
+    if (React.isValidElement(accessory)) return accessory as React.ReactElement;
+
+    // Descriptor form
+    if (typeof accessory === 'object' && accessory !== null && 'type' in accessory) {
       switch (accessory.type) {
         case 'chevron':
           return <Icon name="ArrowRight" size="md" color="tertiary" />;
+
         case 'toggle':
           return (
             <GlassToggle
@@ -100,16 +114,39 @@ export const ListItem: React.FC<ListItemProps> = ({
               accessibilityLabel={`${title} toggle`}
             />
           );
-        case 'badge':
+
+        case 'badge': {
+          // Map legacy/domain variants → current UI variants
+          const map: Record<string, BadgeVariant> = {
+            // domain → ui
+            success: 'positive',
+            warning: 'warn',
+            error: 'danger',
+            info: 'neutral',
+            neutral: 'neutral',
+            // direct ui variants supported as-is
+            positive: 'positive',
+            warn: 'warn',
+            danger: 'danger',
+            brand: 'brand',
+          };
+
+          const desired = (accessory.variant ?? 'neutral') as string;
+          const mappedVariant: BadgeVariant = map[desired] ?? 'neutral';
+
           return (
-            <Badge variant={accessory.variant ?? 'neutral'} quiet={accessory.quiet}>
+            <Badge variant={mappedVariant} quiet={accessory.quiet}>
               {accessory.label}
             </Badge>
           );
+        }
+
         default:
           return null;
       }
     }
+
+    // Fallback render
     return <>{accessory}</>;
   };
 

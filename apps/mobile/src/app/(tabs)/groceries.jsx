@@ -8,42 +8,32 @@ import {
 import {
   Text,
   GlassCard,
-  GlassButton,
   Icon,
   ListItem,
+  Badge,
+  Button,
   useTheme,
   useTokens
 } from '@/components/ui';
 import * as Haptics from 'expo-haptics';
 
-// Glass Section header component
-const SectionHeader = ({ title, count }) => {
-  const { theme } = useTheme();
-  const colors = theme;
+// Section header component
+const SectionHeader = ({ title, count, variant = 'neutral' }) => {
   const tokens = useTokens();
-  
+
   return (
-    <View style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: tokens.Spacing.md,
-      paddingHorizontal: tokens.Spacing.sm
-    }}>
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: tokens.Spacing.md,
+        paddingHorizontal: tokens.Spacing.sm,
+      }}
+    >
       <Text variant="titleLarge" weight="semibold" style={{ marginRight: tokens.Spacing.sm }}>
         {title}
       </Text>
-      <View style={{
-        backgroundColor: colors.interactive.primary,
-        borderRadius: tokens.BorderRadius.full,
-        paddingVertical: tokens.Spacing.xs,
-        paddingHorizontal: tokens.Spacing.sm,
-        minWidth: 24,
-        alignItems: 'center'
-      }}>
-        <Text variant="labelSmall" weight="bold" color="inverse">
-          {count}
-        </Text>
-      </View>
+      <Badge variant={variant}>{count}</Badge>
     </View>
   );
 };
@@ -160,7 +150,7 @@ export default function GroceriesScreen() {
         {/* Out Items Section */}
         {outItems.length > 0 && (
           <View style={{ marginBottom: tokens.Spacing.xl }}>
-            <SectionHeader title="Out" count={outItems.length} />
+            <SectionHeader title="Out" count={outItems.length} variant="danger" />
             {outItems.map((item) => (
               <ListItem
                 key={item.id}
@@ -181,7 +171,7 @@ export default function GroceriesScreen() {
         {/* Low Items Section */}
         {lowItems.length > 0 && (
           <View style={{ marginBottom: tokens.Spacing.xl }}>
-            <SectionHeader title="Running Low" count={lowItems.length} />
+            <SectionHeader title="Running Low" count={lowItems.length} variant="warn" />
             {lowItems.map((item) => (
               <ListItem
                 key={item.id}
@@ -223,7 +213,7 @@ export default function GroceriesScreen() {
         {/* Bought Items Section */}
         {boughtItems.length > 0 && (
           <View style={{ marginBottom: tokens.Spacing.xl }}>
-            <SectionHeader title="Recently Bought" count={boughtItems.length} />
+            <SectionHeader title="Recently Bought" count={boughtItems.length} variant="positive" />
             {boughtItems.map((item) => (
               <ListItem
                 key={item.id}
@@ -241,18 +231,17 @@ export default function GroceriesScreen() {
           </View>
         )}
 
-        {/* Glass Add Item Button */}
-        <GlassButton
+        {/* Add Item Button */}
+        <Button
           variant="primary"
-          buttonStyle="tinted"
           size="large"
           fullWidth
           onPress={handleAddItem}
-          leftIcon={<Icon name="Plus" size="sm" color="inverse" />}
+          leftIcon={<Icon name="Plus" size="md" color="inverse" />}
           style={{ marginVertical: tokens.Spacing.lg }}
         >
           Add Item
-        </GlassButton>
+        </Button>
 
         {/* Spacer for bottom tabs */}
         <View style={{ height: 80 }} />
