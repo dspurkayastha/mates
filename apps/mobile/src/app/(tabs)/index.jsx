@@ -13,6 +13,7 @@ import {
   Icon,
   ListItem,
   Card,
+  NavTile,
   useTheme,
   useTokens,
 } from '@/components/ui';
@@ -20,37 +21,8 @@ import { withOpacity } from '@/design-system/ThemeProvider';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import FloatingActionMenu from '@/components/FloatingActionMenu';
-import { usePollStore } from '@/utils/pollStore';
+import { useLatestPoll } from '@/features/polls/hooks';
 
-const NavigationCard = ({ title, subtitle, icon, onPress }) => {
-  const { theme } = useTheme();
-  const tokens = useTokens();
-
-  return (
-    <Card
-      variant="elevated"
-      interactive
-      onPress={onPress}
-      accessibilityLabel={title}
-      accessibilityHint={subtitle}
-      style={{ flex: 1, marginHorizontal: tokens.Spacing.xs }}
-    >
-      <ListItem
-        title={title}
-        meta={subtitle}
-        density="compact"
-        media={<Icon name={icon} size="lg" color="brand" />}
-        accessory={{ type: 'chevron' }}
-        style={{
-          backgroundColor: theme.background.elevated,
-          borderBottomWidth: 0,
-          marginHorizontal: -tokens.Spacing.lg,
-          marginVertical: -tokens.Spacing.lg,
-        }}
-      />
-    </Card>
-  );
-};
 
 const SummaryCard = ({ title, icon, onPress, items }) => {
   const { theme } = useTheme();
@@ -105,7 +77,7 @@ export default function HomeScreen() {
   const { theme } = useTheme();
   const tokens = useTokens();
   const router = useRouter();
-  const { activePoll } = usePollStore();
+  const { data: activePoll } = useLatestPoll();
 
   const handleFabPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -171,7 +143,7 @@ export default function HomeScreen() {
 
   const handleCreatePoll = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    router.push('/create-poll');
+    router.push('/polls/create');
   };
 
   return (
@@ -195,7 +167,7 @@ export default function HomeScreen() {
 
         <Pressable
           onPress={() =>
-            router.push(activePoll ? '/poll-results' : '/create-poll')
+            router.push(activePoll ? `/polls/${activePoll.id}` : '/polls/create')
           }
           style={{
             backgroundColor: withOpacity(theme.interactive.primary, 0.05),
@@ -232,13 +204,13 @@ export default function HomeScreen() {
           
           {/* First Row */}
           <View style={{ flexDirection: 'row', marginBottom: tokens.Spacing.md }}>
-            <NavigationCard
+            <NavTile
               title="Expenses"
               subtitle="Track & split costs"
               icon="DollarSign"
               onPress={handleExpensesPress}
             />
-            <NavigationCard
+            <NavTile
               title="Groceries"
               subtitle="Shopping lists"
               icon="ShoppingCart"
@@ -248,13 +220,13 @@ export default function HomeScreen() {
           
           {/* Second Row */}
           <View style={{ flexDirection: 'row', marginBottom: tokens.Spacing.md }}>
-            <NavigationCard
+            <NavTile
               title="Chores"
               subtitle="Household tasks"
               icon="SquareCheck"
               onPress={handleChoresPress}
             />
-            <NavigationCard
+            <NavTile
               title="Profile"
               subtitle="Your account"
               icon="User"
@@ -264,13 +236,13 @@ export default function HomeScreen() {
           
           {/* Third Row */}
           <View style={{ flexDirection: 'row' }}>
-            <NavigationCard
+            <NavTile
               title="Settings"
               subtitle="App preferences"
               icon="Settings"
               onPress={handleSettingsPress}
             />
-            <NavigationCard
+            <NavTile
               title="Coming Soon"
               subtitle="More features"
               icon="Plus"

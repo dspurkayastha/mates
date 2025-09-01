@@ -197,7 +197,7 @@ export const Button: React.FC<ButtonProps> = ({
     ? { borderWidth: 2, borderColor: theme.border.brand }
     : {};
 
-  const widthStyle = fullWidth ? { alignSelf: 'stretch' } : {};
+  const widthStyle: ViewStyle = fullWidth ? { alignSelf: 'stretch' } : {};
 
   return (
     <Animated.View style={[widthStyle, animatedStyle]}>

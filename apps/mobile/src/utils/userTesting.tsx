@@ -805,7 +805,6 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
             fullWidth
             onPress={handleSubmit}
             disabled={feedbackType === 'rating' ? rating === 0 : false}
-            gradient
             accessibilityLabel="Submit feedback"
           >
             Submit Feedback

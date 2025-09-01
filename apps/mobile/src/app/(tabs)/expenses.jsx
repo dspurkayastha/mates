@@ -154,89 +154,88 @@ export default function ExpensesScreen() {
         </View>
         {/* Summary Section */}
         <Card variant="elevated" style={{ marginBottom: tokens.Spacing.lg }}>
-            <Text
-              variant="titleLarge"
-              weight="semibold"
-              style={{ marginBottom: tokens.Spacing.md }}
-            >
-              August Summary
-            </Text>
+          <Text
+            variant="titleLarge"
+            weight="semibold"
+            style={{ marginBottom: tokens.Spacing.md }}
+          >
+            August Summary
+          </Text>
+          <View
+            style={{
+              backgroundColor: colors.background.secondary,
+              borderRadius: tokens.BorderRadius.md,
+              padding: tokens.Spacing.md,
+            }}
+          >
             <View
               style={{
-                backgroundColor: colors.background.secondary,
-                borderRadius: tokens.BorderRadius.md,
-                padding: tokens.Spacing.md,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: tokens.Spacing.sm,
               }}
             >
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  marginBottom: tokens.Spacing.sm,
-                }}
-              >
-                <Text variant="bodyMedium" color="secondary">
-                  Total Expenses:
-                </Text>
-                <Text variant="bodyMedium" weight="medium">
-                  ₹6,300
-                </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  marginBottom: tokens.Spacing.sm,
-                }}
-              >
-                <Text variant="bodyMedium" color="secondary">
-                  You paid:
-                </Text>
-                <Text variant="bodyMedium" weight="medium">
-                  ₹3,650
-                </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  marginBottom: tokens.Spacing.sm,
-                }}
-              >
-                <Text variant="bodyMedium" color="secondary">
-                  You owe:
-                </Text>
-                <Text variant="bodyMedium" weight="medium">
-                  ₹400
-                </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  marginBottom: tokens.Spacing.sm,
-                }}
-              >
-                <Text variant="bodyMedium" color="secondary">
-                  You are owed:
-                </Text>
-                <Text variant="bodyMedium" weight="medium">
-                  ₹850
-                </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <Text variant="bodyMedium" color="secondary">
-                  Net balance:
-                </Text>
-                <Text variant="bodyMedium" weight="bold" color="success">
-                  +₹450
-                </Text>
-              </View>
+              <Text variant="bodyMedium" color="secondary">
+                Total Expenses:
+              </Text>
+              <Text variant="bodyMedium" weight="medium">
+                ₹6,300
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: tokens.Spacing.sm,
+              }}
+            >
+              <Text variant="bodyMedium" color="secondary">
+                You paid:
+              </Text>
+              <Text variant="bodyMedium" weight="medium">
+                ₹3,650
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: tokens.Spacing.sm,
+              }}
+            >
+              <Text variant="bodyMedium" color="secondary">
+                You owe:
+              </Text>
+              <Text variant="bodyMedium" weight="medium">
+                ₹400
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: tokens.Spacing.sm,
+              }}
+            >
+              <Text variant="bodyMedium" color="secondary">
+                You are owed:
+              </Text>
+              <Text variant="bodyMedium" weight="medium">
+                ₹850
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Text variant="bodyMedium" color="secondary">
+                Net balance:
+              </Text>
+              <Text variant="bodyMedium" weight="bold" color="success">
+                +₹450
+              </Text>
             </View>
           </View>
         </Card>
