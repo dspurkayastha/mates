@@ -1,11 +1,17 @@
 import React from 'react';
-import { Pressable, View, ViewStyle, StyleSheet } from 'react-native';
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { useTheme, useTokens } from '../../design-system/ThemeProvider';
-import Text from './Text';
-import Icon from './Icon';
+import { Pressable, StyleSheet, View, ViewStyle } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+
+import Badge from './Badge';
 import GlassToggle from './GlassToggle';
-import StatusIndicator from './StatusIndicator';
+import Icon from './Icon';
+import Text from './Text';
+import { useTheme, useTokens } from '../../design-system/ThemeProvider';
 
 // ============================================================================
 // TYPES
@@ -13,16 +19,18 @@ import StatusIndicator from './StatusIndicator';
 
 type Density = 'comfortable' | 'compact';
 
-type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral';
+type BadgeVariant = 'neutral' | 'positive' | 'warn' | 'danger' | 'brand';
 
-type ListItemAccessory =
+type ListItemAccessoryBase =
   | { type: 'chevron' }
   | { type: 'toggle'; value: boolean; onValueChange: (val: boolean) => void }
-  | { type: 'badge'; label: string; variant?: BadgeVariant };
+  | { type: 'badge'; label: string; variant?: BadgeVariant; quiet?: boolean };
+
+type ListItemAccessory = ListItemAccessoryBase | React.ReactNode;
 
 interface ListItemProps {
   title: string;
-  meta?: string;
+  meta?: React.ReactNode;
   media?: React.ReactNode;
   accessory?: ListItemAccessory;
   density?: Density;
@@ -75,33 +83,34 @@ export const ListItem: React.FC<ListItemProps> = ({
     });
   };
 
-  const paddingVertical =
-    density === 'compact' ? tokens.Spacing.md : tokens.Spacing.lg;
+  const paddingVertical = density === 'compact' ? tokens.Spacing.md : tokens.Spacing.lg;
 
   const renderAccessory = () => {
     if (!accessory) return null;
-    switch (accessory.type) {
-      case 'chevron':
-        return <Icon name="ArrowRight" size="md" color="tertiary" />;
-      case 'toggle':
-        return (
-          <GlassToggle
-            value={accessory.value}
-            onValueChange={accessory.onValueChange}
-            accessibilityLabel={`${title} toggle`}
-          />
-        );
-      case 'badge':
-        return (
-          <StatusIndicator
-            variant={accessory.variant || 'neutral'}
-            label={accessory.label}
-            size="small"
-          />
-        );
-      default:
-        return null;
+    if (React.isValidElement(accessory)) return accessory;
+    if (typeof accessory === 'object' && 'type' in accessory) {
+      switch (accessory.type) {
+        case 'chevron':
+          return <Icon name="ArrowRight" size="md" color="tertiary" />;
+        case 'toggle':
+          return (
+            <GlassToggle
+              value={accessory.value}
+              onValueChange={accessory.onValueChange}
+              accessibilityLabel={`${title} toggle`}
+            />
+          );
+        case 'badge':
+          return (
+            <Badge variant={accessory.variant ?? 'neutral'} quiet={accessory.quiet}>
+              {accessory.label}
+            </Badge>
+          );
+        default:
+          return null;
+      }
     }
+    return <>{accessory}</>;
   };
 
   const content = (
@@ -131,13 +140,21 @@ export const ListItem: React.FC<ListItemProps> = ({
           {title}
         </Text>
         {meta && (
-          <Text variant="bodySmall" color="secondary">
-            {meta}
-          </Text>
+          <View style={{ marginTop: tokens.Spacing.xs }}>
+            {typeof meta === 'string' ? (
+              <Text variant="bodySmall" color="secondary">
+                {meta}
+              </Text>
+            ) : (
+              meta
+            )}
+          </View>
         )}
       </View>
       {accessory && (
-        <View style={{ marginLeft: tokens.Spacing.md }}>{renderAccessory()}</View>
+        <View style={{ marginLeft: tokens.Spacing.md, alignItems: 'flex-end' }}>
+          {renderAccessory()}
+        </View>
       )}
     </View>
   );
@@ -157,7 +174,7 @@ export const ListItem: React.FC<ListItemProps> = ({
         onPressOut={handlePressOut}
         style={[containerStyle, style, animatedStyle]}
         accessibilityRole="button"
-        accessibilityLabel={accessibilityLabel || title}
+        accessibilityLabel={accessibilityLabel ?? title}
         accessibilityHint={accessibilityHint}
         testID={testID}
       >
@@ -169,7 +186,7 @@ export const ListItem: React.FC<ListItemProps> = ({
   return (
     <View
       style={[containerStyle, style]}
-      accessibilityLabel={accessibilityLabel || title}
+      accessibilityLabel={accessibilityLabel ?? title}
       accessibilityHint={accessibilityHint}
       accessibilityRole="text"
       testID={testID}
