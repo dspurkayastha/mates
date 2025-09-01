@@ -1,9 +1,3 @@
-/**
- * Modern Card Component
- * Premium card with 2025 design standards
- * Subtle shadows and interaction states
- */
-
 import * as Haptics from 'expo-haptics';
 import React from 'react';
 import {
@@ -22,21 +16,26 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import Text from './Text';
-import { useTheme, useTokens } from '../../design-system/ThemeProvider';
+import {
+  useTheme,
+  useTokens,
+  getGlassBackground,
+  getGlassBorder,
+} from '../../design-system/ThemeProvider';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-type CardVariant = 'elevated' | 'outlined' | 'filled';
+type CardVariant = 'elevated' | 'outlined' | 'filled' | 'glass';
 
 interface BaseCardProps {
   variant?: CardVariant;
   interactive?: boolean;
   hapticFeedback?: boolean;
   style?: ViewStyle;
+  contentStyle?: ViewStyle;
   children: React.ReactNode;
-  // Accessibility props
   accessibilityLabel?: string;
   accessibilityHint?: string;
   accessibilityRole?: 'none' | 'button' | 'link' | 'text' | 'summary';
@@ -65,6 +64,7 @@ export const Card: React.FC<CardProps> = ({
   interactive = false,
   hapticFeedback = true,
   style,
+  contentStyle,
   children,
   accessibilityLabel,
   accessibilityHint,
@@ -77,22 +77,17 @@ export const Card: React.FC<CardProps> = ({
   const scale = useSharedValue(1);
 
   // Animation for interactive cards
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: scale.value }],
-    };
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
-  // Handle press interactions (non-bouncy, premium feel)
   const handlePressIn = () => {
     if (!interactive) return;
-
     const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
     scale.value = withTiming(tokens.Animation.press.scale, {
       duration: tokens.Animation.duration.in,
       easing,
     });
-
     if (hapticFeedback) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
@@ -100,7 +95,6 @@ export const Card: React.FC<CardProps> = ({
 
   const handlePressOut = () => {
     if (!interactive) return;
-
     const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
     scale.value = withTiming(1, {
       duration: tokens.Animation.duration.out,
@@ -109,12 +103,10 @@ export const Card: React.FC<CardProps> = ({
   };
 
   const getOuterStyle = (): ViewStyle => {
-    const base: ViewStyle = {
-      borderRadius: tokens.BorderRadius.lg,
-    };
-
+    const base: ViewStyle = { borderRadius: tokens.BorderRadius.lg };
     switch (variant) {
       case 'elevated':
+      case 'glass':
         return { ...base, ...tokens.Shadows.lg };
       case 'filled':
       case 'outlined':
@@ -125,12 +117,12 @@ export const Card: React.FC<CardProps> = ({
 
   const getInnerStyle = (): ViewStyle => {
     const base: ViewStyle = {
-      backgroundColor: theme.background.primary,
       borderRadius: tokens.BorderRadius.lg,
       padding: tokens.Spacing.lg,
       overflow: 'hidden',
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: theme.border.light,
+      backgroundColor: theme.background.primary,
     };
 
     switch (variant) {
@@ -138,6 +130,12 @@ export const Card: React.FC<CardProps> = ({
         return { ...base, backgroundColor: theme.background.elevated };
       case 'filled':
         return { ...base, backgroundColor: theme.background.secondary };
+      case 'glass':
+        return {
+          ...base,
+          backgroundColor: getGlassBackground(theme, 'neutral', 'regular'),
+          borderColor: getGlassBorder(theme, 'regular'),
+        };
       case 'outlined':
       default:
         return base;
@@ -145,21 +143,18 @@ export const Card: React.FC<CardProps> = ({
   };
 
   const outerStyle = getOuterStyle();
-  const innerStyle = getInnerStyle();
+  const innerBaseStyle = getInnerStyle();
+  const innerStyles = [innerBaseStyle, contentStyle];
 
-  // Accessibility
   const getAccessibilityProps = () => {
     const defaultRole = interactive ? 'button' : 'text';
     const role = accessibilityRole ?? defaultRole;
-
     const defaultLabel = interactive
-      ? (accessibilityLabel ?? 'Interactive card')
+      ? accessibilityLabel ?? 'Interactive card'
       : accessibilityLabel;
-
     const defaultHint = interactive
-      ? (accessibilityHint ?? 'Double tap to interact with this card')
+      ? accessibilityHint ?? 'Double tap to interact with this card'
       : accessibilityHint;
-
     return {
       accessible: true,
       accessibilityLabel: defaultLabel,
@@ -169,15 +164,13 @@ export const Card: React.FC<CardProps> = ({
     };
   };
 
-  // Render interactive card
   if (interactive) {
     const { onPress, onPressIn, onPressOut, ...pressableProps } = props as InteractiveCardProps;
     const accessibilityProps = getAccessibilityProps();
-
     return (
       <Animated.View style={[outerStyle, animatedStyle, style]}>
         <Pressable
-          style={innerStyle}
+          style={innerStyles}
           onPress={onPress}
           onPressIn={(e: GestureResponderEvent) => {
             handlePressIn();
@@ -196,11 +189,10 @@ export const Card: React.FC<CardProps> = ({
     );
   }
 
-  // Render static card
   const accessibilityProps = getAccessibilityProps();
   return (
     <Animated.View style={[outerStyle, style]} {...accessibilityProps}>
-      <View style={innerStyle}>{children}</View>
+      <View style={innerStyles}>{children}</View>
     </Animated.View>
   );
 };
@@ -218,7 +210,6 @@ interface CardHeaderProps {
 
 export const CardHeader: React.FC<CardHeaderProps> = ({ title, subtitle, action, style }) => {
   const tokens = useTokens();
-
   return (
     <View
       style={[
@@ -276,7 +267,6 @@ interface CardFooterProps {
 
 export const CardFooter: React.FC<CardFooterProps> = ({ children, style }) => {
   const tokens = useTokens();
-
   return (
     <View
       style={[

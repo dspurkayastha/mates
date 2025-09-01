@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Alert, SafeAreaView, ScrollView } from 'react-native';
 import {
   Text,
-  GlassCard,
+  Card,
   Icon,
   ListItem,
   Badge,
@@ -124,19 +124,15 @@ export default function GroceriesScreen() {
 
         {/* Glass Attention Banner */}
         {attentionCount > 0 && (
-          <GlassCard
-            variant="filled"
-            style={{
-              backgroundColor: colors.status.warning,
-              marginBottom: tokens.Spacing.lg
-            }}
+          <Card
+            variant="glass"
+            contentStyle={{ backgroundColor: colors.status.warning, padding: tokens.Spacing.md }}
+            style={{ marginBottom: tokens.Spacing.lg }}
           >
-            <View style={{ padding: tokens.Spacing.md }}>
-              <Text variant="titleSmall" weight="semibold" color="inverse" align="center">
-                {attentionCount} items need attention!
-              </Text>
-            </View>
-          </GlassCard>
+            <Text variant="titleSmall" weight="semibold" color="inverse" align="center">
+              {attentionCount} items need attention!
+            </Text>
+          </Card>
         )}
 
         {/* Out Items Section */}
@@ -226,7 +222,7 @@ export default function GroceriesScreen() {
         {/* Add Item Button */}
         <Button
           variant="primary"
-          size="large"
+          size="lg"
           fullWidth
           onPress={handleAddItem}
           leftIcon={<Icon name="Plus" size="md" color="inverse" />}

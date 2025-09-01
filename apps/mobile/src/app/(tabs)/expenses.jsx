@@ -1,11 +1,10 @@
 import * as Haptics from 'expo-haptics';
 import React, { useState } from 'react';
 import { ScrollView, SafeAreaView, View } from 'react-native';
-
 import {
   Text,
-  GlassCard,
-  GlassButton,
+  Card,
+  Button,
   Icon,
   ListItem,
   Badge,
@@ -14,15 +13,12 @@ import {
   useTokens,
 } from '../../components/ui';
 import { useExpenses } from '../../hooks';
-
 export default function ExpensesScreen() {
   const [activeTab, setActiveTab] = useState('all');
   const { theme } = useTheme();
   const colors = theme;
   const tokens = useTokens();
-
   const { data: transactions = [], isLoading } = useExpenses();
-
   const getBadgeProps = (status) => {
     switch (status) {
       case 'PENDING':
@@ -37,30 +33,25 @@ export default function ExpensesScreen() {
         return { label: status, variant: 'neutral' };
     }
   };
-
   const handleTabPress = (tab) => {
     setActiveTab(tab);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     // In a real app, this would filter the transactions
   };
-
   const handleSettleUp = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     // This would open UPI/payment options
     console.log('Open settle up options');
   };
-
   const handleAddExpense = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     // This would open the expense form
     console.log('Open add expense form');
   };
-
   const filtered =
     activeTab === 'all'
       ? transactions
       : transactions.filter((t) => t.status === activeTab.toUpperCase());
-
   if (isLoading) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
@@ -72,7 +63,6 @@ export default function ExpensesScreen() {
       </SafeAreaView>
     );
   }
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
       <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
@@ -95,7 +85,6 @@ export default function ExpensesScreen() {
             Expenses
           </Text>
         </View>
-
         {/* Glass Tabs */}
         <View
           style={{
@@ -104,37 +93,31 @@ export default function ExpensesScreen() {
             gap: tokens.Spacing.sm,
           }}
         >
-          <GlassButton
+          <Button
             variant={activeTab === 'all' ? 'primary' : 'secondary'}
-            buttonStyle={activeTab === 'all' ? 'tinted' : 'outlined'}
-            size="medium"
+            size="md"
             onPress={() => handleTabPress('all')}
             style={{ flex: 1 }}
           >
             All
-          </GlassButton>
-
-          <GlassButton
+          </Button>
+          <Button
             variant={activeTab === 'settled' ? 'primary' : 'secondary'}
-            buttonStyle={activeTab === 'settled' ? 'tinted' : 'outlined'}
-            size="medium"
+            size="md"
             onPress={() => handleTabPress('settled')}
             style={{ flex: 1 }}
           >
             Settled
-          </GlassButton>
-
-          <GlassButton
+          </Button>
+          <Button
             variant={activeTab === 'owe' ? 'primary' : 'secondary'}
-            buttonStyle={activeTab === 'owe' ? 'tinted' : 'outlined'}
-            size="medium"
+            size="md"
             onPress={() => handleTabPress('owe')}
             style={{ flex: 1 }}
           >
             Owe/Owed
-          </GlassButton>
+          </Button>
         </View>
-
         {/* Transaction List */}
         <View style={{ marginBottom: tokens.Spacing.lg }}>
           {filtered.map((transaction) => {
@@ -169,10 +152,8 @@ export default function ExpensesScreen() {
             );
           })}
         </View>
-
         {/* Summary Section */}
-        <GlassCard variant="translucent" size="large" style={{ marginBottom: tokens.Spacing.lg }}>
-          <View style={{ padding: tokens.Spacing.lg }}>
+        <Card variant="elevated" style={{ marginBottom: tokens.Spacing.lg }}>
             <Text
               variant="titleLarge"
               weight="semibold"
@@ -180,7 +161,6 @@ export default function ExpensesScreen() {
             >
               August Summary
             </Text>
-
             <View
               style={{
                 backgroundColor: colors.background.secondary,
@@ -202,7 +182,6 @@ export default function ExpensesScreen() {
                   ₹6,300
                 </Text>
               </View>
-
               <View
                 style={{
                   flexDirection: 'row',
@@ -217,7 +196,6 @@ export default function ExpensesScreen() {
                   ₹3,650
                 </Text>
               </View>
-
               <View
                 style={{
                   flexDirection: 'row',
@@ -232,7 +210,6 @@ export default function ExpensesScreen() {
                   ₹400
                 </Text>
               </View>
-
               <View
                 style={{
                   flexDirection: 'row',
@@ -247,7 +224,6 @@ export default function ExpensesScreen() {
                   ₹850
                 </Text>
               </View>
-
               <View
                 style={{
                   flexDirection: 'row',
@@ -263,8 +239,7 @@ export default function ExpensesScreen() {
               </View>
             </View>
           </View>
-        </GlassCard>
-
+        </Card>
         {/* Glass Action Buttons */}
         <View
           style={{
@@ -274,29 +249,25 @@ export default function ExpensesScreen() {
             gap: tokens.Spacing.md,
           }}
         >
-          <GlassButton
-            variant="success"
-            buttonStyle="tinted"
-            size="large"
+          <Button
+            variant="secondary"
+            size="lg"
             leftIcon={<Icon name="Check" size="sm" color="inverse" />}
             onPress={handleSettleUp}
             style={{ flex: 1 }}
           >
             Settle Up
-          </GlassButton>
-
-          <GlassButton
+          </Button>
+          <Button
             variant="primary"
-            buttonStyle="tinted"
-            size="large"
+            size="lg"
             leftIcon={<Icon name="Plus" size="sm" color="inverse" />}
             onPress={handleAddExpense}
             style={{ flex: 1 }}
           >
             Add Expense
-          </GlassButton>
+          </Button>
         </View>
-
         {/* Spacer for bottom tabs */}
         <View style={{ height: 80 }} />
       </ScrollView>

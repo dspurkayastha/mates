@@ -1,22 +1,13 @@
-/**
- * Modern Button Component
- * Premium button with 2025 design standards
- * Supports variants, sizes, haptic feedback, and accessibility
- */
-
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Pressable,
   PressableProps,
   ActivityIndicator,
-  ViewStyle,
-  View,
   StyleSheet,
+  View,
+  ViewStyle,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { useColors, useTokens } from '../../design-system/ThemeProvider';
-import Text from './Text';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -24,12 +15,23 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import Text from './Text';
+import { useTheme, useTokens } from '../../design-system/ThemeProvider';
+
 // ============================================================================
 // TYPES
 // ============================================================================
 
-type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'danger' | 'success';
-type ButtonSize = 'small' | 'medium' | 'large';
+type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'ghost'
+  | 'destructive'
+  | 'success'
+  | 'danger'
+  | 'tertiary';
+
+type ButtonSize = 'sm' | 'md' | 'lg' | 'small' | 'medium' | 'large';
 
 interface ButtonProps extends Omit<PressableProps, 'style'> {
   variant?: ButtonVariant;
@@ -40,13 +42,10 @@ interface ButtonProps extends Omit<PressableProps, 'style'> {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   hapticFeedback?: boolean;
-  gradient?: boolean;
   style?: ViewStyle;
   children: React.ReactNode;
-  // Accessibility props
   accessibilityLabel?: string;
   accessibilityHint?: string;
-  accessibilityRole?: 'button' | 'link' | 'none';
   testID?: string;
 }
 
@@ -56,285 +55,181 @@ interface ButtonProps extends Omit<PressableProps, 'style'> {
 
 export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
-  size = 'medium',
+  size = 'md',
   fullWidth = false,
   loading = false,
   disabled = false,
   leftIcon,
   rightIcon,
   hapticFeedback = true,
-  gradient = false,
   style,
   children,
   onPress,
   accessibilityLabel,
   accessibilityHint,
-  accessibilityRole = 'button',
   testID,
   ...props
 }) => {
-  const colors = useColors();
+  const { theme, accessibility } = useTheme();
   const tokens = useTokens();
 
   const scale = useSharedValue(1);
-  const iconOffset = useSharedValue(0);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const iconAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: iconOffset.value }],
-  }));
-
-  // Generate accessibility label if not provided
-  const getAccessibilityLabel = () => {
-    if (accessibilityLabel) return accessibilityLabel;
-    
-    const childText = typeof children === 'string' ? children : 'Button';
-    if (loading) return `${childText}, Loading`;
-    if (disabled) return `${childText}, Disabled`;
-    return childText;
-  };
-
-  // Generate accessibility hint if not provided
-  const getAccessibilityHint = () => {
-    if (accessibilityHint) return accessibilityHint;
-    
-    if (loading) return 'Please wait while the action is being processed';
-    if (disabled) return 'This button is currently disabled';
-    
-    switch (variant) {
-      case 'danger':
-        return 'Double tap to perform a destructive action';
-      case 'primary':
-        return 'Double tap to perform the primary action';
-      default:
-        return 'Double tap to activate';
-    }
-  };
-
-  // Handle press with haptic feedback
-  const handlePress = (event: any) => {
-    if (disabled || loading) return;
-    
-    if (hapticFeedback) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    
-    onPress?.(event);
-  };
+  const [isFocused, setIsFocused] = useState(false);
 
   const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
+
   const handlePressIn = () => {
-    if (disabled || loading) return;
+    if (accessibility.isReduceMotionEnabled) return;
     scale.value = withTiming(tokens.Animation.press.scale, {
-      duration: tokens.Animation.duration.in,
-      easing,
-    });
-    iconOffset.value = withTiming(tokens.Animation.press.iconNudge, {
       duration: tokens.Animation.duration.in,
       easing,
     });
   };
 
   const handlePressOut = () => {
+    if (accessibility.isReduceMotionEnabled) return;
     scale.value = withTiming(1, {
       duration: tokens.Animation.duration.out,
       easing,
     });
-    iconOffset.value = withTiming(0, {
-      duration: tokens.Animation.duration.out,
-      easing,
-    });
   };
-  const buttonStyles = useMemo((): ViewStyle => {
-    const baseStyle: ViewStyle = {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderRadius: tokens.BorderRadius.md,
-      ...tokens.Shadows.md,
-    };
 
-    const sizeStyles = {
-      small: {
-        paddingHorizontal: tokens.Spacing.md,
-        paddingVertical: tokens.Spacing.sm,
-        minHeight: 36,
-      },
-      medium: {
-        paddingHorizontal: tokens.Spacing.lg,
-        paddingVertical: tokens.Spacing.md,
-        minHeight: 44,
-      },
-      large: {
-        paddingHorizontal: tokens.Spacing.xl,
-        paddingVertical: tokens.Spacing.lg,
-        minHeight: 52,
-      },
-    } as const;
-
-    let variantStyles: ViewStyle = {};
-    switch (variant) {
-      case 'primary':
-        variantStyles = { backgroundColor: colors.interactive.primary };
-        break;
-      case 'secondary':
-        variantStyles = {
-          backgroundColor: colors.interactive.secondary,
-          borderWidth: 1,
-          borderColor: colors.border.medium,
-        };
-        break;
-      case 'tertiary':
-        variantStyles = { backgroundColor: 'transparent' };
-        break;
-      case 'danger':
-        variantStyles = { backgroundColor: colors.interactive.danger };
-        break;
-      case 'success':
-        variantStyles = { backgroundColor: colors.interactive.success };
-        break;
+  const handlePress = (e: any) => {
+    if (disabled || loading) return;
+    if (hapticFeedback) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
+    onPress?.(e);
+  };
 
-    if (disabled) {
-      variantStyles = { ...variantStyles, opacity: 0.5 };
-    }
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
-    const widthStyle = fullWidth ? { width: '100%' as const } : {};
-
-    return {
-      ...baseStyle,
-      ...sizeStyles[size],
-      ...variantStyles,
-      ...widthStyle,
-    };
-  }, [variant, size, fullWidth, disabled, tokens, colors]);
-
-  const textColor = useMemo(() => {
-    if (disabled) return colors.text.tertiary;
-
-    switch (variant) {
-      case 'primary':
-      case 'danger':
-      case 'success':
-        return colors.text.inverse;
-      case 'secondary':
-        return colors.text.primary;
-      case 'tertiary':
-        return colors.interactive.primary;
-      default:
-        return colors.text.inverse;
-    }
-  }, [variant, disabled, colors]);
-
-  const textVariant = useMemo(() => {
+  const resolvedSize = useMemo(() => {
     switch (size) {
       case 'small':
-        return 'labelMedium' as const;
-      case 'medium':
-        return 'labelLarge' as const;
+      case 'sm':
+        return 'sm';
       case 'large':
-        return 'titleSmall' as const;
+      case 'lg':
+        return 'lg';
       default:
-        return 'labelLarge' as const;
+        return 'md';
     }
   }, [size]);
 
-  const gradientColors = useMemo(() => {
-    if (variant === 'primary') {
-      return [colors.interactive.primary, colors.interactive.primaryHover];
+  const sizeStyle = useMemo(() => {
+    switch (resolvedSize) {
+      case 'sm':
+        return {
+          paddingHorizontal: tokens.Spacing.md,
+          paddingVertical: tokens.Spacing.sm,
+        };
+      case 'lg':
+        return {
+          paddingHorizontal: tokens.Spacing['2xl'],
+          paddingVertical: tokens.Spacing.lg,
+        };
+      case 'md':
+      default:
+        return {
+          paddingHorizontal: tokens.Spacing.lg,
+          paddingVertical: tokens.Spacing.md,
+        };
     }
-    return [colors.interactive.primary, colors.interactive.primary];
-  }, [variant, colors]);
+  }, [resolvedSize, tokens]);
 
-  const ButtonContent = () => (
-    <>
-      {leftIcon && !loading && (
-        <React.Fragment>
-          {leftIcon}
-          <View style={{ width: tokens.Spacing.sm }} />
-        </React.Fragment>
-      )}
-      
-      {loading ? (
-        <ActivityIndicator 
-          size="small" 
-          color={textColor}
-          style={{ marginRight: leftIcon || rightIcon ? tokens.Spacing.sm : 0 }}
-        />
-      ) : (
-        <Text
-          variant={textVariant}
-          color={textColor}
-          weight="semibold"
-        >
-          {children}
-        </Text>
-      )}
-      
-      {rightIcon && !loading && (
-        <React.Fragment>
-          <View style={{ width: tokens.Spacing.sm }} />
-          <Animated.View style={iconAnimatedStyle}>{rightIcon}</Animated.View>
-        </React.Fragment>
-      )}
-    </>
-  );
+  const resolvedVariant = useMemo(() => {
+    switch (variant) {
+      case 'tertiary':
+        return 'ghost';
+      case 'danger':
+        return 'destructive';
+      case 'success':
+        return 'primary';
+      default:
+        return variant as 'primary' | 'secondary' | 'ghost' | 'destructive';
+    }
+  }, [variant]);
 
-  const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+  const { backgroundColor, borderColor, textColor } = useMemo(() => {
+    switch (resolvedVariant) {
+      case 'primary':
+        return {
+          backgroundColor: theme.interactive.primary,
+          borderColor: 'transparent',
+          textColor: theme.text.inverse,
+        };
+      case 'secondary':
+        return {
+          backgroundColor: theme.background.secondary,
+          borderColor: theme.border.light,
+          textColor: theme.text.primary,
+        };
+      case 'ghost':
+        return {
+          backgroundColor: 'transparent',
+          borderColor: 'transparent',
+          textColor: theme.interactive.primary,
+        };
+      case 'destructive':
+        return {
+          backgroundColor: theme.interactive.danger,
+          borderColor: 'transparent',
+          textColor: theme.text.inverse,
+        };
+    }
+  }, [resolvedVariant, theme]);
 
-  // Render with gradient if enabled and primary variant
-  if (gradient && variant === 'primary' && !disabled) {
-    return (
-      <AnimatedPressable
-        style={[buttonStyles, animatedStyle, style]}
+  const baseStyle: ViewStyle = {
+    borderRadius: tokens.BorderRadius.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: borderColor === 'transparent' ? 0 : StyleSheet.hairlineWidth,
+    backgroundColor,
+    borderColor,
+    opacity: disabled ? 0.5 : 1,
+  };
+
+  const focusStyle = isFocused
+    ? { borderWidth: 2, borderColor: theme.border.brand }
+    : {};
+
+  const widthStyle = fullWidth ? { alignSelf: 'stretch' } : {};
+
+  return (
+    <Animated.View style={[widthStyle, animatedStyle]}>
+      <Pressable
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         disabled={disabled || loading}
-        accessibilityLabel={getAccessibilityLabel()}
-        accessibilityHint={getAccessibilityHint()}
-        accessibilityRole={accessibilityRole}
-        accessibilityState={{
-          disabled: disabled || loading,
-          busy: loading,
-        }}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
+        accessibilityHint={accessibilityHint}
         testID={testID}
+        style={[baseStyle, sizeStyle, focusStyle, style]}
         {...props}
       >
-        <LinearGradient
-          colors={gradientColors as [string, string, ...string[]]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[StyleSheet.absoluteFill, { borderRadius: tokens.BorderRadius.md }]}
-        />
-        <ButtonContent />
-      </AnimatedPressable>
-    );
-  }
-
-  // Regular button
-  return (
-    <AnimatedPressable
-      style={[buttonStyles, animatedStyle, style]}
-      onPress={handlePress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      disabled={disabled || loading}
-      accessibilityLabel={getAccessibilityLabel()}
-      accessibilityHint={getAccessibilityHint()}
-      accessibilityRole={accessibilityRole}
-      accessibilityState={{
-        disabled: disabled || loading,
-        busy: loading,
-      }}
-      testID={testID}
-      {...props}
-    >
-      <ButtonContent />
-    </AnimatedPressable>
+        {leftIcon && !loading && (
+          <View style={{ marginRight: tokens.Spacing.sm }}>{leftIcon}</View>
+        )}
+        {loading ? (
+          <ActivityIndicator color={textColor} />
+        ) : (
+          <Text variant="labelLarge" weight="semibold" color={textColor}>
+            {children}
+          </Text>
+        )}
+        {rightIcon && !loading && (
+          <View style={{ marginLeft: tokens.Spacing.sm }}>{rightIcon}</View>
+        )}
+      </Pressable>
+    </Animated.View>
   );
 };
 
