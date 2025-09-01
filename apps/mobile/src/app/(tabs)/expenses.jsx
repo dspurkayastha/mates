@@ -10,6 +10,7 @@ import {
   GlassButton,
   Icon,
   ListItem,
+  Badge,
   useTheme,
   useTokens
 } from '../../components/ui';
@@ -48,7 +49,7 @@ export default function ExpensesScreen() {
       paidBy: 'You',
       sharedWith: 'All roommates',
       amount: '1,200',
-      status: 'SETTLED',
+      status: 'OWED',
     },
     {
       id: '4',
@@ -57,9 +58,24 @@ export default function ExpensesScreen() {
       paidBy: 'Roommate',
       sharedWith: 'You, Roommate',
       amount: '850',
-      status: 'PENDING',
+      status: 'OWE',
     },
   ];
+
+  const getBadgeProps = (status) => {
+    switch (status) {
+      case 'PENDING':
+        return { label: 'Pending', variant: 'warn' };
+      case 'SETTLED':
+        return { label: 'Settled', variant: 'positive' };
+      case 'OWED':
+        return { label: 'Owed', variant: 'brand' };
+      case 'OWE':
+        return { label: 'Owe', variant: 'neutral' };
+      default:
+        return { label: status, variant: 'neutral' };
+    }
+  };
 
   const handleTabPress = (tab) => {
     setActiveTab(tab);
@@ -132,16 +148,45 @@ export default function ExpensesScreen() {
 
         {/* Transaction List */}
         <View style={{ marginBottom: tokens.Spacing.lg }}>
-          {transactions.map((transaction) => (
-            <ListItem
-              key={transaction.id}
-              media={<Icon name="Receipt" size="lg" color="brand" />}
-              title={transaction.title}
-              meta={`Paid by ${transaction.paidBy} • ₹${transaction.amount}`}
-              accessory={{ type: 'chevron' }}
-              onPress={() => {}}
-            />
-          ))}
+          {transactions.map((transaction) => {
+            const badge = getBadgeProps(transaction.status);
+            return (
+              <ListItem
+                key={transaction.id}
+                media={<Icon name="Receipt" size="lg" color="brand" />}
+                title={transaction.title}
+                meta={
+                  <>
+                    <Text variant="bodySmall" color="secondary">
+                      {transaction.date}
+                    </Text>
+                    <Text variant="bodySmall" color="secondary">
+                      Paid by {transaction.paidBy}
+                    </Text>
+                  </>
+                }
+                accessory={
+                  <View style={{ alignItems: 'flex-end' }}>
+                    <Text
+                      variant="bodyMedium"
+                      weight="medium"
+                      style={{ textAlign: 'right' }}
+                    >
+                      ₹{transaction.amount}
+                    </Text>
+                    <Badge
+                      variant={badge.variant}
+                      quiet
+                      style={{ marginTop: tokens.Spacing.xs }}
+                    >
+                      {badge.label}
+                    </Badge>
+                  </View>
+                }
+                onPress={() => {}}
+              />
+            );
+          })}
         </View>
 
         {/* Summary Section */}

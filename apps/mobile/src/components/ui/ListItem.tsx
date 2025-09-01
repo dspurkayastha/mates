@@ -5,7 +5,7 @@ import { useTheme, useTokens } from '../../design-system/ThemeProvider';
 import Text from './Text';
 import Icon from './Icon';
 import GlassToggle from './GlassToggle';
-import StatusIndicator from './StatusIndicator';
+import Badge from './Badge';
 
 // ============================================================================
 // TYPES
@@ -13,16 +13,17 @@ import StatusIndicator from './StatusIndicator';
 
 type Density = 'comfortable' | 'compact';
 
-type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral';
+type BadgeVariant = 'neutral' | 'positive' | 'warn' | 'danger' | 'brand';
 
 type ListItemAccessory =
   | { type: 'chevron' }
   | { type: 'toggle'; value: boolean; onValueChange: (val: boolean) => void }
-  | { type: 'badge'; label: string; variant?: BadgeVariant };
+  | { type: 'badge'; label: string; variant?: BadgeVariant; quiet?: boolean }
+  | React.ReactNode;
 
 interface ListItemProps {
   title: string;
-  meta?: string;
+  meta?: React.ReactNode;
   media?: React.ReactNode;
   accessory?: ListItemAccessory;
   density?: Density;
@@ -80,6 +81,7 @@ export const ListItem: React.FC<ListItemProps> = ({
 
   const renderAccessory = () => {
     if (!accessory) return null;
+    if (React.isValidElement(accessory)) return accessory;
     switch (accessory.type) {
       case 'chevron':
         return <Icon name="ArrowRight" size="md" color="tertiary" />;
@@ -93,11 +95,9 @@ export const ListItem: React.FC<ListItemProps> = ({
         );
       case 'badge':
         return (
-          <StatusIndicator
-            variant={accessory.variant || 'neutral'}
-            label={accessory.label}
-            size="small"
-          />
+          <Badge variant={accessory.variant || 'neutral'} quiet={accessory.quiet}>
+            {accessory.label}
+          </Badge>
         );
       default:
         return null;
@@ -131,13 +131,21 @@ export const ListItem: React.FC<ListItemProps> = ({
           {title}
         </Text>
         {meta && (
-          <Text variant="bodySmall" color="secondary">
-            {meta}
-          </Text>
+          <View style={{ marginTop: tokens.Spacing.xs }}>
+            {typeof meta === 'string' ? (
+              <Text variant="bodySmall" color="secondary">
+                {meta}
+              </Text>
+            ) : (
+              meta
+            )}
+          </View>
         )}
       </View>
       {accessory && (
-        <View style={{ marginLeft: tokens.Spacing.md }}>{renderAccessory()}</View>
+        <View style={{ marginLeft: tokens.Spacing.md, alignItems: 'flex-end' }}>
+          {renderAccessory()}
+        </View>
       )}
     </View>
   );

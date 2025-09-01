@@ -13,7 +13,7 @@ import Text from './Text';
 // TYPES
 // ============================================================================
 
-type BadgeVariant = 'neutral' | 'positive' | 'warn' | 'danger';
+type BadgeVariant = 'neutral' | 'positive' | 'warn' | 'danger' | 'brand';
 
 interface BadgeProps {
   variant?: BadgeVariant;
@@ -56,6 +56,11 @@ export const Badge: React.FC<BadgeProps> = ({
   let textColor: string = theme.text.secondary;
 
   switch (variant) {
+    case 'brand':
+      backgroundColor = quiet ? 'transparent' : theme.interactive.primary;
+      borderColor = quiet ? theme.interactive.primary : 'transparent';
+      textColor = quiet ? theme.interactive.primary : theme.text.inverse;
+      break;
     case 'positive':
       backgroundColor = quiet ? 'transparent' : theme.status.successBackground;
       borderColor = quiet ? theme.status.success : 'transparent';
