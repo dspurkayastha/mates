@@ -44,6 +44,45 @@ jest.mock('expo-blur', () => ({ BlurView: require('react-native').View }));
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
+
+// Mock @react-navigation/native to avoid parsing its ESM build in Jest
+jest.mock('@react-navigation/native', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    __esModule: true,
+    useFocusEffect: (effect: any) => {
+      React.useEffect(() => {
+        const cleanup = typeof effect === 'function' ? effect() : undefined;
+        return typeof cleanup === 'function' ? cleanup : undefined;
+      }, []);
+    },
+    useNavigation: () => ({
+      navigate: jest.fn(),
+      goBack: jest.fn(),
+      push: jest.fn(),
+      replace: jest.fn(),
+    }),
+    NavigationContainer: View,
+  };
+});
+
+// Mock SceneBackground hooks/context used by screens
+jest.mock('@/components/ui/background/useSceneBackground', () => {
+  const React = require('react');
+  return {
+    __esModule: true,
+    SceneBackgroundProvider: ({ children }: any) =>
+      React.createElement(React.Fragment, null, children),
+    useSceneBackground: () => ({ value: 0 }),
+    useSceneBackgroundContext: () => ({
+      theme: null,
+      version: 0,
+      register: jest.fn(),
+      sceneTransition: { value: 0 },
+    }),
+  };
+});
 jest.mock('react-native-svg', () => {
   const React = require('react');
   const { View } = require('react-native');
@@ -57,7 +96,10 @@ jest.mock('react-native-svg', () => {
     Rect: component(),
     Defs: component(),
     LinearGradient: component(),
+    RadialGradient: component(),
     Stop: component(),
+    Circle: component(),
+    Pattern: component(),
     G: component(),
     ClipPath: component(),
   };

@@ -11,6 +11,8 @@ import {
   useTokens,
 } from '@/components/ui';
 import { withOpacity } from '@/design-system/ThemeProvider';
+import { useSceneBackground } from '@/components/ui/background/useSceneBackground';
+import { usePalette } from '@/components/ui/background/palettes';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import FloatingActionMenu from '@/components/FloatingActionMenu';
@@ -65,20 +67,31 @@ export default function HomeScreen() {
   const tokens = useTokens();
   const router = useRouter();
   const { data: activePoll } = useLatestPoll();
-  const backgroundShapes = [
-    {
-      type: 'circle',
-      size: 240,
-      color: withOpacity(theme.interactive.primary, 0.04),
-      offset: { x: -80, y: -100 },
-    },
-    {
-      type: 'blob',
-      size: 160,
-      color: withOpacity(theme.interactive.primary, 0.03),
-      offset: { x: 120, y: 200 },
-    },
-  ];
+  const stops = usePalette('brandWatercolor');
+  useSceneBackground({
+    key: 'home',
+    gradient: { type: 'linear', angle: 36, stops },
+    shapes: [
+      { kind: 'circle', x: -60, y: -90, r: 260, opacity: 0.06, colorIndex: 1 },
+      { kind: 'blob', x: 120, y: 180, w: 200, h: 160, radius: 56, opacity: 0.04, colorIndex: 2 },
+      {
+        kind: 'arc',
+        x: 0,
+        y: 260,
+        r: 320,
+        start: 10,
+        end: 40,
+        thickness: 18,
+        opacity: 0.024,
+        colorIndex: 1,
+      },
+    ],
+    noise: true,
+    intensity: 'subtle',
+    drift: { amplitude: 6, periodMs: 12000 },
+    swirl: { durationInMs: 220, durationOutMs: 240, overshoot: 0.04, staggerMs: 40 },
+    seed: 101,
+  });
 
   const handleFabPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -148,12 +161,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <ScreenBackground
-      palette="brand"
-      variant="subtle"
-      gradientShape="linear"
-      shapes={backgroundShapes}
-    >
+    <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Welcome Header */}
         <View
