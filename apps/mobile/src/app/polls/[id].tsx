@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, SafeAreaView } from 'react-native';
+import { View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { Text, Icon, Button, Card, LoadingSkeleton, useTheme, useTokens } from '@/components/ui';
+import { Text, Icon, Button, Card, LoadingSkeleton, ScreenBackground, useTheme, useTokens } from '@/components/ui';
 import { withOpacity } from '@/design-system/ThemeProvider';
 import { usePoll, useVotePoll } from '@/features/polls/hooks';
 
@@ -14,11 +14,11 @@ export default function PollDetailScreen() {
 
   if (isLoading || !data) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: theme.background.primary }}>
+      <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
         <View style={{ padding: tokens.Spacing.xl }}>
           <LoadingSkeleton height={200} />
         </View>
-      </SafeAreaView>
+      </ScreenBackground>
     );
   }
 
@@ -28,7 +28,7 @@ export default function PollDetailScreen() {
   const noPct = total ? (votes.no / total) * 100 : 0;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background.primary }}>
+    <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
       <View style={{ padding: tokens.Spacing.xl }}>
         <View
           style={{
@@ -117,6 +117,6 @@ export default function PollDetailScreen() {
           </Card>
         )}
       </View>
-    </SafeAreaView>
+    </ScreenBackground>
   );
 }

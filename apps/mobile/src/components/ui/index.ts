@@ -60,6 +60,7 @@ export { default as GlassCard } from './GlassCard';
 export { default as GlassToggle } from './GlassToggle';
 export { default as GlassInput } from './GlassInput';
 export { default as GlassModal } from './GlassModal';
+export { default as ScreenBackground } from './ScreenBackground';
 
 // Re-export design system providers for convenience
 export { ThemeProvider, useTheme, useColors, useTokens } from '../../design-system/ThemeProvider';

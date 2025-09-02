@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import * as Linking from 'expo-linking';
 import { useRouter } from 'expo-router';
 import { supabase, SUPABASE_ENABLED } from '@/lib/supabase';
+import { debug } from '@/utils/logger';
 import { useAuthStore } from './store';
 
 /**
@@ -52,7 +53,7 @@ export const DeepLinkHandler = () => {
    */
   const handleDeepLink = async (url) => {
     try {
-      console.log('Processing deep link:', url);
+      debug('deeplink', 'Processing deep link', url);
 
       // Parse the URL to extract parameters
       const parsedUrl = Linking.parse(url);
@@ -68,7 +69,7 @@ export const DeepLinkHandler = () => {
         url.includes('&access_token=');
 
       if (isAuthCallback) {
-        console.log('Auth callback detected');
+        debug('deeplink', 'Auth callback detected');
 
         // Extract auth parameters from URL fragments or query params
         let accessToken, refreshToken, tokenType, expiresIn, errorParam, errorDescription;
@@ -117,7 +118,7 @@ export const DeepLinkHandler = () => {
 
         // Handle successful authentication
         if (accessToken && refreshToken) {
-          console.log('Auth tokens found, setting session...');
+          debug('deeplink', 'Auth tokens found, setting session...');
           
           try {
             // Set the session using the tokens from the URL
@@ -136,7 +137,7 @@ export const DeepLinkHandler = () => {
             }
 
             if (data?.session?.user) {
-              console.log('Successfully authenticated user:', data.session.user.email);
+              debug('deeplink', 'Successfully authenticated user', data.session.user.email);
               
               // Update auth state
               useAuthStore.setState({ 
@@ -167,11 +168,11 @@ export const DeepLinkHandler = () => {
             );
           }
         } else {
-          console.log('No auth tokens found in URL');
+          debug('deeplink', 'No auth tokens found in URL');
         }
       } else {
         // Handle other deep links (if any)
-        console.log('Non-auth deep link:', url);
+        debug('deeplink', 'Non-auth deep link', url);
       }
     } catch (error) {
       console.error('Error processing deep link:', error);
