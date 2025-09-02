@@ -11,6 +11,8 @@ import {
   useTokens,
 } from '@/components/ui';
 import { withOpacity } from '@/design-system/ThemeProvider';
+import { useSceneBackground } from '@/components/ui/background/useSceneBackground';
+import { usePalette } from '@/components/ui/background/palettes';
 import { FormField, TextInput as FormTextInput, TextArea, FormScreen } from '@/components/form';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/features/auth/useAuth';
@@ -157,20 +159,28 @@ export default function ProfileScreen() {
     setSignOutVisible(true);
   };
 
-  const backgroundShapes = [
-    {
-      type: 'circle',
-      size: 240,
-      color: withOpacity(theme.interactive.primary, 0.04),
-      offset: { x: -80, y: -100 },
-    },
-    {
-      type: 'blob',
-      size: 160,
-      color: withOpacity(theme.interactive.primary, 0.03),
-      offset: { x: 120, y: 200 },
-    },
-  ];
+  const stops = usePalette('neutralHint');
+  useSceneBackground({
+    key: 'profile',
+    gradient: { type: 'linear', stops },
+    shapes: [
+      { kind: 'circle', x: 40, y: 80, r: 80, opacity: 0.05, colorIndex: 1 },
+      {
+        kind: 'arc',
+        x: 20,
+        y: 200,
+        r: 160,
+        start: 20,
+        end: 60,
+        thickness: 12,
+        opacity: 0.024,
+        colorIndex: 1,
+      },
+    ],
+    intensity: 'subtle',
+    noise: false,
+    seed: 303,
+  });
 
   const iconContainer = (name, bgColor, iconColor) => (
     <View
@@ -188,12 +198,7 @@ export default function ProfileScreen() {
   );
 
   return (
-    <ScreenBackground
-      palette="brand"
-      variant="subtle"
-      gradientShape="linear"
-      shapes={backgroundShapes}
-    >
+    <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
       <ScrollView
         contentContainerStyle={{
           padding: tokens.Spacing.lg,

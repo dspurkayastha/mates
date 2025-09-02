@@ -11,6 +11,8 @@ import {
   Card,
 } from '@/components/ui';
 import { withOpacity } from '@/design-system/ThemeProvider';
+import { useSceneBackground } from '@/components/ui/background/useSceneBackground';
+import { usePalette } from '@/components/ui/background/palettes';
 import * as Clipboard from 'expo-clipboard';
 import { useAuth } from '@/features/auth/useAuth';
 
@@ -22,28 +24,21 @@ export default function SettingsScreen() {
   const [darkMode, setDarkMode] = useState(false);
   const [signOutVisible, setSignOutVisible] = useState(false);
   const debug = process.env.EXPO_PUBLIC_DEBUG?.includes('dev');
-  const backgroundShapes = [
-    {
-      type: 'circle',
-      size: 240,
-      color: withOpacity(theme.interactive.primary, 0.04),
-      offset: { x: -80, y: -100 },
-    },
-    {
-      type: 'blob',
-      size: 160,
-      color: withOpacity(theme.interactive.primary, 0.03),
-      offset: { x: 120, y: 200 },
-    },
-  ];
+  const stops = usePalette('sunriseWash');
+  useSceneBackground({
+    key: 'settings',
+    gradient: { type: 'linear', stops },
+    shapes: [
+      { kind: 'circle', x: -40, y: -60, r: 120, opacity: 0.05, colorIndex: 1 },
+      { kind: 'circle', x: 140, y: 220, r: 100, opacity: 0.04, colorIndex: 2 },
+    ],
+    intensity: 'subtle',
+    noise: false,
+    seed: 404,
+  });
 
   return (
-    <ScreenBackground
-      palette="brand"
-      variant="subtle"
-      gradientShape="linear"
-      shapes={backgroundShapes}
-    >
+    <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
       <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
         <Text variant="titleLarge" weight="semibold" style={{ marginBottom: tokens.Spacing.md }}>
           Account

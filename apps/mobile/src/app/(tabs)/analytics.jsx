@@ -9,9 +9,9 @@ import {
   EmptyState,
   ErrorBanner,
   useTokens,
-  useTheme,
 } from '@/components/ui';
-import { withOpacity } from '@/design-system/ThemeProvider';
+import { useSceneBackground } from '@/components/ui/background/useSceneBackground';
+import { usePalette } from '@/components/ui/background/palettes';
 import { useExpenses } from '@/features/expenses/hooks';
 import { useGroceries } from '@/features/groceries/hooks';
 import { useChores } from '@/features/chores/hooks';
@@ -29,21 +29,28 @@ import {
 
 export default function AnalyticsScreen() {
   const tokens = useTokens();
-  const { theme } = useTheme();
-  const backgroundShapes = [
-    {
-      type: 'circle',
-      size: 240,
-      color: withOpacity(theme.interactive.primary, 0.04),
-      offset: { x: -80, y: -100 },
-    },
-    {
-      type: 'blob',
-      size: 160,
-      color: withOpacity(theme.interactive.primary, 0.03),
-      offset: { x: 120, y: 200 },
-    },
-  ];
+  const stops = usePalette('seafoamWash');
+  useSceneBackground({
+    key: 'analytics',
+    gradient: { type: 'radial', stops },
+    shapes: [
+      { kind: 'blob', x: 60, y: 140, w: 260, h: 200, radius: 100, opacity: 0.05, colorIndex: 1 },
+      {
+        kind: 'arc',
+        x: -40,
+        y: 220,
+        r: 320,
+        start: 10,
+        end: 70,
+        thickness: 16,
+        opacity: 0.032,
+        colorIndex: 2,
+      },
+    ],
+    noise: true,
+    intensity: 'balanced',
+    seed: 202,
+  });
   const groupId = process.env.EXPO_PUBLIC_PROJECT_GROUP_ID;
   const {
     data: expenses = [],
@@ -74,12 +81,7 @@ export default function AnalyticsScreen() {
   const anyLoading = loadingExpenses || loadingGroceries || loadingChores;
 
   return (
-    <ScreenBackground
-      palette="brand"
-      variant="subtle"
-      gradientShape="linear"
-      shapes={backgroundShapes}
-    >
+    <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
       <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
         {expensesError && (
           <ErrorBanner message="Failed to load expenses" onRetry={refetchExpenses} />
