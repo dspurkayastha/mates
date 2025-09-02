@@ -1,12 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import supabase, { SUPABASE_ENABLED } from '@/lib/supabase';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { useAuth } from '@/features/auth/useAuth';
 
 const client = supabase as SupabaseClient;
-import { useAuth } from '@/features/auth/useAuth';
 
 export interface Poll {
   id: string;
+  group_id: string;
   question: string;
   created_at: string;
   created_by?: string | null;
@@ -19,67 +20,77 @@ export interface PollVote {
   vote: boolean;
 }
 
-export function useLatestPoll() {
+export function useActivePoll({ groupId }: { groupId: string }) {
   return useQuery<Poll | null>({
-    queryKey: ['polls', 'latest'],
+    queryKey: ['polls', 'active', { groupId }],
     queryFn: async () => {
       const { data, error } = await client
         .from('polls')
         .select('*')
+        .eq('group_id', groupId)
         .order('created_at', { ascending: false })
         .limit(1);
       if (error) throw error;
       return (data && data[0]) || null;
     },
-    enabled: SUPABASE_ENABLED,
+    enabled: SUPABASE_ENABLED && !!groupId,
   });
 }
 
-export function usePoll(id: string) {
+export function usePollResults({ pollId }: { pollId: string }) {
   const { auth } = useAuth();
   return useQuery({
-    queryKey: ['poll', id],
+    queryKey: ['polls', 'results', pollId],
     queryFn: async () => {
-      const { data: poll, error } = await client.from('polls').select('*').eq('id', id).single();
+      const { data: poll, error } = await client.from('polls').select('*').eq('id', pollId).single();
       if (error) throw error;
       const { data: votes, error: votesError } = await client
         .from('poll_votes')
         .select('*')
-        .eq('poll_id', id);
+        .eq('poll_id', pollId);
       if (votesError) throw votesError;
       const yes = votes.filter((v: PollVote) => v.vote).length;
       const no = votes.filter((v: PollVote) => !v.vote).length;
       const myVoteEntry = votes.find((v: PollVote) => v.user_id === auth?.id);
       return { poll: poll as Poll, votes: { yes, no }, myVote: myVoteEntry?.vote ?? null };
     },
-    enabled: SUPABASE_ENABLED && !!id,
+    enabled: SUPABASE_ENABLED && !!pollId,
   });
 }
 
 export function useCreatePoll() {
+  const { auth } = useAuth();
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (question: string) => {
-      const { data, error } = await client.from('polls').insert({ question }).select().single();
+    mutationFn: async ({ question, groupId }: { question: string; groupId: string }) => {
+      const { data, error } = await client
+        .from('polls')
+        .insert({ question, group_id: groupId, created_by: auth?.id })
+        .select()
+        .single();
       if (error) throw error;
       return data as Poll;
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['polls', 'active', { groupId: variables.groupId }] });
     },
   });
 }
 
-export function useVotePoll() {
+export function useVote({ pollId }: { pollId: string }) {
   const { auth } = useAuth();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ pollId, vote }: { pollId: string; vote: boolean }) => {
+    mutationFn: async (vote: boolean) => {
       if (!auth?.id) throw new Error('No user');
       const { error } = await client
         .from('poll_votes')
         .upsert({ poll_id: pollId, user_id: auth.id, vote }, { onConflict: 'poll_id,user_id' });
       if (error) throw error;
     },
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['poll', variables.pollId] });
-      queryClient.invalidateQueries({ queryKey: ['polls', 'latest'] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['polls', 'results', pollId] });
     },
   });
 }
+

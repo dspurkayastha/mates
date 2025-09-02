@@ -13,7 +13,7 @@ import {
   useTokens,
 } from '@/components/ui';
 import * as Haptics from 'expo-haptics';
-import { useGroceries, useUpdateGrocery } from '@/hooks';
+import { useGroceries, useUpdateItemStatus } from '@/features/groceries/hooks';
 
 // Section header component
 const SectionHeader = ({ title, count, variant = 'neutral' }) => {
@@ -41,8 +41,8 @@ export default function GroceriesScreen() {
   const colors = theme;
   const tokens = useTokens();
 
-  const { data: groceryItems = [], isLoading } = useGroceries();
-  const updateGrocery = useUpdateGrocery();
+  const { data: groceryItems = [], isLoading } = useGroceries({ groupId: process.env.EXPO_PUBLIC_PROJECT_GROUP_ID });
+  const updateItemStatus = useUpdateItemStatus(process.env.EXPO_PUBLIC_PROJECT_GROUP_ID);
 
   const handleMarkBought = (id) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -54,12 +54,12 @@ export default function GroceriesScreen() {
             'Expense Details',
             'This would open the expense form with this grocery item pre-filled',
           );
-          updateGrocery.mutate({ id, status: 'bought' });
+          updateItemStatus.mutate({ id, status: 'BOUGHT' });
         },
       },
       {
         text: 'Just Mark as Bought',
-        onPress: () => updateGrocery.mutate({ id, status: 'bought' }),
+        onPress: () => updateItemStatus.mutate({ id, status: 'BOUGHT' }),
       },
       {
         text: 'Cancel',
@@ -75,14 +75,14 @@ export default function GroceriesScreen() {
 
   const getStatusVariant = (status) => {
     switch (status) {
-      case 'out':
-        return 'error';
-      case 'low':
-        return 'warning';
-      case 'needed':
-        return 'info';
-      case 'bought':
-        return 'success';
+      case 'OUT':
+        return 'danger';
+      case 'LOW':
+        return 'warn';
+      case 'NEEDED':
+        return 'brand';
+      case 'BOUGHT':
+        return 'positive';
       default:
         return 'info';
     }
@@ -101,10 +101,10 @@ export default function GroceriesScreen() {
   }
 
   // Filter items by status
-  const outItems = groceryItems.filter((item) => item.status === 'out');
-  const lowItems = groceryItems.filter((item) => item.status === 'low');
-  const neededItems = groceryItems.filter((item) => item.status === 'needed');
-  const boughtItems = groceryItems.filter((item) => item.status === 'bought');
+  const outItems = groceryItems.filter((item) => item.status === 'OUT');
+  const lowItems = groceryItems.filter((item) => item.status === 'LOW');
+  const neededItems = groceryItems.filter((item) => item.status === 'NEEDED');
+  const boughtItems = groceryItems.filter((item) => item.status === 'BOUGHT');
 
   // Count items that need attention
   const attentionCount = outItems.length + lowItems.length;

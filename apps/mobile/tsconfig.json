@@ -7,6 +7,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts", "nativewind-env.d.ts"],
+  "include": ["./src", "./__tests__", "./app.config.ts", "./index.ts", "./index.js"],
   "exclude": ["polyfills/**", "src/__create/**"]
 }

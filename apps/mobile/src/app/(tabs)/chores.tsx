@@ -13,7 +13,7 @@ import {
   useTokens,
 } from '@/components/ui';
 import * as Haptics from 'expo-haptics';
-import { useChores, useToggleChore, Chore } from '@/hooks';
+import { useChores, useCompleteChore, Chore } from '@/features/chores/hooks';
 import { isToday, isThisWeek } from 'date-fns';
 
 interface Leader {
@@ -24,31 +24,32 @@ interface Leader {
 }
 
 const segments = [
-  { label: 'Today', value: 'today' },
-  { label: 'This Week', value: 'week' },
-  { label: 'Leaderboard', value: 'leaderboard' },
+  { key: 'today', label: 'Today' },
+  { key: 'week', label: 'This Week' },
+  { key: 'leaderboard', label: 'Leaderboard' },
 ];
 
 export default function ChoresScreen() {
   const { theme } = useTheme();
   const tokens = useTokens();
   const [activeTab, setActiveTab] = React.useState<'today' | 'week' | 'leaderboard'>('today');
-  const { data: chores = [], isLoading } = useChores();
-  const toggleChore = useToggleChore();
+  const groupId = process.env.EXPO_PUBLIC_PROJECT_GROUP_ID!;
+  const { data: chores = [], isLoading } = useChores({ groupId });
+  const completeChore = useCompleteChore(groupId);
 
   const todayChores = React.useMemo(
-    () => chores.filter((c) => isToday(new Date(c.dueTime))),
+    () => chores.filter((c) => isToday(new Date(c.due_at))),
     [chores],
   );
   const weekChores = React.useMemo(
-    () => chores.filter((c) => isThisWeek(new Date(c.dueTime))),
+    () => chores.filter((c) => isThisWeek(new Date(c.due_at))),
     [chores],
   );
   const leaderboard = React.useMemo(() => {
     const counts: Record<string, number> = {};
     chores.forEach((c) => {
-      if (c.isCompleted) {
-        counts[c.assignedTo] = (counts[c.assignedTo] || 0) + 1;
+      if (c.completed_at && c.assignee) {
+        counts[c.assignee] = (counts[c.assignee] || 0) + 1;
       }
     });
     return Object.entries(counts)
@@ -64,9 +65,9 @@ export default function ChoresScreen() {
   const handleToggleComplete = React.useCallback(
     (id: string, current: boolean) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      toggleChore.mutate({ id, isCompleted: !current });
+      completeChore.mutate({ id, complete: !current });
     },
-    [toggleChore],
+    [completeChore],
   );
 
   const handleAddChore = React.useCallback(() => {
@@ -77,13 +78,12 @@ export default function ChoresScreen() {
   const renderChore = React.useCallback(
     ({ item }: { item: Chore }) => (
       <ListItem
-        media={<Text style={{ fontSize: 20 }}>{item.icon}</Text>}
-        title={item.name}
-        meta={`Assigned to ${item.assignedTo} • Due ${item.dueTime}`}
+        title={item.title}
+        meta={`Assigned to ${item.assignee || 'Unassigned'} • Due ${item.due_at}`}
         accessory={{
           type: 'toggle',
-          value: item.isCompleted,
-          onValueChange: () => handleToggleComplete(item.id, item.isCompleted),
+          value: !!item.completed_at,
+          onValueChange: () => handleToggleComplete(item.id, !!item.completed_at),
         }}
       />
     ),

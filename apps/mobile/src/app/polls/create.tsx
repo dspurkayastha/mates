@@ -18,11 +18,15 @@ export default function CreatePollScreen() {
   const router = useRouter();
   const [question, setQuestion] = React.useState('');
   const createPoll = useCreatePoll();
+  const groupId = process.env.EXPO_PUBLIC_PROJECT_GROUP_ID!;
 
   const handleCreate = async () => {
     if (!question) return;
     try {
-      const poll = await createPoll.mutateAsync(question);
+      const poll = await createPoll.mutateAsync({
+        question,
+        groupId,
+      });
       router.replace(`/polls/${poll.id}`);
     } catch (e) {
       console.error(e);
