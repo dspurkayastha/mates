@@ -1,0 +1,92 @@
+{
+  "summary": {
+    "risk_score": "High",
+    "total_findings": 12
+  },
+  "findings": [
+    {
+      "id": "THEME-COLOR-01",
+      "severity": "P0",
+      "files": ["apps/mobile/src/app/+not-found.tsx:228-334"],
+      "reason": "Hard-coded colors bypass ThemeProvider",
+      "fix": "Replace with useColors/useTokens"
+    },
+    {
+      "id": "THEME-SHADOW-01",
+      "severity": "P0",
+      "files": ["apps/mobile/src/components/FloatingActionMenu.jsx:161-170"],
+      "reason": "Raw black shadow color",
+      "fix": "Use theme shadow tokens"
+    },
+    {
+      "id": "THEME-CLIP-01",
+      "severity": "P1",
+      "files": ["apps/mobile/src/components/ui/SearchBar.tsx:614-620"],
+      "reason": "Results card clips shadows",
+      "fix": "Remove overflow or wrap inner view"
+    },
+    {
+      "id": "THEME-CLIP-02",
+      "severity": "P1",
+      "files": ["apps/mobile/src/app/polls/[id].tsx:80-106"],
+      "reason": "Poll result bars overflow hidden",
+      "fix": "Use inner wrapper for clipping"
+    },
+    {
+      "id": "EXP-LOGIC-01",
+      "severity": "P0",
+      "files": ["apps/mobile/src/app/(tabs)/expenses.jsx:39-49"],
+      "reason": "Expense screen lacks settle/split implementation",
+      "fix": "Implement settle, split, budget flows"
+    },
+    {
+      "id": "GROC-LIFECYCLE-01",
+      "severity": "P0",
+      "files": ["apps/mobile/src/app/(tabs)/groceries.jsx:46-73"],
+      "reason": "Groceries screen uses alerts instead of persisting lifecycle",
+      "fix": "Add item form and status persistence"
+    },
+    {
+      "id": "CHORE-ASSIGN-01",
+      "severity": "P0",
+      "files": ["apps/mobile/src/app/(tabs)/chores.tsx:66-69"],
+      "reason": "Add chore action only logs to console",
+      "fix": "Implement chore creation and assignment"
+    },
+    {
+      "id": "SETTING-THEME-01",
+      "severity": "P0",
+      "files": ["apps/mobile/src/app/(tabs)/settings.jsx:129-153"],
+      "reason": "Settings toggles do not update theme or preferences",
+      "fix": "Wire toggles to ThemeProvider and persist prefs"
+    },
+    {
+      "id": "PROFILE-LOGOUT-01",
+      "severity": "P0",
+      "files": ["apps/mobile/src/app/(tabs)/profile.jsx:165-168"],
+      "reason": "Logout does not clear caches",
+      "fix": "Invalidate React Query caches on signOut"
+    },
+    {
+      "id": "DATA-SCOPE-01",
+      "severity": "P1",
+      "files": ["apps/mobile/src/hooks/useExpenses.ts:23-33"],
+      "reason": "React Query hooks lack group/user scoping",
+      "fix": "Parameterize queries by groupId/userId"
+    },
+    {
+      "id": "ACCESS-FAB-01",
+      "severity": "P1",
+      "files": ["apps/mobile/src/components/FloatingActionMenu.jsx:176-193"],
+      "reason": "FloatingActionMenu buttons missing accessibility labels",
+      "fix": "Add accessibilityLabel and role"
+    },
+    {
+      "id": "TEST-COVERAGE-01",
+      "severity": "P2",
+      "files": ["apps/mobile/__tests__/basic.test.ts:1-5"],
+      "reason": "Only trivial test exists",
+      "fix": "Add unit tests for domain logic and hooks"
+    }
+  ]
+}
