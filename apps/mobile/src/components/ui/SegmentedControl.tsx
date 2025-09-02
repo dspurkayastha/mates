@@ -4,6 +4,7 @@ import Animated from 'react-native-reanimated';
 import Text from './Text';
 import { usePressFeedback } from '../animation/usePressFeedback';
 import { useTheme, useTokens, withOpacity } from '../../design-system/ThemeProvider';
+import { ensureMinTouchTarget, asTabProps } from '@/utils/a11y';
 
 interface Segment {
   key: string;
@@ -45,16 +46,17 @@ const SegmentedTabButton = ({
         onPress={onPress}
         onPressIn={onPressIn}
         onPressOut={onPressOut}
-        accessibilityRole="button"
-        accessibilityState={{ selected: active }}
+        {...asTabProps(active)}
         accessibilityLabel={label}
-        style={{
+        style={ensureMinTouchTarget({
           paddingVertical: tokens.Spacing.sm,
           alignItems: 'center',
           justifyContent: 'center',
           borderRadius: tokens.BorderRadius.lg,
-          backgroundColor: active ? withOpacity(theme.interactive.primary, 0.08) : 'transparent',
-        }}
+          backgroundColor: active
+            ? withOpacity(theme.interactive.primary, 0.08)
+            : 'transparent',
+        })}
       >
         <Text
           variant="labelLarge"

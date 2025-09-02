@@ -12,6 +12,7 @@ import { usePressFeedback } from '../animation/usePressFeedback';
 
 import Text from './Text';
 import { useTheme, useTokens } from '../../design-system/ThemeProvider';
+import { ensureMinTouchTarget, asButtonProps } from '@/utils/a11y';
 
 // ============================================================================
 // TYPES
@@ -186,11 +187,16 @@ export const Button: React.FC<ButtonProps> = ({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         disabled={disabled || loading}
-        accessibilityRole="button"
+        {...asButtonProps(disabled || loading)}
         accessibilityLabel={accessibilityLabel}
         accessibilityHint={accessibilityHint}
         testID={testID}
-        style={[baseStyle, sizeStyle, focusStyle, style]}
+        style={ensureMinTouchTarget([
+          baseStyle,
+          sizeStyle,
+          focusStyle,
+          style,
+        ])}
         {...rest}
       >
         {leftIcon && !loading && <View style={{ marginRight: tokens.Spacing.sm }}>{leftIcon}</View>}
