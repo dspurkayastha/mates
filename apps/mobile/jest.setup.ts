@@ -1,12 +1,20 @@
 import '@testing-library/jest-native/extend-expect';
 import 'react-native-gesture-handler/jestSetup';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-jest.mock('react-native-reanimated', () => require('react-native-reanimated/mock'));
+jest.mock('react-native-reanimated', () => {
+  const Reanimated = require('react-native-reanimated/mock');
+  Reanimated.default.call = () => {};
+  return Reanimated;
+});
 (global as any).ReanimatedDataMock = { now: () => Date.now() };
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 jest.mock('expo-linear-gradient', () => require('react-native').View);
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 jest.mock('expo-blur', () => ({ BlurView: require('react-native').View }));
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+);
 jest.mock('react-native-svg', () => {
   const React = require('react');
   const { View } = require('react-native');

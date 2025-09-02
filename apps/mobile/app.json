@@ -58,7 +58,8 @@
     },
     "extra": {
       "router": {
-        "origin": false
+        "origin": false,
+        "extraRoutes": ["+/analytics"]
       }
     },
     "runtimeVersion": {

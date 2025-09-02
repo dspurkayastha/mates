@@ -11,9 +11,17 @@ interface NavTileProps {
   subtitle: string;
   onPress: () => void;
   style?: ViewStyle;
+  accessibilityLabel?: string;
 }
 
-const NavTile: React.FC<NavTileProps> = ({ icon, title, subtitle, onPress, style }) => {
+const NavTile: React.FC<NavTileProps> = ({
+  icon,
+  title,
+  subtitle,
+  onPress,
+  style,
+  accessibilityLabel,
+}) => {
   const { theme } = useTheme();
   const tokens = useTokens();
 
@@ -22,8 +30,9 @@ const NavTile: React.FC<NavTileProps> = ({ icon, title, subtitle, onPress, style
       variant="elevated"
       interactive
       onPress={onPress}
-      accessibilityLabel={title}
+      accessibilityLabel={accessibilityLabel || title}
       accessibilityHint={subtitle}
+      accessibilityRole="button"
       style={{ flex: 1, marginHorizontal: tokens.Spacing.xs, ...(style || {}) }}
     >
       <ListItem
