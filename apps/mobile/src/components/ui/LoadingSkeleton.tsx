@@ -43,11 +43,7 @@ export const LoadingSkeleton: React.FC<SkeletonProps> = ({
 
   React.useEffect(() => {
     if (animated) {
-      opacity.value = withRepeat(
-        withTiming(1, { duration: 1000 }),
-        -1,
-        true
-      );
+      opacity.value = withRepeat(withTiming(1, { duration: 1000 }), -1, true);
     }
   }, [animated, opacity]);
 

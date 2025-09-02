@@ -5,13 +5,7 @@
  */
 
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
-import {
-  View,
-  ViewStyle,
-  TouchableWithoutFeedback,
-  Dimensions,
-  Platform,
-} from 'react-native';
+import { View, ViewStyle, TouchableWithoutFeedback, Dimensions, Platform } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -96,7 +90,7 @@ const TooltipBubble: React.FC<TooltipBubbleProps> = ({ tooltip, onHide }) => {
   const tokens = useTokens();
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [actualPosition, setActualPosition] = useState<TooltipPosition>('top');
-  
+
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0.8);
   const translateY = useSharedValue(-10);
@@ -165,19 +159,10 @@ const TooltipBubble: React.FC<TooltipBubbleProps> = ({ tooltip, onHide }) => {
   // Entry animation
   useEffect(() => {
     const showDelay = tooltip.showDelay || 0;
-    
-    opacity.value = withDelay(
-      showDelay,
-      withTiming(1, { duration: 200 })
-    );
-    scale.value = withDelay(
-      showDelay,
-      withSpring(1, { damping: 20, stiffness: 300 })
-    );
-    translateY.value = withDelay(
-      showDelay,
-      withSpring(0, { damping: 20, stiffness: 300 })
-    );
+
+    opacity.value = withDelay(showDelay, withTiming(1, { duration: 200 }));
+    scale.value = withDelay(showDelay, withSpring(1, { damping: 20, stiffness: 300 }));
+    translateY.value = withDelay(showDelay, withSpring(0, { damping: 20, stiffness: 300 }));
 
     // Haptic feedback
     setTimeout(() => {
@@ -186,9 +171,7 @@ const TooltipBubble: React.FC<TooltipBubbleProps> = ({ tooltip, onHide }) => {
 
     // Announce to screen reader
     setTimeout(() => {
-      const announcement = tooltip.title 
-        ? `${tooltip.title}. ${tooltip.content}`
-        : tooltip.content;
+      const announcement = tooltip.title ? `${tooltip.title}. ${tooltip.content}` : tooltip.content;
       focusManager.announceAction(announcement);
     }, showDelay + 100);
 
@@ -208,10 +191,7 @@ const TooltipBubble: React.FC<TooltipBubbleProps> = ({ tooltip, onHide }) => {
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
-    transform: [
-      { scale: scale.value },
-      { translateY: translateY.value },
-    ],
+    transform: [{ scale: scale.value }, { translateY: translateY.value }],
   }));
 
   const handleHide = () => {
@@ -364,12 +344,7 @@ const TooltipBubble: React.FC<TooltipBubbleProps> = ({ tooltip, onHide }) => {
 
           {/* Title */}
           {tooltip.title && (
-            <Text
-              variant="titleSmall"
-              color="primary"
-              weight="semibold"
-              style={{ flex: 1 }}
-            >
+            <Text variant="titleSmall" color="primary" weight="semibold" style={{ flex: 1 }}>
               {tooltip.title}
             </Text>
           )}
@@ -445,23 +420,23 @@ export const TooltipProvider: React.FC<TooltipProviderProps> = ({ children }) =>
     // Measure target element
     targetRef.current?.measureInWindow((x, y, width, height) => {
       const measurements = { x, y, width, height, pageX: x, pageY: y };
-      
+
       const newTooltip: ActiveTooltip = {
         ...config,
         targetRef,
         measurements,
       };
 
-      setActiveTooltips(prev => {
+      setActiveTooltips((prev) => {
         // Remove existing tooltip with same ID
-        const filtered = prev.filter(t => t.id !== config.id);
+        const filtered = prev.filter((t) => t.id !== config.id);
         return [...filtered, newTooltip];
       });
     });
   };
 
   const hideTooltip = (id: string) => {
-    setActiveTooltips(prev => prev.filter(t => t.id !== id));
+    setActiveTooltips((prev) => prev.filter((t) => t.id !== id));
   };
 
   const hideAllTooltips = () => {
@@ -469,7 +444,7 @@ export const TooltipProvider: React.FC<TooltipProviderProps> = ({ children }) =>
   };
 
   const isVisible = (id: string) => {
-    return activeTooltips.some(t => t.id === id);
+    return activeTooltips.some((t) => t.id === id);
   };
 
   const contextValue: TooltipContextType = {
@@ -481,9 +456,7 @@ export const TooltipProvider: React.FC<TooltipProviderProps> = ({ children }) =>
 
   const handleTouchOutside = () => {
     // Hide tooltips that allow dismissOnTouchOutside
-    setActiveTooltips(prev => 
-      prev.filter(tooltip => tooltip.dismissOnTouchOutside === false)
-    );
+    setActiveTooltips((prev) => prev.filter((tooltip) => tooltip.dismissOnTouchOutside === false));
   };
 
   return (
@@ -491,14 +464,10 @@ export const TooltipProvider: React.FC<TooltipProviderProps> = ({ children }) =>
       <TouchableWithoutFeedback onPress={handleTouchOutside}>
         <View style={{ flex: 1 }}>
           {children}
-          
+
           {/* Render Active Tooltips */}
-          {activeTooltips.map(tooltip => (
-            <TooltipBubble
-              key={tooltip.id}
-              tooltip={tooltip}
-              onHide={hideTooltip}
-            />
+          {activeTooltips.map((tooltip) => (
+            <TooltipBubble key={tooltip.id} tooltip={tooltip} onHide={hideTooltip} />
           ))}
         </View>
       </TouchableWithoutFeedback>
@@ -531,7 +500,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   const handleTrigger = () => {
     if (disabled) return;
-    
+
     showTooltip({ ...tooltip, id: tooltipId }, targetRef as React.RefObject<View>);
   };
 
@@ -551,11 +520,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
   };
 
   return (
-    <View
-      ref={targetRef}
-      style={style}
-      {...getTriggerProps()}
-    >
+    <View ref={targetRef} style={style} {...getTriggerProps()}>
       {children}
     </View>
   );
@@ -601,20 +566,23 @@ export const useHelpfulHints = (hints: HelpfulHint[]) => {
     if (shownHints.has(hint.id)) return;
 
     const delay = hint.showAfterDelay || 0;
-    
+
     setTimeout(() => {
-      showTooltip({
-        id: hint.id,
-        title: hint.title,
-        content: hint.content,
-        variant: hint.variant || 'info',
-        persistent: true,
-        dismissOnTouchOutside: true,
-        onHide: () => {
-          setShownHints(prev => new Set(prev).add(hint.id));
-          // Save to AsyncStorage
+      showTooltip(
+        {
+          id: hint.id,
+          title: hint.title,
+          content: hint.content,
+          variant: hint.variant || 'info',
+          persistent: true,
+          dismissOnTouchOutside: true,
+          onHide: () => {
+            setShownHints((prev) => new Set(prev).add(hint.id));
+            // Save to AsyncStorage
+          },
         },
-      }, targetRef);
+        targetRef,
+      );
     }, delay);
   };
 

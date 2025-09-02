@@ -113,14 +113,23 @@ export default function GroceriesScreen() {
     <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
       <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
         {/* Header */}
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginBottom: tokens.Spacing.lg,
-          paddingTop: tokens.Spacing.sm
-        }}>
-          <Icon name="ShoppingCart" size="xl" color="brand" style={{ marginRight: tokens.Spacing.sm }} />
-          <Text variant="headlineMedium" weight="bold">Groceries</Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: tokens.Spacing.lg,
+            paddingTop: tokens.Spacing.sm,
+          }}
+        >
+          <Icon
+            name="ShoppingCart"
+            size="xl"
+            color="brand"
+            style={{ marginRight: tokens.Spacing.sm }}
+          />
+          <Text variant="headlineMedium" weight="bold">
+            Groceries
+          </Text>
         </View>
 
         {/* Glass Attention Banner */}
@@ -238,4 +247,3 @@ export default function GroceriesScreen() {
     </ScreenBackground>
   );
 }
-

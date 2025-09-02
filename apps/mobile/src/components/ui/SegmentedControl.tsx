@@ -1,6 +1,11 @@
 import React from 'react';
 import { View, Pressable, StyleSheet } from 'react-native';
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import Text from './Text';
 import { useTheme, useTokens, withOpacity } from '../../design-system/ThemeProvider';
 
@@ -25,7 +30,13 @@ interface SegmentButtonProps {
   tokens: ReturnType<typeof useTokens>;
 }
 
-const SegmentButton: React.FC<SegmentButtonProps> = ({ seg, active, onChange, accessibility, tokens }) => {
+const SegmentButton: React.FC<SegmentButtonProps> = ({
+  seg,
+  active,
+  onChange,
+  accessibility,
+  tokens,
+}) => {
   const scale = useSharedValue(1);
   const animatedSegmentStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],

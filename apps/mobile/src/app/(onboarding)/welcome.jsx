@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Alert,
-  SafeAreaView,
-  ScrollView,
-} from 'react-native';
+import { View, Alert, SafeAreaView, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../utils/auth/useAuth';
 import {
@@ -14,7 +9,7 @@ import {
   GlassInput,
   Icon,
   useColors,
-  useTokens
+  useTokens,
 } from '@/components/ui';
 import * as Haptics from 'expo-haptics';
 
@@ -79,20 +74,32 @@ export default function WelcomeScreen() {
   if (!isAuthenticated) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
-        <ScrollView contentContainerStyle={{
-          flexGrow: 1,
-          padding: tokens.Spacing.xl,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            padding: tokens.Spacing.xl,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <View style={{ marginBottom: tokens.Spacing['2xl'] }}>
             <Icon name="House" size="6xl" color="brand" />
           </View>
 
-          <Text variant="headlineLarge" weight="bold" style={{ marginBottom: tokens.Spacing.sm }} align="center">
+          <Text
+            variant="headlineLarge"
+            weight="bold"
+            style={{ marginBottom: tokens.Spacing.sm }}
+            align="center"
+          >
             Mates
           </Text>
-          <Text variant="titleMedium" color="secondary" style={{ marginBottom: tokens.Spacing['3xl'] }} align="center">
+          <Text
+            variant="titleMedium"
+            color="secondary"
+            style={{ marginBottom: tokens.Spacing['3xl'] }}
+            align="center"
+          >
             Your Roommate Management App
           </Text>
 
@@ -101,11 +108,16 @@ export default function WelcomeScreen() {
             size="large"
             style={{
               width: '100%',
-              marginBottom: tokens.Spacing['2xl']
+              marginBottom: tokens.Spacing['2xl'],
             }}
           >
             <View style={{ padding: tokens.Spacing.xl }}>
-              <Text variant="bodyLarge" color="secondary" style={{ marginBottom: tokens.Spacing.xl }} align="center">
+              <Text
+                variant="bodyLarge"
+                color="secondary"
+                style={{ marginBottom: tokens.Spacing.xl }}
+                align="center"
+              >
                 Please sign in or create an account to continue
               </Text>
 
@@ -138,20 +150,32 @@ export default function WelcomeScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
-      <ScrollView contentContainerStyle={{
-        flexGrow: 1,
-        padding: tokens.Spacing.xl,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+          padding: tokens.Spacing.xl,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         <View style={{ marginBottom: tokens.Spacing['2xl'] }}>
           <Icon name="House" size="6xl" color="brand" />
         </View>
 
-        <Text variant="headlineLarge" weight="bold" style={{ marginBottom: tokens.Spacing.sm }} align="center">
+        <Text
+          variant="headlineLarge"
+          weight="bold"
+          style={{ marginBottom: tokens.Spacing.sm }}
+          align="center"
+        >
           Mates
         </Text>
-        <Text variant="titleMedium" color="secondary" style={{ marginBottom: tokens.Spacing['3xl'] }} align="center">
+        <Text
+          variant="titleMedium"
+          color="secondary"
+          style={{ marginBottom: tokens.Spacing['3xl'] }}
+          align="center"
+        >
           Join your house group
         </Text>
 
@@ -160,7 +184,7 @@ export default function WelcomeScreen() {
           size="large"
           style={{
             width: '100%',
-            marginBottom: tokens.Spacing['2xl']
+            marginBottom: tokens.Spacing['2xl'],
           }}
         >
           <View style={{ padding: tokens.Spacing.xl }}>
@@ -243,7 +267,7 @@ export default function WelcomeScreen() {
           style={{
             borderRadius: tokens.BorderRadius.full,
             paddingVertical: tokens.Spacing.lg,
-            marginTop: tokens.Spacing.sm
+            marginTop: tokens.Spacing.sm,
           }}
         >
           Continue

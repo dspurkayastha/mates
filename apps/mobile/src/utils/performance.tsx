@@ -65,7 +65,12 @@ interface PerformanceContextType {
   recordMetric: (metric: Omit<PerformanceMetric, 'id' | 'timestamp'>) => void;
   recordNavigation: (from: string, to: string, duration: number, success?: boolean) => void;
   recordRender: (component: string, renderTime: number, updateCount?: number) => void;
-  recordUserInteraction: (action: string, element: string, duration?: number, metadata?: Record<string, any>) => void;
+  recordUserInteraction: (
+    action: string,
+    element: string,
+    duration?: number,
+    metadata?: Record<string, any>,
+  ) => void;
   getReport: (period: 'session' | 'daily' | 'weekly') => Promise<PerformanceReport>;
   isEnabled: boolean;
   setEnabled: (enabled: boolean) => void;
@@ -187,7 +192,8 @@ class PerformanceCollector {
     const issues: PerformanceIssue[] = [];
 
     // Check for slow renders
-    if (metric.category === 'render' && metric.value > 16) { // 16ms = 60fps threshold
+    if (metric.category === 'render' && metric.value > 16) {
+      // 16ms = 60fps threshold
       issues.push({
         type: 'slow_render',
         severity: metric.value > 100 ? 'high' : 'medium',
@@ -198,7 +204,8 @@ class PerformanceCollector {
     }
 
     // Check for slow navigation
-    if (metric.category === 'navigation' && metric.value > 1000) { // 1s threshold
+    if (metric.category === 'navigation' && metric.value > 1000) {
+      // 1s threshold
       issues.push({
         type: 'navigation_delay',
         severity: metric.value > 3000 ? 'high' : 'medium',
@@ -220,14 +227,14 @@ class PerformanceCollector {
 
     switch (period) {
       case 'daily':
-        startTime = now - (24 * 60 * 60 * 1000);
+        startTime = now - 24 * 60 * 60 * 1000;
         break;
       case 'weekly':
-        startTime = now - (7 * 24 * 60 * 60 * 1000);
+        startTime = now - 7 * 24 * 60 * 60 * 1000;
         break;
     }
 
-    const periodMetrics = this.metrics.filter(m => m.timestamp >= startTime);
+    const periodMetrics = this.metrics.filter((m) => m.timestamp >= startTime);
     const averages = this.calculateAverages(periodMetrics);
     const trends = this.calculateTrends(periodMetrics);
     const issues = this.detectIssues(periodMetrics);
@@ -258,9 +265,7 @@ class PerformanceCollector {
     const trends: Record<string, number[]> = {};
 
     Object.entries(groups).forEach(([name, groupMetrics]) => {
-      trends[name] = groupMetrics
-        .sort((a, b) => a.timestamp - b.timestamp)
-        .map(m => m.value);
+      trends[name] = groupMetrics.sort((a, b) => a.timestamp - b.timestamp).map((m) => m.value);
     });
 
     return trends;
@@ -274,8 +279,9 @@ class PerformanceCollector {
 
     // Analyze render performance
     if (categories.render) {
-      const slowRenders = categories.render.filter(m => m.value > 16);
-      if (slowRenders.length > categories.render.length * 0.1) { // 10% threshold
+      const slowRenders = categories.render.filter((m) => m.value > 16);
+      if (slowRenders.length > categories.render.length * 0.1) {
+        // 10% threshold
         issues.push({
           type: 'slow_render',
           severity: 'medium',
@@ -288,7 +294,7 @@ class PerformanceCollector {
 
     // Analyze navigation performance
     if (categories.navigation) {
-      const slowNavigation = categories.navigation.filter(m => m.value > 1000);
+      const slowNavigation = categories.navigation.filter((m) => m.value > 1000);
       if (slowNavigation.length > 0) {
         issues.push({
           type: 'navigation_delay',
@@ -304,12 +310,15 @@ class PerformanceCollector {
   }
 
   private groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
-    return array.reduce((groups, item) => {
-      const group = String(item[key]);
-      groups[group] = groups[group] || [];
-      groups[group].push(item);
-      return groups;
-    }, {} as Record<string, T[]>);
+    return array.reduce(
+      (groups, item) => {
+        const group = String(item[key]);
+        groups[group] = groups[group] || [];
+        groups[group].push(item);
+        return groups;
+      },
+      {} as Record<string, T[]>,
+    );
   }
 
   setEnabled(enabled: boolean) {
@@ -379,7 +388,7 @@ export const PerformanceProvider: React.FC<PerformanceProviderProps> = ({
     action: string,
     element: string,
     duration?: number,
-    metadata?: Record<string, any>
+    metadata?: Record<string, any>,
   ) => {
     collector.recordMetric({
       name: 'user_interaction',
@@ -413,11 +422,7 @@ export const PerformanceProvider: React.FC<PerformanceProviderProps> = ({
     setEnabled,
   };
 
-  return (
-    <PerformanceContext.Provider value={contextValue}>
-      {children}
-    </PerformanceContext.Provider>
-  );
+  return <PerformanceContext.Provider value={contextValue}>{children}</PerformanceContext.Provider>;
 };
 
 // ============================================================================
@@ -484,7 +489,7 @@ export const useInteractionPerformance = () => {
 
   const recordTimedInteraction = (action: string, element: string) => {
     const startTime = Date.now();
-    
+
     return (metadata?: Record<string, any>) => {
       const duration = Date.now() - startTime;
       recordUserInteraction(action, element, duration, metadata);
@@ -500,7 +505,7 @@ export const useInteractionPerformance = () => {
 
 export const getDeviceInfo = () => {
   const { width, height } = Dimensions.get('window');
-  
+
   return {
     platform: Platform.OS,
     version: Platform.Version,

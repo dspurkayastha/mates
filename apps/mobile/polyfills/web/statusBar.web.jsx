@@ -10,7 +10,7 @@ function postColorToParent(color) {
         color: color,
         timestamp: Date.now(),
       },
-      '*'
+      '*',
     );
   } catch {
     console.warn('Color was not sent to parent');

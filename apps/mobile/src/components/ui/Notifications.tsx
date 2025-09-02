@@ -5,13 +5,7 @@
  */
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import {
-  View,
-  ViewStyle,
-  Dimensions,
-  Platform,
-  SafeAreaView,
-} from 'react-native';
+import { View, ViewStyle, Dimensions, Platform, SafeAreaView } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -21,7 +15,7 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { useColors, useTokens } from '../../design-system/ThemeProvider';
+import { useColors, useTokens, withOpacity } from '../../design-system/ThemeProvider';
 import { generateAccessibilityLabel, focusManager } from '../../utils/accessibility';
 import Text from './Text';
 import Icon from './Icon';
@@ -127,10 +121,11 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     opacity.value = withTiming(1, { duration: 300 });
 
     // Announce to screen reader
-    const announcement = notification.accessibilityLabel || 
+    const announcement =
+      notification.accessibilityLabel ||
       generateAccessibilityLabel.status(
         notification.type || 'info',
-        `${notification.title}${notification.message ? '. ' + notification.message : ''}`
+        `${notification.title}${notification.message ? '. ' + notification.message : ''}`,
       );
     focusManager.announceAction(announcement);
 
@@ -147,10 +142,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   }, []);
 
   const handleDismiss = () => {
-    translateY.value = withSpring(
-      position === 'top' ? -200 : 200,
-      { damping: 20, stiffness: 300 }
-    );
+    translateY.value = withSpring(position === 'top' ? -200 : 200, { damping: 20, stiffness: 300 });
     opacity.value = withTiming(0, { duration: 200 });
     scale.value = withTiming(0.8, { duration: 200 }, () => {
       runOnJS(onDismiss)(notification.id);
@@ -160,10 +152,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [
-        { translateY: translateY.value },
-        { scale: scale.value },
-      ],
+      transform: [{ translateY: translateY.value }, { scale: scale.value }],
       opacity: opacity.value,
     };
   });
@@ -211,28 +200,38 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
   const getIconName = (): any => {
     if (notification.icon) return notification.icon;
-    
+
     switch (notification.type) {
-      case 'success': return 'Check';
-      case 'error': return 'X';
-      case 'warning': return 'Circle';
-      case 'info': return 'Info';
-      default: return 'Bell';
+      case 'success':
+        return 'Check';
+      case 'error':
+        return 'X';
+      case 'warning':
+        return 'Circle';
+      case 'info':
+        return 'Info';
+      default:
+        return 'Bell';
     }
   };
 
   const getIconColor = () => {
     switch (notification.type) {
-      case 'success': return colors.status.success;
-      case 'error': return colors.status.error;
-      case 'warning': return colors.status.warning;
-      case 'info': return colors.status.info;
-      default: return colors.text.secondary;
+      case 'success':
+        return colors.status.success;
+      case 'error':
+        return colors.status.error;
+      case 'warning':
+        return colors.status.warning;
+      case 'info':
+        return colors.status.info;
+      default:
+        return colors.text.secondary;
     }
   };
 
   return (
-    <Animated.View 
+    <Animated.View
       style={[animatedStyle, getNotificationStyles()]}
       accessible={true}
       accessibilityRole="alert"
@@ -240,7 +239,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     >
       {/* Icon */}
       <View style={{ marginRight: tokens.Spacing.md }}>
-        <Icon 
+        <Icon
           name={getIconName()}
           size="md"
           color={getIconColor()}
@@ -250,19 +249,19 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
       {/* Content */}
       <View style={{ flex: 1 }}>
-        <Text 
-          variant="titleSmall" 
-          color="primary" 
+        <Text
+          variant="titleSmall"
+          color="primary"
           weight="semibold"
           style={{ marginBottom: notification.message ? tokens.Spacing.xs : 0 }}
           accessibilityElementsHidden={true}
         >
           {notification.title}
         </Text>
-        
+
         {notification.message && (
-          <Text 
-            variant="bodyMedium" 
+          <Text
+            variant="bodyMedium"
             color="secondary"
             style={{ marginBottom: notification.actions?.length ? tokens.Spacing.md : 0 }}
             accessibilityElementsHidden={true}
@@ -273,12 +272,14 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
         {/* Actions */}
         {notification.actions && notification.actions.length > 0 && (
-          <View style={{ 
-            flexDirection: 'row', 
-            flexWrap: 'wrap',
-            marginTop: tokens.Spacing.sm,
-            gap: tokens.Spacing.sm,
-          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              marginTop: tokens.Spacing.sm,
+              gap: tokens.Spacing.sm,
+            }}
+          >
             {notification.actions.map((action, index) => (
               <Button
                 key={index}
@@ -288,9 +289,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
                   action.onPress();
                   handleDismiss();
                 }}
-                leftIcon={action.icon ? (
-                  <Icon name={action.icon as any} size="xs" />
-                ) : undefined}
+                leftIcon={action.icon ? <Icon name={action.icon as any} size="xs" /> : undefined}
                 accessibilityElementsHidden={true}
               >
                 {action.label}
@@ -310,7 +309,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           style={{ marginLeft: tokens.Spacing.sm }}
           accessibilityLabel="Dismiss notification"
           accessibilityElementsHidden={true}
-        >{''}</Button>
+        >
+          {''}
+        </Button>
       )}
     </Animated.View>
   );
@@ -330,22 +331,24 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   maxNotifications = 5,
 }) => {
   const [notifications, setNotifications] = useState<(NotificationConfig & { id: string })[]>([]);
-  
+  const colors = useColors();
+  const tokens = useTokens();
+
   const show = (config: NotificationConfig): string => {
     const id = config.id || Date.now().toString() + Math.random().toString(36);
     const notification = { ...config, id };
-    
-    setNotifications(prev => {
+
+    setNotifications((prev) => {
       const updated = [notification, ...prev];
       // Limit number of notifications
       return updated.slice(0, maxNotifications);
     });
-    
+
     return id;
   };
 
   const hide = (id: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
   const hideAll = () => {
@@ -353,11 +356,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   };
 
   const update = (id: string, config: Partial<NotificationConfig>) => {
-    setNotifications(prev => 
-      prev.map(n => 
-        n.id === id ? { ...n, ...config } : n
-      )
-    );
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, ...config } : n)));
   };
 
   const contextValue: NotificationContextType = {
@@ -368,26 +367,28 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   };
 
   // Group notifications by position
-  const topNotifications = notifications.filter(n => (n.position || 'top') === 'top');
-  const bottomNotifications = notifications.filter(n => (n.position || 'top') === 'bottom');
-  const centerNotifications = notifications.filter(n => (n.position || 'top') === 'center');
+  const topNotifications = notifications.filter((n) => (n.position || 'top') === 'top');
+  const bottomNotifications = notifications.filter((n) => (n.position || 'top') === 'bottom');
+  const centerNotifications = notifications.filter((n) => (n.position || 'top') === 'center');
 
   return (
     <NotificationContext.Provider value={contextValue}>
       {children}
-      
+
       {/* Top Notifications */}
       {topNotifications.length > 0 && (
-        <View style={{
-          position: 'absolute',
-          top: Platform.OS === 'ios' ? 50 : 20,
-          left: 0,
-          right: 0,
-          zIndex: 9999,
-          pointerEvents: 'box-none',
-        }}>
+        <View
+          style={{
+            position: 'absolute',
+            top: Platform.OS === 'ios' ? 50 : 20,
+            left: 0,
+            right: 0,
+            zIndex: 9999,
+            pointerEvents: 'box-none',
+          }}
+        >
           <SafeAreaView>
-            {topNotifications.map(notification => (
+            {topNotifications.map((notification) => (
               <NotificationItem
                 key={notification.id}
                 notification={notification}
@@ -402,15 +403,17 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
 
       {/* Bottom Notifications */}
       {bottomNotifications.length > 0 && (
-        <View style={{
-          position: 'absolute',
-          bottom: Platform.OS === 'ios' ? 90 : 20,
-          left: 0,
-          right: 0,
-          zIndex: 9999,
-          pointerEvents: 'box-none',
-        }}>
-          {bottomNotifications.map(notification => (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: Platform.OS === 'ios' ? 90 : 20,
+            left: 0,
+            right: 0,
+            zIndex: 9999,
+            pointerEvents: 'box-none',
+          }}
+        >
+          {bottomNotifications.map((notification) => (
             <NotificationItem
               key={notification.id}
               notification={notification}
@@ -424,18 +427,20 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
 
       {/* Center Notifications (Modal style) */}
       {centerNotifications.length > 0 && (
-        <View style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 9999,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        }}>
-          {centerNotifications.map(notification => (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 9999,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: withOpacity(colors.background.primary, 0.5),
+          }}
+        >
+          {centerNotifications.map((notification) => (
             <NotificationItem
               key={notification.id}
               notification={notification}
@@ -468,20 +473,20 @@ export const useNotifications = (): NotificationContextType => {
 
 export const useToast = () => {
   const { show } = useNotifications();
-  
+
   return {
     success: (title: string, message?: string, options?: Partial<NotificationConfig>) =>
       show({ type: 'success', title, message, duration: 4000, ...options }),
-      
+
     error: (title: string, message?: string, options?: Partial<NotificationConfig>) =>
       show({ type: 'error', title, message, duration: 6000, ...options }),
-      
+
     warning: (title: string, message?: string, options?: Partial<NotificationConfig>) =>
       show({ type: 'warning', title, message, duration: 5000, ...options }),
-      
+
     info: (title: string, message?: string, options?: Partial<NotificationConfig>) =>
       show({ type: 'info', title, message, duration: 4000, ...options }),
-      
+
     custom: (config: NotificationConfig) => show(config),
   };
 };

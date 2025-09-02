@@ -1,6 +1,11 @@
 import React from 'react';
 import { View, Pressable, StyleSheet } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 import { Text, Icon, useTheme, useTokens } from './ui';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -62,11 +67,7 @@ const TopBar: React.FC<TopBarProps> = ({ title, onBackPress, rightAction }) => {
         <View style={[styles.action, { width: target, height: target }]} />
       )}
 
-      <Text
-        variant="titleLarge"
-        weight="bold"
-        style={{ flex: 1, textAlign: 'center' }}
-      >
+      <Text variant="titleLarge" weight="bold" style={{ flex: 1, textAlign: 'center' }}>
         {title}
       </Text>
 
@@ -87,4 +88,3 @@ const styles = StyleSheet.create({
 });
 
 export default TopBar;
-

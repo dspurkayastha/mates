@@ -17,7 +17,7 @@ import { withOpacity } from '@/design-system/ThemeProvider';
 function TabBarIcon({ focused, IconComponent, hasNotification = false }) {
   const { theme } = useTheme();
   const tokens = useTokens();
-  
+
   return (
     <View
       style={{
@@ -27,10 +27,7 @@ function TabBarIcon({ focused, IconComponent, hasNotification = false }) {
         position: 'relative',
       }}
     >
-      <IconComponent
-        size="md"
-        color={focused ? theme.interactive.primary : theme.text.secondary}
-      />
+      <IconComponent size="md" color={focused ? theme.interactive.primary : theme.text.secondary} />
       {hasNotification && (
         <View
           style={{
@@ -54,7 +51,7 @@ export default function TabsLayout() {
   const { theme } = useTheme();
   const tokens = useTokens();
   const insets = useSafeAreaInsets();
-  
+
   return (
     <Tabs
       screenOptions={{
@@ -89,9 +86,7 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} IconComponent={HomeIcon} />
-          ),
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} IconComponent={HomeIcon} />,
         }}
       />
       <Tabs.Screen
@@ -125,9 +120,7 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} IconComponent={UserIcon} />
-          ),
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} IconComponent={UserIcon} />,
         }}
       />
     </Tabs>

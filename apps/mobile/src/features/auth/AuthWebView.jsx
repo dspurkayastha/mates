@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useAuthStore } from './store';
+import { debug } from '@/utils/logger';
 
 const callbackUrl = '/api/auth/token';
 const callbackQueryString = `callbackUrl=${callbackUrl}`;
@@ -45,7 +46,7 @@ export const AuthWebView = ({ mode, proxyURL, baseURL }) => {
           user: event.data.user,
         });
       } else if (event.data.type === 'AUTH_ERROR') {
-        console.error('Auth error:', event.data.error);
+        debug('deeplink', 'Auth error', event.data.error);
       }
     };
 
@@ -58,7 +59,7 @@ export const AuthWebView = ({ mode, proxyURL, baseURL }) => {
 
   if (Platform.OS === 'web') {
     const handleIframeError = () => {
-      console.error('Failed to load auth iframe');
+      debug('deeplink', 'Failed to load auth iframe');
     };
 
     return (

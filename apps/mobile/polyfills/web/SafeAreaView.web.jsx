@@ -14,15 +14,15 @@ export const SafeAreaView = forwardRef(
     const isTabletAndAbove = typeof window !== 'undefined' ? window.self !== window.top : true;
     return (
       <NativeSafeAreaView {...rest} edges={edges} ref={forwardedRef}>
-        {isTabletAndAbove && (Array.isArray(edges) && edges.includes('top') || (!Array.isArray(edges) && edges.top !== 'off')) && (
-          <View style={{ height: 64 }} />
-        )}
+        {isTabletAndAbove &&
+          ((Array.isArray(edges) && edges.includes('top')) ||
+            (!Array.isArray(edges) && edges.top !== 'off')) && <View style={{ height: 64 }} />}
         {children}
-        {isTabletAndAbove && (Array.isArray(edges) && edges.includes('bottom') || (!Array.isArray(edges) && edges.bottom !== 'off')) && (
-          <View style={{ height: 34 }} />
-        )}
+        {isTabletAndAbove &&
+          ((Array.isArray(edges) && edges.includes('bottom')) ||
+            (!Array.isArray(edges) && edges.bottom !== 'off')) && <View style={{ height: 34 }} />}
       </NativeSafeAreaView>
     );
-  }
+  },
 );
 export default SafeAreaView;

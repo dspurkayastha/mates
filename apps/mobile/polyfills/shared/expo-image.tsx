@@ -82,7 +82,7 @@ const WrappedImage = forwardRef<ExpoImage.Image, ImageProps>(function WrappedIma
         setFallbackSource(require('../../src/__create/placeholder.svg'));
       }
     },
-    [source, fallbackSource, onError, style]
+    [source, fallbackSource, onError, style],
   );
 
   return (

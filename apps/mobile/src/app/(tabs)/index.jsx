@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Dimensions,
-  Alert,
-  Pressable,
-} from 'react-native';
+import { View, StyleSheet, ScrollView, Dimensions, Alert, Pressable } from 'react-native';
 import {
   Text,
   Icon,
@@ -22,7 +15,6 @@ import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import FloatingActionMenu from '@/components/FloatingActionMenu';
 import { useLatestPoll } from '@/features/polls/hooks';
-
 
 const SummaryCard = ({ title, icon, onPress, items }) => {
   const { theme } = useTheme();
@@ -44,12 +36,7 @@ const SummaryCard = ({ title, icon, onPress, items }) => {
         }}
       >
         {icon && (
-          <Icon
-            name={icon}
-            size="md"
-            color="brand"
-            style={{ marginRight: tokens.Spacing.sm }}
-          />
+          <Icon name={icon} size="md" color="brand" style={{ marginRight: tokens.Spacing.sm }} />
         )}
         <Text variant="titleMedium" weight="semibold">
           {title}
@@ -150,10 +137,12 @@ export default function HomeScreen() {
     <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Welcome Header */}
-        <View style={{
-          marginBottom: tokens.Spacing.xl,
-          paddingTop: tokens.Spacing.sm
-        }}>
+        <View
+          style={{
+            marginBottom: tokens.Spacing.xl,
+            paddingTop: tokens.Spacing.sm,
+          }}
+        >
           <Text variant="headlineLarge" weight="bold" style={{ marginBottom: tokens.Spacing.xs }}>
             Welcome back!
           </Text>
@@ -166,9 +155,7 @@ export default function HomeScreen() {
         </View>
 
         <Pressable
-          onPress={() =>
-            router.push(activePoll ? `/polls/${activePoll.id}` : '/polls/create')
-          }
+          onPress={() => router.push(activePoll ? `/polls/${activePoll.id}` : '/polls/create')}
           style={{
             backgroundColor: withOpacity(theme.interactive.primary, 0.05),
             borderColor: theme.border.light,
@@ -178,18 +165,10 @@ export default function HomeScreen() {
             marginBottom: tokens.Spacing.xl,
           }}
           accessibilityRole="button"
-          accessibilityLabel={
-            activePoll ? 'View poll results' : 'Create a poll'
-          }
+          accessibilityLabel={activePoll ? 'View poll results' : 'Create a poll'}
         >
-          <Text
-            variant="titleMedium"
-            weight="semibold"
-            style={{ marginBottom: tokens.Spacing.xs }}
-          >
-            {activePoll
-              ? activePoll.question
-              : 'Start a poll with your roommates'}
+          <Text variant="titleMedium" weight="semibold" style={{ marginBottom: tokens.Spacing.xs }}>
+            {activePoll ? activePoll.question : 'Start a poll with your roommates'}
           </Text>
           <Text variant="bodySmall" color="secondary">
             {activePoll ? 'Tap to view results' : 'Tap to create a poll'}
@@ -201,7 +180,7 @@ export default function HomeScreen() {
           <Text variant="titleLarge" weight="semibold" style={{ marginBottom: tokens.Spacing.md }}>
             Quick Access
           </Text>
-          
+
           {/* First Row */}
           <View style={{ flexDirection: 'row', marginBottom: tokens.Spacing.md }}>
             <NavTile
@@ -217,7 +196,7 @@ export default function HomeScreen() {
               onPress={handleGroceriesPress}
             />
           </View>
-          
+
           {/* Second Row */}
           <View style={{ flexDirection: 'row', marginBottom: tokens.Spacing.md }}>
             <NavTile
@@ -233,7 +212,7 @@ export default function HomeScreen() {
               onPress={handleProfilePress}
             />
           </View>
-          
+
           {/* Third Row */}
           <View style={{ flexDirection: 'row' }}>
             <NavTile
@@ -279,10 +258,7 @@ export default function HomeScreen() {
           title="Groceries"
           icon="ShoppingCart"
           onPress={handleViewAllGroceries}
-          items={[
-            { title: '2 items out' },
-            { title: '3 items running low' },
-          ]}
+          items={[{ title: '2 items out' }, { title: '3 items running low' }]}
         />
 
         <SummaryCard

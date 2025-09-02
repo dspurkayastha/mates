@@ -1,4 +1,6 @@
-html, body, #__next {
+html,
+body,
+#__next {
   -webkit-overflow-scrolling: touch;
 }
 #__next {
@@ -23,8 +25,8 @@ input:focus,
 textarea:focus,
 button:focus,
 select:focus {
-  outline: none;        /* removes the glow */
-  box-shadow: none;     /* Chrome fallback */
+  outline: none; /* removes the glow */
+  box-shadow: none; /* Chrome fallback */
 }
 
 /* Firefox also adds padding on some controls */

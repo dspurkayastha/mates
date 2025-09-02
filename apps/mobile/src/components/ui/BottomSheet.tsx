@@ -6,11 +6,11 @@
 
 import React, { forwardRef, useCallback, useMemo } from 'react';
 import { View, ViewStyle, BackHandler } from 'react-native';
-import BottomSheet, { 
-  BottomSheetView, 
+import BottomSheet, {
+  BottomSheetView,
   BottomSheetBackdrop,
   BottomSheetHandle,
-  BottomSheetBackdropProps 
+  BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
 import { useFocusEffect } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
@@ -49,16 +49,13 @@ interface BottomSheetProps {
 
 const CustomBackdrop = (props: BottomSheetBackdropProps) => {
   const colors = useColors();
-  
+
   return (
     <BottomSheetBackdrop
       {...props}
       disappearsOnIndex={-1}
       appearsOnIndex={0}
-      style={[
-        props.style,
-        { backgroundColor: colors.background.overlay }
-      ]}
+      style={[props.style, { backgroundColor: colors.background.overlay }]}
     />
   );
 };
@@ -70,7 +67,7 @@ const CustomBackdrop = (props: BottomSheetBackdropProps) => {
 const CustomHandle = (props: any) => {
   const colors = useColors();
   const tokens = useTokens();
-  
+
   return (
     <BottomSheetHandle
       {...props}
@@ -92,152 +89,156 @@ const CustomHandle = (props: any) => {
 // MAIN COMPONENT
 // ============================================================================
 
-export const ModernBottomSheet = forwardRef<BottomSheet, BottomSheetProps>(({
-  title,
-  message,
-  actions = [],
-  children,
-  snapPoints = ['25%', '50%'],
-  enablePanDownToClose = true,
-  enableBackdropDismiss = true,
-  onClose,
-  style,
-}, ref) => {
-  const colors = useColors();
-  const tokens = useTokens();
+export const ModernBottomSheet = forwardRef<BottomSheet, BottomSheetProps>(
+  (
+    {
+      title,
+      message,
+      actions = [],
+      children,
+      snapPoints = ['25%', '50%'],
+      enablePanDownToClose = true,
+      enableBackdropDismiss = true,
+      onClose,
+      style,
+    },
+    ref,
+  ) => {
+    const colors = useColors();
+    const tokens = useTokens();
 
-  // Memoize snap points
-  const memoizedSnapPoints = useMemo(() => snapPoints, [snapPoints]);
+    // Memoize snap points
+    const memoizedSnapPoints = useMemo(() => snapPoints, [snapPoints]);
 
-  // Handle sheet changes
-  const handleSheetChanges = useCallback((index: number) => {
-    if (index === -1) {
-      onClose?.();
-    }
-    
-    // Haptic feedback on sheet movement
-    if (index >= 0) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-  }, [onClose]);
-
-  // Handle back button on Android
-  useFocusEffect(
-    useCallback(() => {
-      const onBackPress = () => {
-        if (ref && typeof ref === 'object' && ref.current) {
-          ref.current.close();
-          return true;
+    // Handle sheet changes
+    const handleSheetChanges = useCallback(
+      (index: number) => {
+        if (index === -1) {
+          onClose?.();
         }
-        return false;
-      };
 
-      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-      return () => subscription?.remove();
-    }, [ref])
-  );
+        // Haptic feedback on sheet movement
+        if (index >= 0) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }
+      },
+      [onClose],
+    );
 
-  // Handle backdrop press
-  const handleBackdropPress = useCallback(() => {
-    if (enableBackdropDismiss && ref && typeof ref === 'object' && ref.current) {
-      ref.current.close();
-    }
-  }, [enableBackdropDismiss, ref]);
-
-  // Render action button
-  const renderAction = (action: ActionSheetAction, index: number) => {
-    let buttonVariant: 'primary' | 'secondary' | 'danger' = 'secondary';
-    
-    if (action.variant === 'destructive') {
-      buttonVariant = 'danger';
-    } else if (action.variant === 'cancel') {
-      buttonVariant = 'secondary';
-    } else if (index === 0 && actions.length > 1) {
-      buttonVariant = 'primary';
-    }
-
-    return (
-      <Button
-        key={action.title}
-        variant={buttonVariant}
-        size="large"
-        fullWidth
-        disabled={action.disabled}
-        leftIcon={action.icon ? <Icon name={action.icon as any} size="sm" /> : undefined}
-        onPress={() => {
-          action.onPress();
+    // Handle back button on Android
+    useFocusEffect(
+      useCallback(() => {
+        const onBackPress = () => {
           if (ref && typeof ref === 'object' && ref.current) {
             ref.current.close();
+            return true;
           }
-        }}
-        style={{ marginBottom: tokens.Spacing.md }}
-      >
-        {action.title}
-      </Button>
+          return false;
+        };
+
+        const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+        return () => subscription?.remove();
+      }, [ref]),
     );
-  };
 
-  return (
-    <BottomSheet
-      ref={ref}
-      index={-1}
-      snapPoints={memoizedSnapPoints}
-      enablePanDownToClose={enablePanDownToClose}
-      backdropComponent={CustomBackdrop}
-      handleComponent={CustomHandle}
-      onChange={handleSheetChanges}
-      backgroundStyle={{
-        backgroundColor: colors.background.elevated,
-      }}
-      style={style}
-    >
-      <BottomSheetView style={{
-        flex: 1,
-        paddingHorizontal: tokens.Spacing.lg,
-        paddingBottom: tokens.Spacing.lg,
-      }}>
-        {/* Header */}
-        {(title || message) && (
-          <View style={{ marginBottom: tokens.Spacing.lg }}>
-            {title && (
-              <Text
-                variant="titleLarge"
-                color="primary"
-                align="center"
-                style={{ marginBottom: message ? tokens.Spacing.sm : 0 }}
-              >
-                {title}
-              </Text>
-            )}
-            {message && (
-              <Text
-                variant="bodyMedium"
-                color="secondary"
-                align="center"
-              >
-                {message}
-              </Text>
-            )}
-          </View>
-        )}
+    // Handle backdrop press
+    const handleBackdropPress = useCallback(() => {
+      if (enableBackdropDismiss && ref && typeof ref === 'object' && ref.current) {
+        ref.current.close();
+      }
+    }, [enableBackdropDismiss, ref]);
 
-        {/* Custom children content */}
-        {children && (
-          <View style={{ marginBottom: actions.length > 0 ? tokens.Spacing.lg : 0 }}>
-            {children}
-          </View>
-        )}
+    // Render action button
+    const renderAction = (action: ActionSheetAction, index: number) => {
+      let buttonVariant: 'primary' | 'secondary' | 'danger' = 'secondary';
 
-        {/* Actions */}
-        {actions.length > 0 && (
-          <View style={{ marginTop: 'auto' }}>
-            {actions.map(renderAction)}
-          </View>
-        )}
-      </BottomSheetView>
-    </BottomSheet>
-  );
-});
+      if (action.variant === 'destructive') {
+        buttonVariant = 'danger';
+      } else if (action.variant === 'cancel') {
+        buttonVariant = 'secondary';
+      } else if (index === 0 && actions.length > 1) {
+        buttonVariant = 'primary';
+      }
+
+      return (
+        <Button
+          key={action.title}
+          variant={buttonVariant}
+          size="large"
+          fullWidth
+          disabled={action.disabled}
+          leftIcon={action.icon ? <Icon name={action.icon as any} size="sm" /> : undefined}
+          onPress={() => {
+            action.onPress();
+            if (ref && typeof ref === 'object' && ref.current) {
+              ref.current.close();
+            }
+          }}
+          style={{ marginBottom: tokens.Spacing.md }}
+        >
+          {action.title}
+        </Button>
+      );
+    };
+
+    return (
+      <BottomSheet
+        ref={ref}
+        index={-1}
+        snapPoints={memoizedSnapPoints}
+        enablePanDownToClose={enablePanDownToClose}
+        backdropComponent={CustomBackdrop}
+        handleComponent={CustomHandle}
+        onChange={handleSheetChanges}
+        backgroundStyle={{
+          backgroundColor: colors.background.elevated,
+        }}
+        style={style}
+      >
+        <BottomSheetView
+          style={{
+            flex: 1,
+            paddingHorizontal: tokens.Spacing.lg,
+            paddingBottom: tokens.Spacing.lg,
+          }}
+        >
+          {/* Header */}
+          {(title || message) && (
+            <View style={{ marginBottom: tokens.Spacing.lg }}>
+              {title && (
+                <Text
+                  variant="titleLarge"
+                  color="primary"
+                  align="center"
+                  style={{ marginBottom: message ? tokens.Spacing.sm : 0 }}
+                >
+                  {title}
+                </Text>
+              )}
+              {message && (
+                <Text variant="bodyMedium" color="secondary" align="center">
+                  {message}
+                </Text>
+              )}
+            </View>
+          )}
+
+          {/* Custom children content */}
+          {children && (
+            <View style={{ marginBottom: actions.length > 0 ? tokens.Spacing.lg : 0 }}>
+              {children}
+            </View>
+          )}
+
+          {/* Actions */}
+          {actions.length > 0 && (
+            <View style={{ marginTop: 'auto' }}>{actions.map(renderAction)}</View>
+          )}
+        </BottomSheetView>
+      </BottomSheet>
+    );
+  },
+);
 
 ModernBottomSheet.displayName = 'ModernBottomSheet';
 
@@ -256,9 +257,10 @@ export const useActionSheet = () => {
     bottomSheetRef.current?.close();
   }, []);
 
-  const ActionSheet = useCallback((props: Omit<BottomSheetProps, 'ref'>) => (
-    <ModernBottomSheet ref={bottomSheetRef} {...props} />
-  ), []);
+  const ActionSheet = useCallback(
+    (props: Omit<BottomSheetProps, 'ref'>) => <ModernBottomSheet ref={bottomSheetRef} {...props} />,
+    [],
+  );
 
   return {
     show,

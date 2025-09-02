@@ -100,7 +100,7 @@ const CreateApp = () => {
         type: 'sandbox:mobile:navigation',
         pathname,
       },
-      '*'
+      '*',
     );
   }, [pathname]);
 

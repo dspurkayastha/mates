@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { Platform, Keyboard, KeyboardAvoidingView } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
@@ -91,12 +90,7 @@ const KeyboardAvoidingAnimatedView = (props, ref) => {
   const renderContent = () => {
     if (behavior === 'position') {
       return (
-        <Animated.View
-          style={[
-            contentContainerStyle,
-            positionAnimatedStyle,
-          ]}
-        >
+        <Animated.View style={[contentContainerStyle, positionAnimatedStyle]}>
           {children}
         </Animated.View>
       );

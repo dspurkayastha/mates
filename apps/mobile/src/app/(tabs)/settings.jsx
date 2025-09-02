@@ -10,25 +10,25 @@ import {
   useTokens,
   ScreenBackground,
 } from '@/components/ui';
-import { useAuth } from '@/utils/auth/useAuth';
+import { useAuth } from '@/features/auth/useAuth';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 
 // Premium Settings Item Component
-const SettingsItem = ({ 
-  icon, 
-  title, 
-  subtitle, 
-  onPress, 
-  showToggle = false, 
-  toggleValue = false, 
+const SettingsItem = ({
+  icon,
+  title,
+  subtitle,
+  onPress,
+  showToggle = false,
+  toggleValue = false,
   onToggleChange,
   showChevron = true,
-  destructive = false 
+  destructive = false,
 }) => {
   const colors = useColors();
   const tokens = useTokens();
-  
+
   return (
     <GlassCard
       variant="translucent"
@@ -37,32 +37,32 @@ const SettingsItem = ({
       onPress={showToggle ? undefined : onPress}
       style={{ marginBottom: tokens.Spacing.md }}
     >
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: tokens.Spacing.lg,
-      }}>
-        <View style={{
-          width: 40,
-          height: 40,
-          borderRadius: 20,
-          backgroundColor: destructive ? colors.status.error : colors.background.secondary,
-          justifyContent: 'center',
+      <View
+        style={{
+          flexDirection: 'row',
           alignItems: 'center',
-          marginRight: tokens.Spacing.md,
-        }}>
-          <Icon 
-            name={icon} 
-            size="sm" 
-            color={destructive ? "inverse" : "secondary"} 
-          />
+          padding: tokens.Spacing.lg,
+        }}
+      >
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: destructive ? colors.status.error : colors.background.secondary,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: tokens.Spacing.md,
+          }}
+        >
+          <Icon name={icon} size="sm" color={destructive ? 'inverse' : 'secondary'} />
         </View>
-        
+
         <View style={{ flex: 1 }}>
-          <Text 
-            variant="titleMedium" 
-            weight="medium" 
-            color={destructive ? "error" : "primary"}
+          <Text
+            variant="titleMedium"
+            weight="medium"
+            color={destructive ? 'error' : 'primary'}
             style={{ marginBottom: subtitle ? tokens.Spacing.xs : 0 }}
           >
             {title}
@@ -73,15 +73,11 @@ const SettingsItem = ({
             </Text>
           )}
         </View>
-        
+
         {showToggle ? (
-          <GlassToggle
-            value={toggleValue}
-            onValueChange={onToggleChange}
-            size="medium"
-          />
-        ) : showChevron && (
-          <Icon name="ChevronRight" size="sm" color="tertiary" />
+          <GlassToggle value={toggleValue} onValueChange={onToggleChange} size="medium" />
+        ) : (
+          showChevron && <Icon name="ChevronRight" size="sm" color="tertiary" />
         )}
       </View>
     </GlassCard>
@@ -91,15 +87,15 @@ const SettingsItem = ({
 // Premium Settings Section Component
 const SettingsSection = ({ title, children }) => {
   const tokens = useTokens();
-  
+
   return (
     <View style={{ marginBottom: tokens.Spacing.xl }}>
-      <Text 
-        variant="titleLarge" 
-        weight="semibold" 
-        style={{ 
+      <Text
+        variant="titleLarge"
+        weight="semibold"
+        style={{
           marginBottom: tokens.Spacing.md,
-          paddingHorizontal: tokens.Spacing.sm 
+          paddingHorizontal: tokens.Spacing.sm,
         }}
       >
         {title}
@@ -114,7 +110,7 @@ export default function SettingsScreen() {
   const tokens = useTokens();
   const { signOut } = useAuth();
   const router = useRouter();
-  
+
   // Settings state
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
@@ -190,24 +186,20 @@ export default function SettingsScreen() {
 
   const handleSignOut = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Sign Out',
+        style: 'destructive',
+        onPress: () => {
+          signOut();
+          router.replace('/(onboarding)/welcome');
         },
-        {
-          text: 'Sign Out',
-          style: 'destructive',
-          onPress: () => {
-            signOut();
-            router.replace('/(onboarding)/welcome');
-          },
-        },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
@@ -215,19 +207,28 @@ export default function SettingsScreen() {
       <ScrollView
         contentContainerStyle={{
           padding: tokens.Spacing.lg,
-          paddingBottom: 120 // Extra space for tab bar
+          paddingBottom: 120, // Extra space for tab bar
         }}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginBottom: tokens.Spacing['2xl'],
-          paddingTop: tokens.Spacing.sm
-        }}>
-          <Icon name="Settings" size="xl" color="brand" style={{ marginRight: tokens.Spacing.sm }} />
-          <Text variant="headlineMedium" weight="bold">Settings</Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: tokens.Spacing['2xl'],
+            paddingTop: tokens.Spacing.sm,
+          }}
+        >
+          <Icon
+            name="Settings"
+            size="xl"
+            color="brand"
+            style={{ marginRight: tokens.Spacing.sm }}
+          />
+          <Text variant="headlineMedium" weight="bold">
+            Settings
+          </Text>
         </View>
 
         {/* Account Section */}

@@ -5,12 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  ScrollView,
-  Dimensions,
-  RefreshControl,
-} from 'react-native';
+import { View, ScrollView, Dimensions, RefreshControl } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -20,10 +15,7 @@ import Animated, {
 import * as FileSystem from 'expo-file-system';
 import { useColors, useTokens } from '../../design-system/ThemeProvider';
 import { generateAccessibilityLabel } from '../../utils/accessibility';
-import {
-  getBundleMetrics,
-  bundleAnalyzer,
-} from '../../utils/bundleOptimization';
+import { getBundleMetrics, bundleAnalyzer } from '../../utils/bundleOptimization';
 import Text from './Text';
 import Card from './Card';
 import Button from './Button';
@@ -85,19 +77,19 @@ export const BundleAnalyzerScreen: React.FC = () => {
     try {
       // Gather bundle metrics
       const bundleMetrics = getBundleMetrics();
-      
+
       // Get historical data
       const historicalData = await bundleAnalyzer.getHistoricalMetrics();
-      
+
       // Generate recommendations
       const recommendations = bundleAnalyzer.generateOptimizationRecommendations(bundleMetrics);
-      
+
       // Calculate memory usage (mock for demonstration)
       const memoryUsage = 1024 * 1024 * 2.5; // 2.5MB mock value
-      
+
       // Calculate cache efficiency
       const cacheEfficiency = bundleMetrics.cacheHitRate * 100;
-      
+
       // Generate chunk load times data (mock)
       const chunkLoadTimes: any[] = [];
 
@@ -117,7 +109,6 @@ export const BundleAnalyzerScreen: React.FC = () => {
       // Trigger animations
       headerOpacity.value = withSpring(1, { damping: 20, stiffness: 150 });
       contentTranslateY.value = withSpring(0, { damping: 20, stiffness: 150 });
-
     } catch (error) {
       console.error('Failed to load bundle analysis:', error);
     } finally {
@@ -187,24 +178,18 @@ export const BundleAnalyzerScreen: React.FC = () => {
           }}
         >
           <View>
-            <Text
-              variant="headlineLarge"
-              color="primary"
-              weight="bold"
-              accessibilityRole="header"
-            >
+            <Text variant="headlineLarge" color="primary" weight="bold" accessibilityRole="header">
               Bundle Analyzer
             </Text>
-            <Text
-              variant="bodyMedium"
-              color="secondary"
-              style={{ marginTop: 4 }}
-            >
+            <Text variant="bodyMedium" color="secondary" style={{ marginTop: 4 }}>
               Performance optimization insights
             </Text>
           </View>
 
-          <OptimizationScoreBadge score={optimizationReport.score} grade={optimizationReport.grade} />
+          <OptimizationScoreBadge
+            score={optimizationReport.score}
+            grade={optimizationReport.grade}
+          />
         </View>
       </Animated.View>
 
@@ -217,9 +202,7 @@ export const BundleAnalyzerScreen: React.FC = () => {
             paddingBottom: 100,
           }}
           showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-          }
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
         >
           {/* Quick Actions */}
           <Card
@@ -254,7 +237,7 @@ export const BundleAnalyzerScreen: React.FC = () => {
               >
                 Optimize
               </Button>
-              
+
               <Button
                 variant="secondary"
                 size="medium"
@@ -274,7 +257,7 @@ export const BundleAnalyzerScreen: React.FC = () => {
               {
                 id: 'bundle_size',
                 title: 'Bundle Size',
-                value: Math.round(analysisData.memoryUsage / 1024 / 1024 * 10) / 10,
+                value: Math.round((analysisData.memoryUsage / 1024 / 1024) * 10) / 10,
                 format: 'number' as const,
                 change: 12.5,
                 trend: 'down' as const,
@@ -432,18 +415,10 @@ const OptimizationScoreBadge: React.FC<{ score: number; grade: string }> = ({ sc
       accessibilityRole="text"
       accessibilityLabel={`Optimization score: ${score} out of 100, grade ${grade}`}
     >
-      <Text
-        variant="headlineSmall"
-        color={getScoreColor()}
-        weight="bold"
-      >
+      <Text variant="headlineSmall" color={getScoreColor()} weight="bold">
         {grade}
       </Text>
-      <Text
-        variant="labelMedium"
-        color={getScoreColor()}
-        style={{ opacity: 0.8 }}
-      >
+      <Text variant="labelMedium" color={getScoreColor()} style={{ opacity: 0.8 }}>
         Score: {score}
       </Text>
     </View>
@@ -579,8 +554,6 @@ const BundleAnalyzerSkeleton: React.FC = () => {
 // HELPER FUNCTIONS
 // ============================================================================
 
-
-
 const generateOptimizationReport = (bundleMetrics: any): OptimizationReport => {
   let score = 100;
   const improvements: any[] = [];
@@ -636,25 +609,25 @@ const generateOptimizationReport = (bundleMetrics: any): OptimizationReport => {
 const generateChunkLoadTimesData = () => {
   const data = [];
   const now = new Date();
-  
+
   for (let i = 29; i >= 0; i--) {
     const date = new Date(now);
     date.setDate(date.getDate() - i);
-    
+
     data.push({
       value: Math.random() * 2000 + 500,
       date,
       category: 'chunk_load',
     });
   }
-  
+
   return data;
 };
 
 const generateHistoricalTrendData = (historicalData: any[]) => {
   return historicalData.map((data, index) => ({
     value: data.averageLoadTime || Math.random() * 1000 + 500,
-    date: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)),
+    date: new Date(Date.now() - index * 24 * 60 * 60 * 1000),
     category: 'performance',
   }));
 };

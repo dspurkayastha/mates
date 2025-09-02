@@ -11,10 +11,10 @@ export const generateAccessibilityLabel = {
     item: (content: string, index: number, total: number) => {
       return `${content}. Item ${index} of ${total}`;
     },
-    
+
     section: (title: string, itemCount: number) => {
       return `${title} section with ${itemCount} items`;
-    }
+    },
   },
 
   /**
@@ -24,10 +24,10 @@ export const generateAccessibilityLabel = {
     action: (action: string, context?: string) => {
       return context ? `${action} for ${context}` : action;
     },
-    
+
     toggle: (isActive: boolean, label: string) => {
       return `${label}, ${isActive ? 'active' : 'inactive'}`;
-    }
+    },
   },
 
   /**
@@ -39,11 +39,11 @@ export const generateAccessibilityLabel = {
       const valueText = value ? `, current value: ${value}` : '';
       return `${label}${requiredText}${valueText}`;
     },
-    
+
     validation: (fieldName: string, error?: string) => {
       return error ? `${fieldName} has error: ${error}` : `${fieldName} is valid`;
-    }
-  }
+    },
+  },
 };
 
 export const generateAccessibilityHint = {
@@ -53,7 +53,7 @@ export const generateAccessibilityHint = {
   interaction: {
     tap: (action: string) => `Double tap to ${action}`,
     swipe: (action: string, direction: string) => `Swipe ${direction} to ${action}`,
-    longPress: (action: string) => `Long press to ${action}`
+    longPress: (action: string) => `Long press to ${action}`,
   },
 
   /**
@@ -62,19 +62,19 @@ export const generateAccessibilityHint = {
   navigation: {
     screen: (screenName: string) => `Navigate to ${screenName}`,
     back: () => 'Go back to previous screen',
-    close: () => 'Close current screen'
+    close: () => 'Close current screen',
   },
 
   /**
    * Generate accessibility hints for content
    */
   content: {
-    expand: (isExpanded: boolean) => 
+    expand: (isExpanded: boolean) =>
       isExpanded ? 'Double tap to collapse content' : 'Double tap to expand content',
-    
+
     filter: (filterName: string, isActive: boolean) =>
-      `Double tap to ${isActive ? 'remove' : 'apply'} ${filterName} filter`
-  }
+      `Double tap to ${isActive ? 'remove' : 'apply'} ${filterName} filter`,
+  },
 };
 
 export const AccessibilityRoles = {
@@ -90,4 +90,4 @@ export const AccessibilityRoles = {
   LISTITEM: 'listitem' as const,
 } as const;
 
-export type AccessibilityRole = typeof AccessibilityRoles[keyof typeof AccessibilityRoles];
+export type AccessibilityRole = (typeof AccessibilityRoles)[keyof typeof AccessibilityRoles];

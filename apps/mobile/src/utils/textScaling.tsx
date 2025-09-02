@@ -12,7 +12,7 @@ const accessibilityManager = {
   subscribe: (callback: (state: any) => void) => {
     // Mock implementation
     return () => {}; // unsubscribe function
-  }
+  },
 };
 
 // ============================================================================
@@ -100,15 +100,15 @@ export const TextScalingProvider: React.FC<TextScalingProviderProps> = ({
       // Update font scale based on system preferences
       if (state.preferredContentSizeCategory) {
         const categoryMapping: Record<string, FontScaleCategory> = {
-          'UICTContentSizeCategoryXS': 'extraSmall',
-          'UICTContentSizeCategoryS': 'small',
-          'UICTContentSizeCategoryM': 'medium',
-          'UICTContentSizeCategoryL': 'large',
-          'UICTContentSizeCategoryXL': 'extraLarge',
-          'UICTContentSizeCategoryXXL': 'huge',
-          'UICTContentSizeCategoryXXXL': 'accessibility1',
+          UICTContentSizeCategoryXS: 'extraSmall',
+          UICTContentSizeCategoryS: 'small',
+          UICTContentSizeCategoryM: 'medium',
+          UICTContentSizeCategoryL: 'large',
+          UICTContentSizeCategoryXL: 'extraLarge',
+          UICTContentSizeCategoryXXL: 'huge',
+          UICTContentSizeCategoryXXXL: 'accessibility1',
         };
-        
+
         const mappedCategory = categoryMapping[state.preferredContentSizeCategory] || 'medium';
         setCategory(mappedCategory);
         setFontScale(FONT_SCALE_CATEGORIES[mappedCategory]);
@@ -125,15 +125,19 @@ export const TextScalingProvider: React.FC<TextScalingProviderProps> = ({
   const handleSetFontScale = (scale: number) => {
     const constrainedScale = Math.max(minScale, Math.min(maxScale, scale));
     setFontScale(constrainedScale);
-    
+
     // Find the closest category
-    const closestCategory = Object.entries(FONT_SCALE_CATEGORIES)
-      .reduce((closest, [key, value]) => {
+    const closestCategory = Object.entries(FONT_SCALE_CATEGORIES).reduce(
+      (closest, [key, value]) => {
         const currentDiff = Math.abs(value - constrainedScale);
-        const closestDiff = Math.abs(FONT_SCALE_CATEGORIES[closest as FontScaleCategory] - constrainedScale);
-        return currentDiff < closestDiff ? key as FontScaleCategory : closest;
-      }, 'medium' as FontScaleCategory);
-    
+        const closestDiff = Math.abs(
+          FONT_SCALE_CATEGORIES[closest as FontScaleCategory] - constrainedScale,
+        );
+        return currentDiff < closestDiff ? (key as FontScaleCategory) : closest;
+      },
+      'medium' as FontScaleCategory,
+    );
+
     setCategory(closestCategory);
   };
 
@@ -161,11 +165,7 @@ export const TextScalingProvider: React.FC<TextScalingProviderProps> = ({
     scaleText,
   };
 
-  return (
-    <TextScalingContext.Provider value={contextValue}>
-      {children}
-    </TextScalingContext.Provider>
-  );
+  return <TextScalingContext.Provider value={contextValue}>{children}</TextScalingContext.Provider>;
 };
 
 // ============================================================================

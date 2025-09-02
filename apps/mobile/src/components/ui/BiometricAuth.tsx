@@ -5,13 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  ViewStyle,
-  Modal,
-  Dimensions,
-  Platform,
-} from 'react-native';
+import { View, ViewStyle, Modal, Dimensions, Platform } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -23,7 +17,7 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { useColors, useTokens } from '../../design-system/ThemeProvider';
+import { useColors, useTokens, withOpacity } from '../../design-system/ThemeProvider';
 import { generateAccessibilityLabel } from '../../utils/accessibility';
 import Text from './Text';
 import Button from './Button';
@@ -74,10 +68,10 @@ export const BiometricPrompt: React.FC<BiometricPromptProps> = ({
 }) => {
   const colors = useColors();
   const tokens = useTokens();
-  
+
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [capabilities, setCapabilities] = useState<BiometricCapabilities | null>(null);
-  
+
   const scale = useSharedValue(0);
   const iconScale = useSharedValue(1);
   const opacity = useSharedValue(0);
@@ -97,15 +91,12 @@ export const BiometricPrompt: React.FC<BiometricPromptProps> = ({
     if (visible) {
       scale.value = withSpring(1, { damping: 20, stiffness: 300 });
       opacity.value = withTiming(1, { duration: 200 });
-      
+
       // Start pulse animation
       pulseOpacity.value = withRepeat(
-        withSequence(
-          withTiming(0.8, { duration: 1000 }),
-          withTiming(0.3, { duration: 1000 })
-        ),
+        withSequence(withTiming(0.8, { duration: 1000 }), withTiming(0.3, { duration: 1000 })),
         -1,
-        true
+        true,
       );
     } else {
       scale.value = withTiming(0, { duration: 200 });
@@ -118,20 +109,20 @@ export const BiometricPrompt: React.FC<BiometricPromptProps> = ({
     if (isAuthenticating || !capabilities?.isAvailable) return;
 
     setIsAuthenticating(true);
-    
+
     try {
       // Scale down icon to indicate authentication start
       iconScale.value = withSpring(0.8, { damping: 15 });
-      
+
       const result = await biometricAuthManager.authenticate(options);
-      
+
       if (result.success) {
         // Success animation
         iconScale.value = withSequence(
           withSpring(1.2, { damping: 15 }),
-          withSpring(1, { damping: 15 })
+          withSpring(1, { damping: 15 }),
         );
-        
+
         setTimeout(() => {
           runOnJS(onSuccess)();
         }, 300);
@@ -140,9 +131,9 @@ export const BiometricPrompt: React.FC<BiometricPromptProps> = ({
         iconScale.value = withSequence(
           withSpring(1.1, { damping: 10 }),
           withSpring(0.9, { damping: 10 }),
-          withSpring(1, { damping: 15 })
+          withSpring(1, { damping: 15 }),
         );
-        
+
         if (result.error) {
           runOnJS(onError)(result.error);
         }
@@ -178,7 +169,7 @@ export const BiometricPrompt: React.FC<BiometricPromptProps> = ({
 
   const getBiometricIcon = () => {
     if (!capabilities?.supportedTypes.length) return 'Shield';
-    
+
     const primaryType = capabilities.supportedTypes[0];
     switch (primaryType) {
       case 1: // FINGERPRINT
@@ -192,7 +183,7 @@ export const BiometricPrompt: React.FC<BiometricPromptProps> = ({
 
   const getBiometricTitle = () => {
     if (!capabilities?.supportedTypes.length) return 'Authenticate';
-    
+
     const typeNames = biometricAuthManager.getBiometricTypeNames();
     return `Use ${typeNames[0]}`;
   };
@@ -212,7 +203,7 @@ export const BiometricPrompt: React.FC<BiometricPromptProps> = ({
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backgroundColor: withOpacity(colors.background.primary, 0.5),
           padding: tokens.Spacing['2xl'],
         }}
         accessible={false}
@@ -227,7 +218,10 @@ export const BiometricPrompt: React.FC<BiometricPromptProps> = ({
             }}
             accessible={true}
             accessibilityRole="none"
-            accessibilityLabel={generateAccessibilityLabel.status('dialog', 'Biometric authentication')}
+            accessibilityLabel={generateAccessibilityLabel.status(
+              'dialog',
+              'Biometric authentication',
+            )}
           >
             {/* Pulse Background */}
             <Animated.View
@@ -244,7 +238,7 @@ export const BiometricPrompt: React.FC<BiometricPromptProps> = ({
               ]}
               accessibilityElementsHidden
             />
-            
+
             {/* Icon */}
             <Animated.View
               style={[
@@ -287,13 +281,14 @@ export const BiometricPrompt: React.FC<BiometricPromptProps> = ({
               variant="bodyMedium"
               color="secondary"
               align="center"
-              style={{ 
+              style={{
                 marginBottom: tokens.Spacing['2xl'],
                 maxWidth: 240,
                 lineHeight: tokens.Typography.body.medium.lineHeight * 1.2,
               }}
             >
-              {options.promptMessage || 'Place your finger on the sensor or look at your device to continue'}
+              {options.promptMessage ||
+                'Place your finger on the sensor or look at your device to continue'}
             </Text>
 
             {/* Status */}
@@ -302,7 +297,7 @@ export const BiometricPrompt: React.FC<BiometricPromptProps> = ({
                 variant="bodySmall"
                 color="brand"
                 align="center"
-                style={{ 
+                style={{
                   marginBottom: tokens.Spacing.lg,
                   opacity: 0.8,
                 }}
@@ -330,7 +325,7 @@ export const BiometricPrompt: React.FC<BiometricPromptProps> = ({
               >
                 {options.cancelLabel || 'Cancel'}
               </Button>
-              
+
               {!options.disableDeviceFallback && (
                 <Button
                   variant="tertiary"
@@ -345,7 +340,7 @@ export const BiometricPrompt: React.FC<BiometricPromptProps> = ({
                   {options.fallbackLabel || 'Passcode'}
                 </Button>
               )}
-              
+
               <Button
                 variant="primary"
                 size="medium"
@@ -376,7 +371,7 @@ export const BiometricSetup: React.FC<BiometricSetupProps> = ({
 }) => {
   const colors = useColors();
   const tokens = useTokens();
-  
+
   const [capabilities, setCapabilities] = useState<BiometricCapabilities | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
@@ -401,7 +396,7 @@ export const BiometricSetup: React.FC<BiometricSetupProps> = ({
 
     try {
       const result = await biometricAuthManager.enableBiometricAuth();
-      
+
       if (result.success) {
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         onSetupComplete(true);
@@ -420,7 +415,7 @@ export const BiometricSetup: React.FC<BiometricSetupProps> = ({
   const getBenefits = () => {
     const typeNames = capabilities ? biometricAuthManager.getBiometricTypeNames() : [];
     const primaryType = typeNames[0] || 'Biometric authentication';
-    
+
     return [
       `Quick access with ${primaryType}`,
       'Enhanced security for your account',
@@ -435,11 +430,14 @@ export const BiometricSetup: React.FC<BiometricSetupProps> = ({
       style={{
         padding: tokens.Spacing['3xl'],
         margin: tokens.Spacing.lg,
-        ...style as any,
+        ...(style as any),
       }}
       accessible={true}
       accessibilityRole="none"
-      accessibilityLabel={generateAccessibilityLabel.status('form', 'Biometric authentication setup')}
+      accessibilityLabel={generateAccessibilityLabel.status(
+        'form',
+        'Biometric authentication setup',
+      )}
     >
       {/* Header */}
       <View
@@ -460,13 +458,9 @@ export const BiometricSetup: React.FC<BiometricSetupProps> = ({
           }}
           accessibilityElementsHidden
         >
-          <Icon
-            name="Shield"
-            size="xl"
-            color="info"
-          />
+          <Icon name="Shield" size="xl" color="info" />
         </View>
-        
+
         <Text
           variant="headlineSmall"
           color="primary"
@@ -476,7 +470,7 @@ export const BiometricSetup: React.FC<BiometricSetupProps> = ({
         >
           Secure Your Account
         </Text>
-        
+
         <Text
           variant="bodyLarge"
           color="secondary"
@@ -512,11 +506,7 @@ export const BiometricSetup: React.FC<BiometricSetupProps> = ({
               color="success"
               style={{ marginRight: tokens.Spacing.md }}
             />
-            <Text
-              variant="bodyMedium"
-              color="primary"
-              style={{ flex: 1 }}
-            >
+            <Text variant="bodyMedium" color="primary" style={{ flex: 1 }}>
               {benefit}
             </Text>
           </View>
@@ -534,11 +524,7 @@ export const BiometricSetup: React.FC<BiometricSetupProps> = ({
           }}
           accessibilityRole="alert"
         >
-          <Text
-            variant="bodySmall"
-            color="error"
-            align="center"
-          >
+          <Text variant="bodySmall" color="error" align="center">
             {error}
           </Text>
         </View>
@@ -562,7 +548,7 @@ export const BiometricSetup: React.FC<BiometricSetupProps> = ({
         >
           Skip
         </Button>
-        
+
         <Button
           variant="primary"
           size="large"
@@ -583,13 +569,10 @@ export const BiometricSetup: React.FC<BiometricSetupProps> = ({
 // BIOMETRIC STATUS COMPONENT
 // ============================================================================
 
-export const BiometricStatus: React.FC<BiometricStatusProps> = ({
-  onToggle,
-  style,
-}) => {
+export const BiometricStatus: React.FC<BiometricStatusProps> = ({ onToggle, style }) => {
   const colors = useColors();
   const tokens = useTokens();
-  
+
   const [capabilities, setCapabilities] = useState<BiometricCapabilities | null>(null);
   const [isEnabled, setIsEnabled] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
@@ -678,19 +661,12 @@ export const BiometricStatus: React.FC<BiometricStatusProps> = ({
             color={isEnabled ? 'success' : 'secondary'}
             style={{ marginRight: tokens.Spacing.sm }}
           />
-          <Text
-            variant="titleMedium"
-            color="primary"
-            weight="semibold"
-          >
+          <Text variant="titleMedium" color="primary" weight="semibold">
             Biometric Login
           </Text>
         </View>
-        
-        <Text
-          variant="bodySmall"
-          color={getStatusColor()}
-        >
+
+        <Text variant="bodySmall" color={getStatusColor()}>
           {getStatusText()}
         </Text>
       </View>

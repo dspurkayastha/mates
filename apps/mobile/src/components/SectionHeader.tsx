@@ -25,7 +25,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ title, icon, action, styl
         style,
       ]}
     >
-      <View style={[styles.left, { marginRight: action ? tokens.Spacing.sm : 0 }]}> 
+      <View style={[styles.left, { marginRight: action ? tokens.Spacing.sm : 0 }]}>
         {icon && <View style={{ marginRight: tokens.Spacing.sm }}>{icon}</View>}
         <Text variant="titleMedium" color="primary" weight="semibold">
           {title}
@@ -54,4 +54,3 @@ const styles = StyleSheet.create({
 });
 
 export default SectionHeader;
-

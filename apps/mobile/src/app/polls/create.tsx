@@ -1,7 +1,15 @@
 import React from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Text, Icon, GlassInput, Button, ScreenBackground, useTheme, useTokens } from '@/components/ui';
+import {
+  Text,
+  Icon,
+  GlassInput,
+  Button,
+  ScreenBackground,
+  useTheme,
+  useTokens,
+} from '@/components/ui';
 import { useCreatePoll } from '@/features/polls/hooks';
 
 export default function CreatePollScreen() {
@@ -31,12 +39,7 @@ export default function CreatePollScreen() {
             marginBottom: tokens.Spacing.xl,
           }}
         >
-          <Icon
-            name="Vote"
-            size="xl"
-            color="brand"
-            style={{ marginRight: tokens.Spacing.sm }}
-          />
+          <Icon name="Vote" size="xl" color="brand" style={{ marginRight: tokens.Spacing.sm }} />
           <Text variant="headlineLarge" weight="bold">
             Create Poll
           </Text>

@@ -3,32 +3,29 @@ import { useNavigation } from 'expo-router';
 import { BackHandler } from 'react-native';
 
 export const usePreventBack = () => {
-	const navigation = useNavigation();
+  const navigation = useNavigation();
 
-	useFocusEffect(() => {
-		navigation.setOptions({
-			headerLeft: () => null,
-			gestureEnabled: false,
-		});
+  useFocusEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => null,
+      gestureEnabled: false,
+    });
 
-		navigation.getParent()?.setOptions({ gestureEnabled: false });
+    navigation.getParent()?.setOptions({ gestureEnabled: false });
 
-		// Android back button handler
-		const hardwareBackPressHandler = BackHandler.addEventListener(
-			'hardwareBackPress',
-			() => {
-				// Prevent default behavior of leaving the screen
-				return true;
-			}
-		);
+    // Android back button handler
+    const hardwareBackPressHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      // Prevent default behavior of leaving the screen
+      return true;
+    });
 
-		return () => {
-			navigation.getParent()?.setOptions({ gestureEnabled: true });
-			navigation.setOptions({
-				gestureEnabled: true,
-			});
-			hardwareBackPressHandler.remove();
-		};
-	});
+    return () => {
+      navigation.getParent()?.setOptions({ gestureEnabled: true });
+      navigation.setOptions({
+        gestureEnabled: true,
+      });
+      hardwareBackPressHandler.remove();
+    };
+  });
 };
 export default usePreventBack;

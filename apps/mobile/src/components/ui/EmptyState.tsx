@@ -83,7 +83,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         color={getIconColor() as any}
         style={{ marginBottom: tokens.Spacing.lg }}
       />
-      
+
       <Text
         variant="titleLarge"
         color="primary"
@@ -92,7 +92,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       >
         {title}
       </Text>
-      
+
       <Text
         variant="bodyMedium"
         color="secondary"

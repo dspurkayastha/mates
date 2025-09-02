@@ -16,6 +16,8 @@ jobs:
           cache-dependency-path: apps/mobile/package-lock.json
       - run: npm ci
         working-directory: apps/mobile
+      - run: npm run format:check
+        working-directory: apps/mobile
       - run: npm run typecheck
         working-directory: apps/mobile
       - run: npm run lint:colors

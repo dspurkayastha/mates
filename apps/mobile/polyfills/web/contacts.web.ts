@@ -152,7 +152,7 @@ export const requestPermissionsAsync = async () => {
           },
           style: 'default',
         },
-      ]
+      ],
     );
   });
 };

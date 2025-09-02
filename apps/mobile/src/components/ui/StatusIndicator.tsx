@@ -21,9 +21,16 @@ import Icon from './Icon';
 // TYPES
 // ============================================================================
 
-type StatusVariant = 
-  | 'success' | 'warning' | 'error' | 'info' | 'neutral' 
-  | 'pending' | 'processing' | 'completed' | 'cancelled';
+type StatusVariant =
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'info'
+  | 'neutral'
+  | 'pending'
+  | 'processing'
+  | 'completed'
+  | 'cancelled';
 
 type StatusSize = 'small' | 'medium' | 'large';
 
@@ -67,10 +74,10 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({
       scale.value = withRepeat(
         withSequence(
           withSpring(1.1, { damping: 15, stiffness: 150 }),
-          withSpring(1, { damping: 15, stiffness: 150 })
+          withSpring(1, { damping: 15, stiffness: 150 }),
         ),
         -1,
-        false
+        false,
       );
     }
   }, [pulse, scale]);
@@ -86,10 +93,18 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({
   const getVariantStyles = () => {
     const baseStyle = {
       borderRadius: tokens.BorderRadius.full,
-      paddingVertical: size === 'small' ? tokens.Spacing.xs : 
-                     size === 'medium' ? tokens.Spacing.sm : tokens.Spacing.md,
-      paddingHorizontal: size === 'small' ? tokens.Spacing.sm : 
-                        size === 'medium' ? tokens.Spacing.md : tokens.Spacing.lg,
+      paddingVertical:
+        size === 'small'
+          ? tokens.Spacing.xs
+          : size === 'medium'
+            ? tokens.Spacing.sm
+            : tokens.Spacing.md,
+      paddingHorizontal:
+        size === 'small'
+          ? tokens.Spacing.sm
+          : size === 'medium'
+            ? tokens.Spacing.md
+            : tokens.Spacing.lg,
       flexDirection: 'row' as const,
       alignItems: 'center' as const,
       justifyContent: 'center' as const,
@@ -189,7 +204,7 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({
   const getAccessibilityProps = () => {
     const statusText = label || variant;
     const defaultLabel = accessibilityLabel || `Status: ${statusText}`;
-    
+
     let defaultHint = accessibilityHint;
     if (!defaultHint) {
       switch (variant) {
@@ -224,17 +239,14 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({
 
   const StatusContent = () => {
     const accessibilityProps = getAccessibilityProps();
-    
+
     return (
-      <View 
-        style={[baseStyle, variantStyle, style]}
-        {...accessibilityProps}
-      >
+      <View style={[baseStyle, variantStyle, style]} {...accessibilityProps}>
         {icon && (
           <>
-            <Icon 
-              name={icon as any} 
-              size={iconSize} 
+            <Icon
+              name={icon as any}
+              size={iconSize}
               color={textColor}
               accessibilityElementsHidden={true}
               importantForAccessibility="no-hide-descendants"

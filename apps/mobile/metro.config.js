@@ -29,17 +29,17 @@ const WEB_ALIASES = {
   'react-native-webview': path.resolve(__dirname, './polyfills/web/webview.web.tsx'),
   'react-native-safe-area-context': path.resolve(
     __dirname,
-    './polyfills/web/safeAreaContext.web.jsx'
+    './polyfills/web/safeAreaContext.web.jsx',
   ),
   'react-native-maps': path.resolve(__dirname, './polyfills/web/maps.web.jsx'),
   'react-native-web/dist/exports/SafeAreaView': path.resolve(
     __dirname,
-    './polyfills/web/SafeAreaView.web.jsx'
+    './polyfills/web/SafeAreaView.web.jsx',
   ),
   'react-native-web/dist/exports/Alert': path.resolve(__dirname, './polyfills/web/alerts.web.tsx'),
   'react-native-web/dist/exports/RefreshControl': path.resolve(
     __dirname,
-    './polyfills/web/refreshControl.web.tsx'
+    './polyfills/web/refreshControl.web.tsx',
   ),
   'expo-status-bar': path.resolve(__dirname, './polyfills/web/statusBar.web.jsx'),
   'expo-location': path.resolve(__dirname, './polyfills/web/location.web.ts'),
@@ -48,7 +48,7 @@ const WEB_ALIASES = {
   'expo-contacts': path.resolve(__dirname, './polyfills/web/contacts.web.ts'),
   'react-native-web/dist/exports/ScrollView': path.resolve(
     __dirname,
-    './polyfills/web/scrollview.web.jsx'
+    './polyfills/web/scrollview.web.jsx',
   ),
   '@gorhom/bottom-sheet': path.resolve(__dirname, './polyfills/web/bottomSheet.web.tsx'),
 };
@@ -56,7 +56,7 @@ const WEB_ALIASES = {
 const NATIVE_ALIASES = {
   './Libraries/Components/TextInput/TextInput': path.resolve(
     __dirname,
-    './polyfills/native/texinput.native.jsx'
+    './polyfills/native/texinput.native.jsx',
   ),
 };
 
@@ -121,13 +121,7 @@ config.resolver = {
     'avif', // For next-gen image format
   ],
   // Source extensions with TypeScript optimization
-  sourceExts: [
-    ...config.resolver.sourceExts,
-    'ts',
-    'tsx',
-    'jsx',
-    'js',
-  ],
+  sourceExts: [...config.resolver.sourceExts, 'ts', 'tsx', 'jsx', 'js'],
   // Platform-specific resolution for better tree-shaking
   platforms: ['ios', 'android', 'native', 'web'],
   // Custom alias resolution merged with original polyfills
@@ -145,7 +139,7 @@ config.resolver = {
   resolveRequest: (context, moduleName, platform) => {
     try {
       // Only handle specific polyfill cases, let Hermes handle everything else
-      
+
       // Polyfills directory exclusion
       if (
         context.originModulePath.startsWith(`${__dirname}/polyfills/native`) ||
@@ -154,17 +148,17 @@ config.resolver = {
       ) {
         return context.resolveRequest(context, moduleName, platform);
       }
-      
+
       // Handle Expo Google Fonts wildcard
       if (moduleName.startsWith('@expo-google-fonts/') && moduleName !== '@expo-google-fonts/dev') {
         return context.resolveRequest(context, '@expo-google-fonts/dev', platform);
       }
-      
+
       // Apply shared aliases
       if (SHARED_ALIASES[moduleName] && !moduleName.startsWith('./polyfills/')) {
         return context.resolveRequest(context, SHARED_ALIASES[moduleName], platform);
       }
-      
+
       // Platform-specific web aliases
       if (platform === 'web' && WEB_ALIASES[moduleName] && !moduleName.startsWith('./polyfills/')) {
         return context.resolveRequest(context, WEB_ALIASES[moduleName], platform);
@@ -174,7 +168,7 @@ config.resolver = {
       if (NATIVE_ALIASES[moduleName] && !moduleName.startsWith('./polyfills/')) {
         return context.resolveRequest(context, NATIVE_ALIASES[moduleName], platform);
       }
-      
+
       // Default resolution - let Hermes handle everything else naturally
       return context.resolveRequest(context, moduleName, platform);
     } catch (error) {
@@ -195,25 +189,25 @@ config.serializer = {
   createModuleIdFactory: function () {
     const moduleIdMap = new Map();
     let nextId = 0;
-    
+
     return function (path) {
       // Return cached ID if exists
       if (moduleIdMap.has(path)) {
         return moduleIdMap.get(path);
       }
-      
+
       // SOLUTION: Use only numeric IDs for all modules
       // This prevents React Native core module name corruption
       // The previous implementation was transforming:
       // "react-native/Libraries/Core/InitializeCore.js" -> "Core_InitializeCore_js"
       // which caused Hermes to fail with "Unknown named module" error
-      
+
       const moduleId = nextId++;
       moduleIdMap.set(path, moduleId);
       return moduleId;
     };
   },
-  
+
   // Custom module filter for tree-shaking
   processModuleFilter: function (modules) {
     // Filter out development-only modules in production
@@ -224,14 +218,12 @@ config.serializer = {
         'flipper',
         '@react-native-community/cli-debugger-ui',
       ];
-      
-      return modules.filter(module => {
-        return !devOnlyModules.some(devModule => 
-          module.path.includes(devModule)
-        );
+
+      return modules.filter((module) => {
+        return !devOnlyModules.some((devModule) => module.path.includes(devModule));
       });
     }
-    
+
     return modules;
   },
 };
@@ -295,7 +287,7 @@ if (process.env.EXPO_PUBLIC_PLATFORM === 'web') {
     // Custom serialization for web platform
     return null; // Let default serializer handle for now
   };
-  
+
   // Web asset optimization
   config.transformer.enableBabelRCLookup = false;
   config.transformer.enableBabelRuntime = false;
@@ -308,16 +300,19 @@ if (process.env.EXPO_PUBLIC_PLATFORM === 'web') {
 if (process.env.NODE_ENV === 'development') {
   // Fast refresh configuration
   config.transformer.enableBabelRCLookup = true;
-  
+
   // Enable Hermes parser for development
   config.transformer.hermesParser = true;
-  
+
   // Suppress named module warnings in development
   const originalConsoleWarn = console.warn;
-  console.warn = function(...args) {
+  console.warn = function (...args) {
     const message = args[0];
-    if (typeof message === 'string' && 
-        (message.includes('Requiring module') && message.includes('by name is only supported for debugging purposes'))) {
+    if (
+      typeof message === 'string' &&
+      message.includes('Requiring module') &&
+      message.includes('by name is only supported for debugging purposes')
+    ) {
       return; // Suppress these specific warnings
     }
     originalConsoleWarn.apply(console, args);

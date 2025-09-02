@@ -346,7 +346,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
             style={[
               buttonStyles,
               {
-                backgroundColor: 'transparent',
+                backgroundColor: withOpacity(colors.background.primary, 0),
                 borderWidth: 1.5,
                 borderColor: disabled ? colors.border.light : getTintColor(),
                 opacity: disabled ? 0.5 : 1,
@@ -365,7 +365,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
             style={[
               buttonStyles,
               {
-                backgroundColor: 'transparent',
+                backgroundColor: withOpacity(colors.background.primary, 0),
                 opacity: disabled ? 0.5 : 1,
               },
             ]}

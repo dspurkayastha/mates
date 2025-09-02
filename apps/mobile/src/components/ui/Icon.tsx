@@ -15,9 +15,16 @@ import { useColors } from '../../design-system/ThemeProvider';
 
 type IconName = keyof typeof icons;
 type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
-type ColorVariant = 
-  | 'primary' | 'secondary' | 'tertiary' | 'inverse' | 'brand'
-  | 'success' | 'warning' | 'error' | 'info';
+type ColorVariant =
+  | 'primary'
+  | 'secondary'
+  | 'tertiary'
+  | 'inverse'
+  | 'brand'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'info';
 
 interface IconProps {
   name: IconName;
@@ -134,17 +141,27 @@ export const Icon: React.FC<IconProps> = ({
 
 // Export commonly used icons as separate components for better DX
 export const HomeIcon = (props: Omit<IconProps, 'name'>) => <Icon name="House" {...props} />;
-export const DollarSignIcon = (props: Omit<IconProps, 'name'>) => <Icon name="DollarSign" {...props} />;
-export const ShoppingCartIcon = (props: Omit<IconProps, 'name'>) => <Icon name="ShoppingCart" {...props} />;
-export const CheckSquareIcon = (props: Omit<IconProps, 'name'>) => <Icon name="SquareCheck" {...props} />;
+export const DollarSignIcon = (props: Omit<IconProps, 'name'>) => (
+  <Icon name="DollarSign" {...props} />
+);
+export const ShoppingCartIcon = (props: Omit<IconProps, 'name'>) => (
+  <Icon name="ShoppingCart" {...props} />
+);
+export const CheckSquareIcon = (props: Omit<IconProps, 'name'>) => (
+  <Icon name="SquareCheck" {...props} />
+);
 export const PlusIcon = (props: Omit<IconProps, 'name'>) => <Icon name="Plus" {...props} />;
 export const SettingsIcon = (props: Omit<IconProps, 'name'>) => <Icon name="Settings" {...props} />;
 export const UserIcon = (props: Omit<IconProps, 'name'>) => <Icon name="User" {...props} />;
 export const BellIcon = (props: Omit<IconProps, 'name'>) => <Icon name="Bell" {...props} />;
 export const MenuIcon = (props: Omit<IconProps, 'name'>) => <Icon name="Menu" {...props} />;
 export const SearchIcon = (props: Omit<IconProps, 'name'>) => <Icon name="Search" {...props} />;
-export const ArrowLeftIcon = (props: Omit<IconProps, 'name'>) => <Icon name="ArrowLeft" {...props} />;
-export const ArrowRightIcon = (props: Omit<IconProps, 'name'>) => <Icon name="ArrowRight" {...props} />;
+export const ArrowLeftIcon = (props: Omit<IconProps, 'name'>) => (
+  <Icon name="ArrowLeft" {...props} />
+);
+export const ArrowRightIcon = (props: Omit<IconProps, 'name'>) => (
+  <Icon name="ArrowRight" {...props} />
+);
 export const CheckIcon = (props: Omit<IconProps, 'name'>) => <Icon name="Check" {...props} />;
 export const XIcon = (props: Omit<IconProps, 'name'>) => <Icon name="X" {...props} />;
 export const EyeIcon = (props: Omit<IconProps, 'name'>) => <Icon name="Eye" {...props} />;

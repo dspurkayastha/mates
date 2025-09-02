@@ -183,50 +183,45 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
   };
 
   // Animated styles for track
-  const animatedTrackStyle = useAnimatedStyle(
-    () => {
-      const backgroundColor = interpolateColor(
-        progress.value,
-        [0, 1],
-        [String(tokens.GlassmorphismTokens.tintColors.neutral), String(variantColors.activeTint)],
-      );
+  const animatedTrackStyle = useAnimatedStyle(() => {
+    const backgroundColor = interpolateColor(
+      progress.value,
+      [0, 1],
+      [String(tokens.GlassmorphismTokens.tintColors.neutral), String(variantColors.activeTint)],
+    );
 
-      return {
-        backgroundColor,
-        transform: accessibility.isReduceMotionEnabled ? [] : [{ scale: scale.value }],
-      };
-    },
-    [accessibility.isReduceMotionEnabled],
-  );
+    return {
+      backgroundColor,
+      transform: accessibility.isReduceMotionEnabled ? [] : [{ scale: scale.value }],
+    };
+  }, [accessibility.isReduceMotionEnabled]);
 
   // Animated styles for thumb
-  const animatedThumbStyle = useAnimatedStyle(
-    () => {
-      const translateX = minX === maxX
-        ? minX
-        : interpolate(progress.value, [0, 1], [minX, maxX]);
+  const animatedThumbStyle = useAnimatedStyle(() => {
+    let translateX = progress.value === 1 ? maxX : minX;
+    if (!accessibility.isReduceMotionEnabled && minX !== maxX) {
+      translateX = interpolate(progress.value, [0, 1], [minX, maxX]);
+    }
 
-      const backgroundColor = interpolateColor(
-        progress.value,
-        [0, 1],
-        [
-          String(isDark ? colors.background.elevated : colors.background.primary),
-          String(colors.background.primary),
-        ],
-      );
+    const backgroundColor = interpolateColor(
+      progress.value,
+      [0, 1],
+      [
+        String(isDark ? colors.background.elevated : colors.background.primary),
+        String(colors.background.primary),
+      ],
+    );
 
-      const transforms: any[] = [{ translateX }];
-      if (!accessibility.isReduceMotionEnabled) {
-        transforms.push({ scale: thumbScale.value });
-      }
+    const transforms: any[] = [{ translateX }];
+    if (!accessibility.isReduceMotionEnabled) {
+      transforms.push({ scale: thumbScale.value });
+    }
 
-      return {
-        transform: transforms,
-        backgroundColor,
-      };
-    },
-    [accessibility.isReduceMotionEnabled],
-  );
+    return {
+      transform: transforms,
+      backgroundColor,
+    };
+  }, [accessibility.isReduceMotionEnabled]);
 
   // Track container style
   const trackStyle: ViewStyle = {

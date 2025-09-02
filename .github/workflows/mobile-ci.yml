@@ -26,10 +26,13 @@ jobs:
         working-directory: apps/mobile
         run: npm ci
 
-      - name: Lint
+      - name: Format check
         working-directory: apps/mobile
-        continue-on-error: true
-        run: npm run lint
+        run: npm run format:check
+
+      - name: Lint colors
+        working-directory: apps/mobile
+        run: npm run lint:colors
 
       - name: Typecheck
         working-directory: apps/mobile

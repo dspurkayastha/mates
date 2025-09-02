@@ -134,18 +134,14 @@ export function Button({
   );
 }
 
-function InternalErrorBoundary({
-  error: errorArg = null,
-}: {
-  error: unknown | null;
-}) {
+function InternalErrorBoundary({ error: errorArg = null }: { error: unknown | null }) {
   const [isOpen, setIsOpen] = useState(true);
   const handleShowLogsClick = useCallback(() => {
     window.parent.postMessage(
       {
         type: 'sandbox:web:show-logs',
       },
-      '*'
+      '*',
     );
   }, []);
   const handleFixClick = useCallback(() => {
@@ -154,7 +150,7 @@ function InternalErrorBoundary({
         type: 'sandbox:web:fix',
         error: serializeError(errorArg),
       },
-      '*'
+      '*',
     );
     setIsOpen(false);
   }, [errorArg]);

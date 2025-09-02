@@ -11,7 +11,7 @@ import {
   useTokens,
 } from '@/components/ui';
 import { useRouter } from 'expo-router';
-import { useAuth } from '@/utils/auth/useAuth';
+import { useAuth } from '@/features/auth/useAuth';
 import * as Haptics from 'expo-haptics';
 
 // -----------------------------------------------------------------------------
@@ -74,28 +74,16 @@ const ProfileHeader = ({ name, email, avatar, actions }) => {
       </View>
 
       <View style={{ flex: 1 }}>
-        <Text
-          variant="titleLarge"
-          weight="bold"
-          style={{ marginBottom: tokens.Spacing.xs }}
-        >
+        <Text variant="titleLarge" weight="bold" style={{ marginBottom: tokens.Spacing.xs }}>
           {name}
         </Text>
-        <Text
-          variant="bodyMedium"
-          color="secondary"
-          style={{ marginBottom: tokens.Spacing.sm }}
-        >
+        <Text variant="bodyMedium" color="secondary" style={{ marginBottom: tokens.Spacing.sm }}>
           {email}
         </Text>
 
         <View style={{ flexDirection: 'row' }}>
           {actions.map((action) => (
-            <ActionChip
-              key={action.label}
-              label={action.label}
-              onPress={action.onPress}
-            />
+            <ActionChip key={action.label} label={action.label} onPress={action.onPress} />
           ))}
         </View>
       </View>
@@ -194,12 +182,7 @@ export default function ProfileScreen() {
             paddingTop: tokens.Spacing.sm,
           }}
         >
-          <Icon
-            name="User"
-            size="xl"
-            color="brand"
-            style={{ marginRight: tokens.Spacing.sm }}
-          />
+          <Icon name="User" size="xl" color="brand" style={{ marginRight: tokens.Spacing.sm }} />
           <Text variant="headlineMedium" weight="bold">
             Profile
           </Text>
@@ -213,11 +196,7 @@ export default function ProfileScreen() {
         />
 
         <View>
-          <Text
-            variant="titleLarge"
-            weight="semibold"
-            style={{ marginBottom: tokens.Spacing.md }}
-          >
+          <Text variant="titleLarge" weight="semibold" style={{ marginBottom: tokens.Spacing.md }}>
             Management
           </Text>
 
@@ -225,11 +204,7 @@ export default function ProfileScreen() {
             <ListItem
               title="Manage House"
               meta="Invite members, house settings"
-              media={iconContainer(
-                'House',
-                theme.background.secondary,
-                'brand',
-              )}
+              media={iconContainer('House', theme.background.secondary, 'brand')}
               accessory={{ type: 'chevron' }}
               onPress={handleHouseManagement}
             />
@@ -237,11 +212,7 @@ export default function ProfileScreen() {
             <ListItem
               title="Payment Methods"
               meta="Manage cards and payment options"
-              media={iconContainer(
-                'CreditCard',
-                theme.background.secondary,
-                'brand',
-              )}
+              media={iconContainer('CreditCard', theme.background.secondary, 'brand')}
               accessory={{ type: 'chevron' }}
               onPress={handlePaymentMethods}
             />
@@ -249,11 +220,7 @@ export default function ProfileScreen() {
             <ListItem
               title="Notification Preferences"
               meta="Customize your notifications"
-              media={iconContainer(
-                'Bell',
-                theme.background.secondary,
-                'brand',
-              )}
+              media={iconContainer('Bell', theme.background.secondary, 'brand')}
               accessory={{ type: 'chevron' }}
               onPress={handleNotificationPrefs}
             />
@@ -261,11 +228,7 @@ export default function ProfileScreen() {
             <ListItem
               title="Export Data"
               meta="Download your data"
-              media={iconContainer(
-                'Download',
-                theme.background.secondary,
-                'brand',
-              )}
+              media={iconContainer('Download', theme.background.secondary, 'brand')}
               accessory={{ type: 'chevron' }}
               onPress={handleDataExport}
             />
@@ -273,22 +236,14 @@ export default function ProfileScreen() {
             <ListItem
               title="Delete Account"
               meta="Permanently delete your account"
-              media={iconContainer(
-                'Trash2',
-                theme.status.errorBackground,
-                theme.status.error,
-              )}
+              media={iconContainer('Trash2', theme.status.errorBackground, theme.status.error)}
               onPress={handleDeleteAccount}
             />
 
             <ListItem
               title="Sign Out"
               meta="Leave this account"
-              media={iconContainer(
-                'LogOut',
-                theme.status.errorBackground,
-                theme.status.error,
-              )}
+              media={iconContainer('LogOut', theme.status.errorBackground, theme.status.error)}
               onPress={handleSignOut}
             />
           </Card>

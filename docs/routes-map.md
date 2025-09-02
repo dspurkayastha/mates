@@ -9,10 +9,10 @@
 | `/` (Home tab) | Tab screen | apps/mobile/src/app/(tabs)/index.jsx | Dashboard |
 | `/expenses` | Tab screen | apps/mobile/src/app/(tabs)/expenses.jsx | Expenses overview |
 | `/groceries` | Tab screen | apps/mobile/src/app/(tabs)/groceries.jsx | Grocery list |
-| `/chores` | Tab screen | apps/mobile/src/app/(tabs)/chores.jsx | Chores list |
+| `/chores` | Tab screen | apps/mobile/src/app/(tabs)/chores.tsx | Chores list |
 | `/profile` | Tab screen | apps/mobile/src/app/(tabs)/profile.jsx | User profile |
 | `/settings` | Tab screen (hidden) | apps/mobile/src/app/(tabs)/settings.jsx | Pushed from Home/Profile |
 | `/polls/create` | Stack screen | apps/mobile/src/app/polls/create.tsx | Create poll form |
 | `/polls/[id]` | Stack screen | apps/mobile/src/app/polls/[id].tsx | Poll voting & results |
 | `*` | Fallback | apps/mobile/src/app/+not-found.tsx | Not found screen |
-| `mates://auth/callback` | Deep link | apps/mobile/src/utils/auth/DeepLinkHandler.jsx | Supabase magic link handler |
+| `mates://auth/callback` | Deep link | apps/mobile/src/features/auth/DeepLinkHandler.jsx | Supabase magic link handler |

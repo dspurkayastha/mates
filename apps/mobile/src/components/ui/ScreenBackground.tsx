@@ -6,9 +6,41 @@ import Svg, { Path } from 'react-native-svg';
 import { useColors, useTheme, withOpacity } from '@/design-system/ThemeProvider';
 
 export type Shape =
-  | { type: 'circle'; x: number; y: number; r: number; opacity?: number; blur?: number; rotate?: number; colorIndex?: number }
-  | { type: 'arc'; x: number; y: number; r: number; start: number; end: number; thickness: number; opacity?: number; blur?: number; rotate?: number; colorIndex?: number }
-  | { type: 'blob'; x: number; y: number; w: number; h: number; radius: number; opacity?: number; blur?: number; rotate?: number; colorIndex?: number };
+  | {
+      type: 'circle';
+      x: number;
+      y: number;
+      r: number;
+      opacity?: number;
+      blur?: number;
+      rotate?: number;
+      colorIndex?: number;
+    }
+  | {
+      type: 'arc';
+      x: number;
+      y: number;
+      r: number;
+      start: number;
+      end: number;
+      thickness: number;
+      opacity?: number;
+      blur?: number;
+      rotate?: number;
+      colorIndex?: number;
+    }
+  | {
+      type: 'blob';
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+      radius: number;
+      opacity?: number;
+      blur?: number;
+      rotate?: number;
+      colorIndex?: number;
+    };
 
 export type PaletteName = 'brand' | 'sunrise' | 'seafoam' | 'lavender' | 'neutral' | 'custom';
 
@@ -27,7 +59,12 @@ const intensityMap = {
   bold: 0.1,
 };
 
-function getPalette(colors: any, palette: PaletteName, custom: string[] | undefined, intensity: number) {
+function getPalette(
+  colors: any,
+  palette: PaletteName,
+  custom: string[] | undefined,
+  intensity: number,
+) {
   if (palette === 'custom' && custom?.length) return custom;
   const base = withOpacity(colors.interactive.primary, intensity);
   const light = withOpacity(colors.background.primary, intensity / 2);
@@ -60,7 +97,10 @@ export const ScreenBackground: React.FC<ScreenBackgroundProps> = ({
 
   if (isHighContrast) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.secondary }} pointerEvents="auto">
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: colors.background.secondary }}
+        pointerEvents="auto"
+      >
         {children}
       </SafeAreaView>
     );
@@ -81,7 +121,10 @@ export const ScreenBackground: React.FC<ScreenBackgroundProps> = ({
       const base = (
         <View
           key={idx}
-          style={[{ width: shape.r * 2, height: shape.r * 2, borderRadius: shape.r, backgroundColor: bg }, style]}
+          style={[
+            { width: shape.r * 2, height: shape.r * 2, borderRadius: shape.r, backgroundColor: bg },
+            style,
+          ]}
         />
       );
       if (shape.blur) {
@@ -89,7 +132,13 @@ export const ScreenBackground: React.FC<ScreenBackgroundProps> = ({
           <BlurView
             key={idx}
             intensity={shape.blur}
-            style={{ position: 'absolute', left: shape.x, top: shape.y, width: shape.r * 2, height: shape.r * 2 }}
+            style={{
+              position: 'absolute',
+              left: shape.x,
+              top: shape.y,
+              width: shape.r * 2,
+              height: shape.r * 2,
+            }}
           >
             {base}
           </BlurView>
@@ -150,22 +199,15 @@ function describeArc(x: number, y: number, radius: number, startAngle: number, e
   const start = polarToCartesian(x, y, radius, endAngle);
   const end = polarToCartesian(x, y, radius, startAngle);
   const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
-  return [
-    'M',
-    start.x,
-    start.y,
-    'A',
-    radius,
-    radius,
-    0,
-    largeArcFlag,
-    0,
-    end.x,
-    end.y,
-  ].join(' ');
+  return ['M', start.x, start.y, 'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y].join(' ');
 }
 
-function polarToCartesian(centerX: number, centerY: number, radius: number, angleInDegrees: number) {
+function polarToCartesian(
+  centerX: number,
+  centerY: number,
+  radius: number,
+  angleInDegrees: number,
+) {
   const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
   return {
     x: centerX + radius * Math.cos(angleInRadians),
