@@ -8,6 +8,7 @@ import GlassToggle from './GlassToggle';
 import Icon from './Icon';
 import Text from './Text';
 import { useTheme, useTokens } from '../../design-system/ThemeProvider';
+import { ensureMinTouchTarget, asButtonProps } from '@/utils/a11y';
 
 // ============================================================================
 // TYPES
@@ -183,8 +184,8 @@ export const ListItem: React.FC<ListItemProps> = ({
         onPress={onPress}
         onPressIn={onPressIn}
         onPressOut={onPressOut}
-        style={[containerStyle, style, animatedStyle]}
-        accessibilityRole="button"
+        style={ensureMinTouchTarget([containerStyle, style, animatedStyle])}
+        {...asButtonProps()}
         accessibilityLabel={accessibilityLabel ?? title}
         accessibilityHint={accessibilityHint}
         testID={testID}

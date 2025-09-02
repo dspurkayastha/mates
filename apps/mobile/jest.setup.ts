@@ -6,16 +6,19 @@ jest.mock('react-native-reanimated', () => ({
   default: {
     createAnimatedComponent: (Component: any) => Component,
     addWhitelistedUIProps: () => {},
+    View: require('react-native').View,
   },
   createAnimatedComponent: (Component: any) => Component,
   addWhitelistedUIProps: () => {},
   View: require('react-native').View,
-  useSharedValue: () => ({ value: 0 }),
+  useSharedValue: () => ({ value: 1 }),
   withTiming: (value: any) => value,
+  useAnimatedStyle: (fn: any) => fn(),
   Easing: {
     linear: (t: any) => t,
     out: (fn: any) => fn,
     inOut: (fn: any) => fn,
+    bezier: () => (t: any) => t,
   },
 }));
 (global as any).ReanimatedDataMock = { now: () => Date.now() };
