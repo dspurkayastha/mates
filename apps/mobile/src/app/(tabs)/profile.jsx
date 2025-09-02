@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView, Image, Alert } from 'react-native';
+import { View, ScrollView, Image, Alert, Modal } from 'react-native';
 import {
   Text,
   ListItem,
@@ -10,6 +10,8 @@ import {
   useTheme,
   useTokens,
 } from '@/components/ui';
+import { withOpacity } from '@/design-system/ThemeProvider';
+import { FormField, TextInput as FormTextInput, TextArea, FormScreen } from '@/components/form';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/features/auth/useAuth';
 import * as Haptics from 'expo-haptics';
@@ -100,6 +102,10 @@ export default function ProfileScreen() {
   const tokens = useTokens();
   const router = useRouter();
   const { signOut } = useAuth();
+  const [editing, setEditing] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editBio, setEditBio] = useState('');
+  const [signOutVisible, setSignOutVisible] = useState(false);
 
   const [user] = useState({
     name: 'Alex Smith',
@@ -108,6 +114,7 @@ export default function ProfileScreen() {
   });
 
   const actionChips = [
+    { label: 'Edit', onPress: () => setEditing(true) },
     { label: 'Expenses', onPress: () => router.push('/(tabs)/expenses') },
     { label: 'Chores', onPress: () => router.push('/(tabs)/chores') },
     { label: 'Groceries', onPress: () => router.push('/(tabs)/groceries') },
@@ -147,8 +154,23 @@ export default function ProfileScreen() {
 
   const handleSignOut = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    signOut();
+    setSignOutVisible(true);
   };
+
+  const backgroundShapes = [
+    {
+      type: 'circle',
+      size: 240,
+      color: withOpacity(theme.interactive.primary, 0.04),
+      offset: { x: -80, y: -100 },
+    },
+    {
+      type: 'blob',
+      size: 160,
+      color: withOpacity(theme.interactive.primary, 0.03),
+      offset: { x: 120, y: 200 },
+    },
+  ];
 
   const iconContainer = (name, bgColor, iconColor) => (
     <View
@@ -166,7 +188,12 @@ export default function ProfileScreen() {
   );
 
   return (
-    <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
+    <ScreenBackground
+      palette="brand"
+      variant="subtle"
+      gradientShape="linear"
+      shapes={backgroundShapes}
+    >
       <ScrollView
         contentContainerStyle={{
           padding: tokens.Spacing.lg,
@@ -249,6 +276,77 @@ export default function ProfileScreen() {
           </Card>
         </View>
       </ScrollView>
+      {editing && (
+        <Modal visible transparent animationType="slide" onRequestClose={() => setEditing(false)}>
+          <FormScreen>
+            <FormField label="Display Name" required>
+              <FormTextInput value={editName} onChangeText={setEditName} />
+            </FormField>
+            <FormField label="Bio" helper="Tell us about yourself">
+              <TextArea value={editBio} onChangeText={setEditBio} />
+            </FormField>
+            <Button
+              variant="primary"
+              onPress={() => {
+                // TODO: save profile
+                setEditing(false);
+              }}
+              accessibilityLabel="Save Profile"
+            >
+              Save
+            </Button>
+            <Button
+              variant="secondary"
+              onPress={() => setEditing(false)}
+              style={{ marginTop: tokens.Spacing.sm }}
+              accessibilityLabel="Cancel Edit"
+            >
+              Cancel
+            </Button>
+          </FormScreen>
+        </Modal>
+      )}
+      {signOutVisible && (
+        <Modal
+          visible
+          transparent
+          animationType="fade"
+          onRequestClose={() => setSignOutVisible(false)}
+        >
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              padding: tokens.Spacing.lg,
+              backgroundColor: withOpacity(theme.text.primary, 0.3),
+            }}
+          >
+            <Card variant="elevated" style={{ padding: tokens.Spacing.lg }}>
+              <Text variant="titleMedium" style={{ marginBottom: tokens.Spacing.md }}>
+                Sign out?
+              </Text>
+              <Button
+                variant="primary"
+                onPress={() => {
+                  setSignOutVisible(false);
+                  signOut();
+                }}
+                accessibilityLabel="Confirm Sign Out"
+              >
+                Confirm
+              </Button>
+              <Button
+                variant="secondary"
+                onPress={() => setSignOutVisible(false)}
+                style={{ marginTop: tokens.Spacing.sm }}
+                accessibilityLabel="Cancel Sign Out"
+              >
+                Cancel
+              </Button>
+            </Card>
+          </View>
+        </Modal>
+      )}
     </ScreenBackground>
   );
 }

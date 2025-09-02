@@ -65,6 +65,20 @@ export default function HomeScreen() {
   const tokens = useTokens();
   const router = useRouter();
   const { data: activePoll } = useLatestPoll();
+  const backgroundShapes = [
+    {
+      type: 'circle',
+      size: 240,
+      color: withOpacity(theme.interactive.primary, 0.04),
+      offset: { x: -80, y: -100 },
+    },
+    {
+      type: 'blob',
+      size: 160,
+      color: withOpacity(theme.interactive.primary, 0.03),
+      offset: { x: 120, y: 200 },
+    },
+  ];
 
   const handleFabPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -134,7 +148,12 @@ export default function HomeScreen() {
   };
 
   return (
-    <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
+    <ScreenBackground
+      palette="brand"
+      variant="subtle"
+      gradientShape="linear"
+      shapes={backgroundShapes}
+    >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Welcome Header */}
         <View
