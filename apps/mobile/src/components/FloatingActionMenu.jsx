@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { 
-  Text, 
-  GlassButton, 
+import {
+  Text,
+  GlassButton,
   Icon,
   useColors,
-  useTokens 
+  useTokens,
 } from '@/components/ui';
 import * as Haptics from 'expo-haptics';
 import Animated, {
@@ -130,10 +130,18 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
   const menuStyles = [menuItem0Style, menuItem1Style, menuItem2Style, menuItem3Style];
   
   const menuItems = [
-    { icon: 'Vote', label: 'Poll', onPress: onCreatePoll, color: 'info' },
-    { icon: 'DollarSign', label: 'Expense', onPress: onAddExpense, color: 'primary' },
-    { icon: 'ShoppingCart', label: 'Grocery', onPress: onAddGrocery, color: 'success' },
-    { icon: 'SquareCheck', label: 'Chore', onPress: onAddChore, color: 'warning' },
+    { icon: 'Vote', label: 'Poll', onPress: onCreatePoll, // TODO(theme): map to token
+    // eslint-disable-next-line local/no-hardcoded-colors
+    color: 'info' },
+    { icon: 'DollarSign', label: 'Expense', onPress: onAddExpense, // TODO(theme): map to token
+    // eslint-disable-next-line local/no-hardcoded-colors
+    color: 'primary' },
+    { icon: 'ShoppingCart', label: 'Grocery', onPress: onAddGrocery, // TODO(theme): map to token
+    // eslint-disable-next-line local/no-hardcoded-colors
+    color: 'success' },
+    { icon: 'SquareCheck', label: 'Chore', onPress: onAddChore, // TODO(theme): map to token
+    // eslint-disable-next-line local/no-hardcoded-colors
+    color: 'warning' },
   ];
   
   return (
@@ -163,7 +171,7 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
             paddingVertical: tokens.Spacing.sm,
             borderRadius: tokens.BorderRadius.lg,
             marginRight: tokens.Spacing.sm,
-            shadowColor: '#000',
+            shadowColor: colors.background.primary,
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.1,
             shadowRadius: 4,
@@ -192,7 +200,6 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
           </GlassButton>
         </Animated.View>
       ))}
-      
       {/* Main FAB */}
       <Animated.View style={mainButtonStyle}>
         <GlassButton

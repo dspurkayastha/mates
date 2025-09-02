@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, SafeAreaView } from 'react-native';
+import { View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Text, Icon, GlassInput, Button, useTheme, useTokens } from '@/components/ui';
+import { Text, Icon, GlassInput, Button, ScreenBackground, useTheme, useTokens } from '@/components/ui';
 import { useCreatePoll } from '@/features/polls/hooks';
 
 export default function CreatePollScreen() {
@@ -22,7 +22,7 @@ export default function CreatePollScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background.primary }}>
+    <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
       <View style={{ padding: tokens.Spacing.xl }}>
         <View
           style={{
@@ -56,6 +56,6 @@ export default function CreatePollScreen() {
           Create Poll
         </Button>
       </View>
-    </SafeAreaView>
+    </ScreenBackground>
   );
 }

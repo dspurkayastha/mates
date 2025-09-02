@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import * as SystemUI from 'expo-system-ui';
 import { useAuth } from '../utils/auth/useAuth';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -65,6 +66,7 @@ export default function RootLayout() {
     const unsubscribe = NetInfo.addEventListener((state) => {
       onlineManager.setOnline(!!state.isConnected);
     });
+    SystemUI.setBackgroundColorAsync('transparent');
     return unsubscribe;
   }, [initiate]);
 

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   Dimensions,
   Alert,
@@ -14,6 +13,7 @@ import {
   ListItem,
   Card,
   NavTile,
+  ScreenBackground,
   useTheme,
   useTokens,
 } from '@/components/ui';
@@ -147,7 +147,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.background.primary }]}>
+    <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Welcome Header */}
         <View style={{
@@ -328,7 +328,7 @@ export default function HomeScreen() {
       />
 
       {/* Modern Action Sheet - TODO: Implement when needed */}
-    </SafeAreaView>
+    </ScreenBackground>
   );
 }
 
