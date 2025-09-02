@@ -10,8 +10,10 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
+    "lint:colors": "eslint 'src/**/*.{js,jsx,ts,tsx}' --rule 'local/no-hardcoded-colors:error'",
     "format": "prettier --write .",
-    "test": "jest"
+    "test": "jest",
+    "codemod:colors": "npx jscodeshift -t ../../tools/codemods/replace-hardcoded-colors.js src"
   },
   "dependencies": {
     "@expo-google-fonts/dev": "^0.4.7",

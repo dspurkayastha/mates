@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  SafeAreaView,
-  ScrollView,
-  Alert,
-  Linking,
-} from 'react-native';
+import { View, ScrollView, Alert, Linking } from 'react-native';
 import {
   Text,
   GlassCard,
@@ -13,7 +7,8 @@ import {
   GlassToggle,
   Icon,
   useColors,
-  useTokens
+  useTokens,
+  ScreenBackground,
 } from '@/components/ui';
 import { useAuth } from '@/utils/auth/useAuth';
 import { useRouter } from 'expo-router';
@@ -216,9 +211,9 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
-      <ScrollView 
-        contentContainerStyle={{ 
+    <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
+      <ScrollView
+        contentContainerStyle={{
           padding: tokens.Spacing.lg,
           paddingBottom: 120 // Extra space for tab bar
         }}
@@ -338,6 +333,6 @@ export default function SettingsScreen() {
           />
         </SettingsSection>
       </ScrollView>
-    </SafeAreaView>
+    </ScreenBackground>
   );
 }

@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import * as Linking from 'expo-linking';
 import { useRouter } from 'expo-router';
 import { supabase, SUPABASE_ENABLED } from '@/lib/supabase';
+import { debug } from '@/utils/logger';
 import { useAuthStore } from './store';
 
 /**
@@ -52,7 +53,7 @@ export const DeepLinkHandler = () => {
    */
   const handleDeepLink = async (url) => {
     try {
-      console.log('Processing deep link:', url);
+      debug('deeplink', 'Processing deep link', url);
 
       // Parse the URL to extract parameters
       const parsedUrl = Linking.parse(url);

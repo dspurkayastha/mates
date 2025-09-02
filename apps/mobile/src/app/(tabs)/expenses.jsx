@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import React, { useState } from 'react';
-import { ScrollView, SafeAreaView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import {
   Text,
   Card,
@@ -9,6 +9,7 @@ import {
   ListItem,
   Badge,
   LoadingSkeleton,
+  ScreenBackground,
   useTheme,
   useTokens,
 } from '../../components/ui';
@@ -54,17 +55,17 @@ export default function ExpensesScreen() {
       : transactions.filter((t) => t.status === activeTab.toUpperCase());
   if (isLoading) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
+      <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
         <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
           {[...Array(4)].map((_, i) => (
             <LoadingSkeleton key={i} height={72} style={{ marginBottom: tokens.Spacing.md }} />
           ))}
         </ScrollView>
-      </SafeAreaView>
+      </ScreenBackground>
     );
   }
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
+    <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
       <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
         {/* Header */}
         <View
@@ -270,6 +271,6 @@ export default function ExpensesScreen() {
         {/* Spacer for bottom tabs */}
         <View style={{ height: 80 }} />
       </ScrollView>
-    </SafeAreaView>
+    </ScreenBackground>
   );
 }

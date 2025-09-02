@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
-import {
-  View,
-  SafeAreaView,
-  ScrollView,
-  Image,
-  Alert
-} from 'react-native';
+import { View, ScrollView, Image, Alert } from 'react-native';
 import {
   Text,
   ListItem,
   Icon,
   Button,
   Card,
+  ScreenBackground,
   useTheme,
   useTokens,
 } from '@/components/ui';
@@ -183,9 +178,7 @@ export default function ProfileScreen() {
   );
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: theme.background.primary }}
-    >
+    <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
       <ScrollView
         contentContainerStyle={{
           padding: tokens.Spacing.lg,
@@ -301,6 +294,6 @@ export default function ProfileScreen() {
           </Card>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ScreenBackground>
   );
 }
