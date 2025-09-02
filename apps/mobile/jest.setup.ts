@@ -1,12 +1,38 @@
 import '@testing-library/jest-native/extend-expect';
 import 'react-native-gesture-handler/jestSetup';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-jest.mock('react-native-reanimated', () => {
-  const Reanimated = require('react-native-reanimated/mock');
-  Reanimated.default.call = () => {};
-  return Reanimated;
-});
+jest.mock('react-native-reanimated', () => ({
+  __esModule: true,
+  default: {
+    createAnimatedComponent: (Component: any) => Component,
+    addWhitelistedUIProps: () => {},
+  },
+  createAnimatedComponent: (Component: any) => Component,
+  addWhitelistedUIProps: () => {},
+  View: require('react-native').View,
+  useSharedValue: () => ({ value: 0 }),
+  withTiming: (value: any) => value,
+  Easing: {
+    linear: (t: any) => t,
+    out: (fn: any) => fn,
+    inOut: (fn: any) => fn,
+  },
+}));
 (global as any).ReanimatedDataMock = { now: () => Date.now() };
+
+const mockAccessibilityInfo = {
+  isScreenReaderEnabled: jest.fn().mockResolvedValue(false),
+  isReduceMotionEnabled: jest.fn().mockResolvedValue(false),
+  addEventListener: jest.fn(() => ({ remove: jest.fn() })),
+  removeEventListener: jest.fn(),
+};
+jest.mock(
+  'react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo',
+  () => mockAccessibilityInfo,
+);
+// Ensure React Native exports use the same mock
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('react-native').AccessibilityInfo = mockAccessibilityInfo;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 jest.mock('expo-linear-gradient', () => require('react-native').View);
 // eslint-disable-next-line @typescript-eslint/no-var-requires

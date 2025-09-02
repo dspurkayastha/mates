@@ -19,6 +19,13 @@ module.exports = {
       ')/)',
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  testPathIgnorePatterns: ['/node_modules/', '/android/', '/ios/', '/dist/', '/.expo/'],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/android/',
+    '/ios/',
+    '/dist/',
+    '/.expo/',
+    '<rootDir>/__tests__/test-utils.tsx',
+  ],
   clearMocks: true,
 };
