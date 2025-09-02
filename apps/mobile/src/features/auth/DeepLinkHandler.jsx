@@ -8,7 +8,7 @@ import { useAuthStore } from './store';
 
 /**
  * Deep Link Handler for Supabase Magic Link Authentication
- * 
+ *
  * This component listens for incoming deep links from Supabase magic link emails
  * and handles the authentication flow automatically.
  */
@@ -26,7 +26,7 @@ export const DeepLinkHandler = () => {
           await handleDeepLink(initialUrl);
         }
       } catch (error) {
-        console.error('Error handling initial URL:', error);
+        debug('deeplink', 'Error handling initial URL', error);
       }
     };
 
@@ -61,11 +61,11 @@ export const DeepLinkHandler = () => {
 
       // Check if this is an authentication callback
       // Handle both custom scheme (mates://) and Expo Go (exp://) URLs
-      const isAuthCallback = 
-        path?.includes('auth/callback') || 
-        queryParams?.access_token || 
+      const isAuthCallback =
+        path?.includes('auth/callback') ||
+        queryParams?.access_token ||
         queryParams?.refresh_token ||
-        url.includes('#access_token=') || 
+        url.includes('#access_token=') ||
         url.includes('&access_token=');
 
       if (isAuthCallback) {
@@ -78,7 +78,7 @@ export const DeepLinkHandler = () => {
         if (url.includes('#')) {
           const fragment = url.split('#')[1];
           const fragmentParams = new URLSearchParams(fragment);
-          
+
           accessToken = fragmentParams.get('access_token');
           refreshToken = fragmentParams.get('refresh_token');
           tokenType = fragmentParams.get('token_type');
@@ -86,7 +86,7 @@ export const DeepLinkHandler = () => {
           errorParam = fragmentParams.get('error');
           errorDescription = fragmentParams.get('error_description');
         }
-        
+
         // Fallback to query parameters
         if (!accessToken && queryParams) {
           accessToken = queryParams.access_token;
@@ -99,27 +99,23 @@ export const DeepLinkHandler = () => {
 
         // Handle authentication errors
         if (errorParam) {
-          console.error('Supabase auth error:', errorDescription || errorParam);
-          
-          Alert.alert(
-            'Authentication Error',
-            errorDescription || 'Authentication failed',
-            [
-              {
-                text: 'OK',
-                onPress: () => {
-                  router.replace('/(onboarding)/welcome');
-                },
+          debug('deeplink', 'Supabase auth error', errorDescription || errorParam);
+
+          Alert.alert('Authentication Error', errorDescription || 'Authentication failed', [
+            {
+              text: 'OK',
+              onPress: () => {
+                router.replace('/(onboarding)/welcome');
               },
-            ]
-          );
+            },
+          ]);
           return;
         }
 
         // Handle successful authentication
         if (accessToken && refreshToken) {
           debug('deeplink', 'Auth tokens found, setting session...');
-          
+
           try {
             // Set the session using the tokens from the URL
             const { data, error } = await supabase.auth.setSession({
@@ -128,43 +124,39 @@ export const DeepLinkHandler = () => {
             });
 
             if (error) {
-              console.error('Error setting Supabase session:', error);
+              debug('deeplink', 'Error setting Supabase session', error);
               Alert.alert(
                 'Authentication Error',
-                'Failed to sign in with the magic link. Please try again.'
+                'Failed to sign in with the magic link. Please try again.',
               );
               return;
             }
 
             if (data?.session?.user) {
               debug('deeplink', 'Successfully authenticated user', data.session.user.email);
-              
+
               // Update auth state
-              useAuthStore.setState({ 
+              useAuthStore.setState({
                 auth: data.session.user,
-                isReady: true 
+                isReady: true,
               });
 
               // Show success message
-              Alert.alert(
-                'Welcome!',
-                `Successfully signed in as ${data.session.user.email}`,
-                [
-                  {
-                    text: 'Continue',
-                    onPress: () => {
-                      // Navigate to the main app
-                      router.replace('/(tabs)');
-                    },
+              Alert.alert('Welcome!', `Successfully signed in as ${data.session.user.email}`, [
+                {
+                  text: 'Continue',
+                  onPress: () => {
+                    // Navigate to the main app
+                    router.replace('/(tabs)');
                   },
-                ]
-              );
+                },
+              ]);
             }
           } catch (sessionError) {
-            console.error('Session error:', sessionError);
+            debug('deeplink', 'Session error', sessionError);
             Alert.alert(
               'Authentication Error',
-              'There was a problem signing you in. Please try again.'
+              'There was a problem signing you in. Please try again.',
             );
           }
         } else {
@@ -175,11 +167,8 @@ export const DeepLinkHandler = () => {
         debug('deeplink', 'Non-auth deep link', url);
       }
     } catch (error) {
-      console.error('Error processing deep link:', error);
-      Alert.alert(
-        'Link Error',
-        'There was a problem processing this link. Please try again.'
-      );
+      debug('deeplink', 'Error processing deep link', error);
+      Alert.alert('Link Error', 'There was a problem processing this link. Please try again.');
     }
   };
 

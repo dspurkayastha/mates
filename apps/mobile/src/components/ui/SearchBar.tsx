@@ -31,15 +31,15 @@ import LoadingSkeleton from './LoadingSkeleton';
 // Helper function for category icons
 const getCategoryIcon = (category: string): string => {
   const categoryMap: Record<string, string> = {
-    'expense': 'DollarSign',
-    'grocery': 'ShoppingCart',
-    'chore': 'SquareCheck',
-    'user': 'User',
-    'house': 'Home',
-    'poll': 'MessageSquare',
-    'default': 'Search'
+    expense: 'DollarSign',
+    grocery: 'ShoppingCart',
+    chore: 'SquareCheck',
+    user: 'User',
+    house: 'Home',
+    poll: 'MessageSquare',
+    default: 'Search',
   };
-  
+
   return categoryMap[category.toLowerCase()] || categoryMap.default;
 };
 
@@ -141,12 +141,7 @@ interface SearchResultItemProps {
   index: number;
 }
 
-const SearchResultItem: React.FC<SearchResultItemProps> = ({
-  result,
-  query,
-  onSelect,
-  index,
-}) => {
+const SearchResultItem: React.FC<SearchResultItemProps> = ({ result, query, onSelect, index }) => {
   const colors = useColors();
   const tokens = useTokens();
   const scale = useSharedValue(1);
@@ -187,7 +182,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({
         accessibilityLabel={generateAccessibilityLabel.list.item(
           `${result.title}${result.subtitle ? ', ' + result.subtitle : ''}`,
           index + 1,
-          1 // We don't know total here, but it's not critical
+          1, // We don't know total here, but it's not critical
         )}
       >
         {/* Category Icon */}
@@ -203,22 +198,13 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({
               marginRight: tokens.Spacing.md,
             }}
           >
-            <Icon
-              name={getCategoryIcon(result.category) as any}
-              size="sm"
-              color="secondary"
-            />
+            <Icon name={getCategoryIcon(result.category) as any} size="sm" color="secondary" />
           </View>
         )}
 
         {/* Content */}
         <View style={{ flex: 1 }}>
-          <HighlightText
-            text={result.title}
-            query={query}
-            variant="titleMedium"
-            color="primary"
-          />
+          <HighlightText text={result.title} query={query} variant="titleMedium" color="primary" />
           {result.subtitle && (
             <HighlightText
               text={result.subtitle}
@@ -259,7 +245,7 @@ const FilterChips: React.FC<FilterChipsProps> = ({ filters, onFilterChange }) =>
   const tokens = useTokens();
 
   const toggleFilter = (filterId: string) => {
-    const updatedFilters = filters.map(filter => ({
+    const updatedFilters = filters.map((filter) => ({
       ...filter,
       active: filter.id === filterId ? !filter.active : filter.active,
     }));
@@ -276,7 +262,7 @@ const FilterChips: React.FC<FilterChipsProps> = ({ filters, onFilterChange }) =>
       }}
       style={{ marginBottom: tokens.Spacing.md }}
     >
-      {filters.map(filter => (
+      {filters.map((filter) => (
         <TouchableOpacity
           key={filter.id}
           onPress={() => toggleFilter(filter.id)}
@@ -284,13 +270,11 @@ const FilterChips: React.FC<FilterChipsProps> = ({ filters, onFilterChange }) =>
             paddingHorizontal: tokens.Spacing.md,
             paddingVertical: tokens.Spacing.sm,
             borderRadius: tokens.BorderRadius.full,
-            backgroundColor: filter.active 
-              ? colors.interactive.primary 
+            backgroundColor: filter.active
+              ? colors.interactive.primary
               : colors.background.secondary,
             borderWidth: 1,
-            borderColor: filter.active 
-              ? colors.interactive.primary 
-              : colors.border.light,
+            borderColor: filter.active ? colors.interactive.primary : colors.border.light,
             flexDirection: 'row',
             alignItems: 'center',
             gap: tokens.Spacing.xs,
@@ -309,9 +293,7 @@ const FilterChips: React.FC<FilterChipsProps> = ({ filters, onFilterChange }) =>
           {filter.count !== undefined && (
             <View
               style={{
-                backgroundColor: filter.active 
-                  ? colors.text.inverse 
-                  : colors.background.primary,
+                backgroundColor: filter.active ? colors.text.inverse : colors.background.primary,
                 borderRadius: 10,
                 paddingHorizontal: 6,
                 paddingVertical: 2,
@@ -344,11 +326,7 @@ interface RecentSearchesProps {
   onClear: () => void;
 }
 
-const RecentSearches: React.FC<RecentSearchesProps> = ({
-  searches,
-  onSelect,
-  onClear,
-}) => {
+const RecentSearches: React.FC<RecentSearchesProps> = ({ searches, onSelect, onClear }) => {
   const colors = useColors();
   const tokens = useTokens();
 
@@ -412,28 +390,28 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   filters = [],
   onFilterChange,
   loading = false,
-  placeholder = "Search...",
+  placeholder = 'Search...',
   showRecentSearches = false,
   recentSearches = [],
   onRecentSearchSelect,
   onClearRecentSearches,
   debounceMs = 300,
   maxResults = 50,
-  emptyStateMessage = "No results found",
+  emptyStateMessage = 'No results found',
   style,
   containerStyle,
   ...textInputProps
 }) => {
   const colors = useColors();
   const tokens = useTokens();
-  
+
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  
+
   const inputRef = useRef<TextInput>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  
+
   // Animations
   const searchBarScale = useSharedValue(1);
   const resultsOpacity = useSharedValue(0);
@@ -460,7 +438,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   useEffect(() => {
     const shouldShowResults = focused && (query.trim().length > 0 || showRecentSearches);
     setShowResults(shouldShowResults);
-    
+
     if (shouldShowResults) {
       const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
       resultsOpacity.value = withTiming(1, {
@@ -532,20 +510,18 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   // Filter and sort results
   const displayResults = useMemo(() => {
     let filteredResults = results;
-    
+
     // Apply filters
-    const activeFilters = filters.filter(f => f.active);
+    const activeFilters = filters.filter((f) => f.active);
     if (activeFilters.length > 0) {
-      filteredResults = results.filter(result => 
-        activeFilters.some(filter => 
-          result.category?.toLowerCase() === filter.id.toLowerCase()
-        )
+      filteredResults = results.filter((result) =>
+        activeFilters.some((filter) => result.category?.toLowerCase() === filter.id.toLowerCase()),
       );
     }
-    
+
     // Sort by relevance score
     filteredResults.sort((a, b) => (b.relevanceScore || 0) - (a.relevanceScore || 0));
-    
+
     return filteredResults.slice(0, maxResults);
   }, [results, filters, maxResults]);
 
@@ -555,21 +531,23 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       <Animated.View style={searchBarAnimatedStyle}>
         <Card
           variant="elevated"
-          style={[
-            {
-              flexDirection: 'row',
-              alignItems: 'center',
-              paddingHorizontal: tokens.Spacing.lg,
-              paddingVertical: tokens.Spacing.md,
-              margin: tokens.Spacing.md,
-              borderWidth: focused ? 2 : 1,
-              borderColor: focused ? colors.interactive.primary : colors.border.light,
-            },
-            style,
-          ] as any}
+          style={
+            [
+              {
+                flexDirection: 'row',
+                alignItems: 'center',
+                paddingHorizontal: tokens.Spacing.lg,
+                paddingVertical: tokens.Spacing.md,
+                margin: tokens.Spacing.md,
+                borderWidth: focused ? 2 : 1,
+                borderColor: focused ? colors.interactive.primary : colors.border.light,
+              },
+              style,
+            ] as any
+          }
         >
           <Icon name="Search" size="md" color="secondary" />
-          
+
           <TextInput
             ref={inputRef}
             value={query}
@@ -616,65 +594,63 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             style={{
               marginHorizontal: tokens.Spacing.md,
               maxHeight: 400,
-              overflow: 'hidden',
             }}
           >
-            <ScrollView
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-            >
-              {/* Loading State */}
-              {loading && (
-                <View style={{ padding: tokens.Spacing.lg }}>
-                  <LoadingSkeleton width="100%" height={40} style={{ marginBottom: 8 }} />
-                  <LoadingSkeleton width="100%" height={40} style={{ marginBottom: 8 }} />
-                  <LoadingSkeleton width="100%" height={40} />
-                </View>
-              )}
+            <View style={{ overflow: 'hidden', borderRadius: tokens.BorderRadius.lg }}>
+              <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+                {/* Loading State */}
+                {loading && (
+                  <View style={{ padding: tokens.Spacing.lg }}>
+                    <LoadingSkeleton width="100%" height={40} style={{ marginBottom: 8 }} />
+                    <LoadingSkeleton width="100%" height={40} style={{ marginBottom: 8 }} />
+                    <LoadingSkeleton width="100%" height={40} />
+                  </View>
+                )}
 
-              {/* Recent Searches */}
-              {!loading && query.trim().length === 0 && showRecentSearches && (
-                <RecentSearches
-                  searches={recentSearches}
-                  onSelect={handleRecentSearchSelect}
-                  onClear={onClearRecentSearches || (() => {})}
-                />
-              )}
+                {/* Recent Searches */}
+                {!loading && query.trim().length === 0 && showRecentSearches && (
+                  <RecentSearches
+                    searches={recentSearches}
+                    onSelect={handleRecentSearchSelect}
+                    onClear={onClearRecentSearches || (() => {})}
+                  />
+                )}
 
-              {/* Search Results */}
-              {!loading && query.trim().length > 0 && (
-                <>
-                  {displayResults.length > 0 ? (
-                    displayResults.map((result, index) => (
-                      <SearchResultItem
-                        key={result.id}
-                        result={result}
-                        query={query}
-                        onSelect={handleResultSelect}
-                        index={index}
-                      />
-                    ))
-                  ) : (
-                    <View
-                      style={{
-                        padding: tokens.Spacing['2xl'],
-                        alignItems: 'center',
-                      }}
-                    >
-                      <Icon name="Search" size="lg" color="tertiary" />
-                      <Text
-                        variant="bodyMedium"
-                        color="secondary"
-                        align="center"
-                        style={{ marginTop: tokens.Spacing.md }}
+                {/* Search Results */}
+                {!loading && query.trim().length > 0 && (
+                  <>
+                    {displayResults.length > 0 ? (
+                      displayResults.map((result, index) => (
+                        <SearchResultItem
+                          key={result.id}
+                          result={result}
+                          query={query}
+                          onSelect={handleResultSelect}
+                          index={index}
+                        />
+                      ))
+                    ) : (
+                      <View
+                        style={{
+                          padding: tokens.Spacing['2xl'],
+                          alignItems: 'center',
+                        }}
                       >
-                        {emptyStateMessage}
-                      </Text>
-                    </View>
-                  )}
-                </>
-              )}
-            </ScrollView>
+                        <Icon name="Search" size="lg" color="tertiary" />
+                        <Text
+                          variant="bodyMedium"
+                          color="secondary"
+                          align="center"
+                          style={{ marginTop: tokens.Spacing.md }}
+                        >
+                          {emptyStateMessage}
+                        </Text>
+                      </View>
+                    )}
+                  </>
+                )}
+              </ScrollView>
+            </View>
           </Card>
         </Animated.View>
       )}

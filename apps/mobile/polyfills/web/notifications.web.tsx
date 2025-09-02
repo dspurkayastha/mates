@@ -28,7 +28,7 @@ export const requestPermissionsAsync = async (): Promise<PermissionResponse> => 
 };
 
 export const scheduleNotificationAsync = async (
-  notificationRequest: NotificationRequest
+  notificationRequest: NotificationRequest,
 ): Promise<string> => {
   const { content, trigger } = notificationRequest;
   const { title, body } = content;

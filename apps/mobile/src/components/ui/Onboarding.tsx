@@ -5,12 +5,7 @@
  */
 
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
-import {
-  View,
-  ViewStyle,
-  Dimensions,
-  ScrollView,
-} from 'react-native';
+import { View, ViewStyle, Dimensions, ScrollView } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
@@ -112,13 +107,15 @@ const OnboardingStepComponent: React.FC<OnboardingStepComponentProps> = ({
       opacity.value = withTiming(1, { duration: 500 });
       translateY.value = withSpring(0, { damping: 20, stiffness: 150 });
       scale.value = withSpring(1, { damping: 20, stiffness: 150 });
-      
+
       // Haptic feedback
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      
+
       // Announce step to screen reader
-      focusManager.announcePageChange(`Onboarding step ${currentIndex + 1} of ${totalSteps}: ${step.title}`);
-      
+      focusManager.announcePageChange(
+        `Onboarding step ${currentIndex + 1} of ${totalSteps}: ${step.title}`,
+      );
+
       // Auto advance if specified
       if (step.autoAdvance) {
         setTimeout(() => {
@@ -135,10 +132,7 @@ const OnboardingStepComponent: React.FC<OnboardingStepComponentProps> = ({
   const animatedStyle = useAnimatedStyle(() => {
     return {
       opacity: opacity.value,
-      transform: [
-        { translateY: translateY.value },
-        { scale: scale.value },
-      ],
+      transform: [{ translateY: translateY.value }, { scale: scale.value }],
     };
   });
 
@@ -157,7 +151,10 @@ const OnboardingStepComponent: React.FC<OnboardingStepComponentProps> = ({
       ]}
       accessible={true}
       accessibilityRole="text"
-      accessibilityLabel={generateAccessibilityLabel.status('onboarding', `Step ${currentIndex + 1}: ${step.title}. ${step.description}`)}
+      accessibilityLabel={generateAccessibilityLabel.status(
+        'onboarding',
+        `Step ${currentIndex + 1}: ${step.title}. ${step.description}`,
+      )}
     >
       {/* Illustration */}
       {step.illustration && (
@@ -220,9 +217,8 @@ const OnboardingStepComponent: React.FC<OnboardingStepComponentProps> = ({
               width: index === currentIndex ? 24 : 8,
               height: 8,
               borderRadius: 4,
-              backgroundColor: index <= currentIndex 
-                ? colors.interactive.primary 
-                : colors.border.light,
+              backgroundColor:
+                index <= currentIndex ? colors.interactive.primary : colors.border.light,
             }}
           />
         ))}
@@ -273,15 +269,15 @@ const OnboardingStepComponent: React.FC<OnboardingStepComponentProps> = ({
           size="large"
           onPress={step.actions?.primary?.onPress || onNext}
           rightIcon={
-            currentIndex === totalSteps - 1
-              ? <Icon name="Check" size="sm" color="inverse" />
-              : <Icon name="ArrowRight" size="sm" color="inverse" />
+            currentIndex === totalSteps - 1 ? (
+              <Icon name="Check" size="sm" color="inverse" />
+            ) : (
+              <Icon name="ArrowRight" size="sm" color="inverse" />
+            )
           }
           style={{ flex: 1 }}
           accessibilityHint={
-            currentIndex === totalSteps - 1
-              ? 'Complete onboarding'
-              : 'Go to next step'
+            currentIndex === totalSteps - 1 ? 'Complete onboarding' : 'Go to next step'
           }
         >
           {step.actions?.primary?.label ||
@@ -304,11 +300,7 @@ interface SwipeableOnboardingProps {
 
 const { width: screenWidth } = Dimensions.get('window');
 
-const SwipeableOnboarding: React.FC<SwipeableOnboardingProps> = ({
-  steps,
-  onComplete,
-  onSkip,
-}) => {
+const SwipeableOnboarding: React.FC<SwipeableOnboardingProps> = ({ steps, onComplete, onSkip }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const translateX = useSharedValue(0);
   const colors = useColors();
@@ -323,7 +315,7 @@ const SwipeableOnboarding: React.FC<SwipeableOnboardingProps> = ({
     },
     onEnd: (event) => {
       const threshold = screenWidth * 0.2;
-      
+
       if (event.translationX > threshold && currentStep > 0) {
         // Swipe right - go to previous step
         translateX.value = withSpring(0);
@@ -527,34 +519,26 @@ export const createExpenseOnboarding = (): OnboardingStep[] => [
     id: 'welcome',
     title: 'Welcome to Mates!',
     description: 'Manage shared expenses with your roommates easily and fairly.',
-    illustration: (
-      <Icon name="House" size="2xl" color="brand" />
-    ),
+    illustration: <Icon name="House" size="2xl" color="brand" />,
     skippable: true,
   },
   {
     id: 'add_expense',
     title: 'Track Expenses',
     description: 'Add expenses and split them automatically among roommates.',
-    illustration: (
-      <Icon name="DollarSign" size="2xl" color="success" />
-    ),
+    illustration: <Icon name="DollarSign" size="2xl" color="success" />,
   },
   {
     id: 'settle_up',
     title: 'Settle Up',
     description: 'Keep track of who owes what and settle up when ready.',
-    illustration: (
-      <Icon name="Check" size="2xl" color="success" />
-    ),
+    illustration: <Icon name="Check" size="2xl" color="success" />,
   },
   {
     id: 'get_started',
     title: 'Ready to Start!',
     description: "You're all set to start managing expenses with your roommates.",
-    illustration: (
-      <Icon name="Users" size="2xl" color="brand" />
-    ),
+    illustration: <Icon name="Users" size="2xl" color="brand" />,
     actions: {
       primary: {
         label: 'Start Using Mates',

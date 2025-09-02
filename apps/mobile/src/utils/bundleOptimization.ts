@@ -46,30 +46,31 @@ export class LazyComponentLoader {
   static createLazyComponent<T extends ComponentType<any>>(
     importFunction: () => Promise<{ default: T }>,
     chunkName: string,
-    options: LazyComponentProps = {}
+    options: LazyComponentProps = {},
   ): LazyExoticComponent<T> {
     const { timeout = 10000, retryCount = 3, onError, onLoad } = options;
 
-    const DefaultFallback: React.FC = () => React.createElement(
-      View,
-      {
-        style: {
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: 100,
+    const DefaultFallback: React.FC = () =>
+      React.createElement(
+        View,
+        {
+          style: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: 100,
+          },
         },
-      },
-      React.createElement(ActivityIndicator, { size: 'large' })
-    );
+        React.createElement(ActivityIndicator, { size: 'large' }),
+      );
 
     const lazyComponent = lazy(async () => {
       const startTime = Date.now();
-      
+
       try {
         const module = await importFunction();
         const loadTime = Date.now() - startTime;
-        
+
         this.recordLoadMetric({
           chunkName,
           loadTime,
@@ -81,7 +82,7 @@ export class LazyComponentLoader {
         return module;
       } catch (error) {
         const loadTime = Date.now() - startTime;
-        
+
         this.recordLoadMetric({
           chunkName,
           loadTime,
@@ -98,7 +99,7 @@ export class LazyComponentLoader {
       return React.createElement(
         Suspense,
         { fallback: options.fallback || React.createElement(DefaultFallback) },
-        React.createElement(lazyComponent as any, { ...props, ref })
+        React.createElement(lazyComponent as any, { ...props, ref }),
       );
     });
 
@@ -107,7 +108,7 @@ export class LazyComponentLoader {
 
   private static recordLoadMetric(metric: ChunkLoadMetrics): void {
     this.loadMetrics.push(metric);
-    
+
     if (this.loadMetrics.length > 100) {
       this.loadMetrics = this.loadMetrics.slice(-100);
     }
@@ -115,17 +116,14 @@ export class LazyComponentLoader {
 
   static getBundleMetrics(): BundleMetrics {
     const totalChunks = this.loadMetrics.length;
-    const loadedChunks = this.loadMetrics
-      .filter(m => m.success)
-      .map(m => m.chunkName);
-    const failedChunks = this.loadMetrics
-      .filter(m => !m.success)
-      .map(m => m.chunkName);
-    
-    const successfulLoads = this.loadMetrics.filter(m => m.success);
-    const averageLoadTime = successfulLoads.length > 0
-      ? successfulLoads.reduce((sum, m) => sum + m.loadTime, 0) / successfulLoads.length
-      : 0;
+    const loadedChunks = this.loadMetrics.filter((m) => m.success).map((m) => m.chunkName);
+    const failedChunks = this.loadMetrics.filter((m) => !m.success).map((m) => m.chunkName);
+
+    const successfulLoads = this.loadMetrics.filter((m) => m.success);
+    const averageLoadTime =
+      successfulLoads.length > 0
+        ? successfulLoads.reduce((sum, m) => sum + m.loadTime, 0) / successfulLoads.length
+        : 0;
 
     const cacheHitRate = this.chunkCache.size / Math.max(totalChunks, 1);
 
@@ -154,13 +152,13 @@ export const optimizedImport = {
     try {
       const module = await import(modulePath);
       const result: Partial<T> = {};
-      
-      exports.forEach(exportName => {
+
+      exports.forEach((exportName) => {
         if (module[exportName]) {
           (result as any)[exportName] = module[exportName];
         }
       });
-      
+
       return result;
     } catch (error) {
       console.error(`Failed to import specific exports from ${modulePath}:`, error);
@@ -170,10 +168,10 @@ export const optimizedImport = {
 
   async importConditional<T>(
     modulePath: string,
-    condition: boolean | (() => boolean)
+    condition: boolean | (() => boolean),
   ): Promise<T | null> {
     const shouldImport = typeof condition === 'function' ? condition() : condition;
-    
+
     if (!shouldImport) {
       return null;
     }
@@ -197,12 +195,15 @@ export class BundleAnalyzer {
 
   static async analyzeBundleUsage(): Promise<BundleMetrics> {
     const metrics = LazyComponentLoader.getBundleMetrics();
-    
+
     try {
-      await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify({
-        ...metrics,
-        timestamp: new Date().toISOString(),
-      }));
+      await AsyncStorage.setItem(
+        this.STORAGE_KEY,
+        JSON.stringify({
+          ...metrics,
+          timestamp: new Date().toISOString(),
+        }),
+      );
     } catch (error) {
       console.warn('Failed to store bundle metrics:', error);
     }
@@ -225,26 +226,22 @@ export class BundleAnalyzer {
 
     if (metrics.averageLoadTime > 3000) {
       recommendations.push(
-        'Consider implementing more aggressive code splitting for chunks taking >3s to load'
+        'Consider implementing more aggressive code splitting for chunks taking >3s to load',
       );
     }
 
     if (metrics.cacheHitRate < 0.8) {
-      recommendations.push(
-        'Improve caching strategy to increase cache hit rate above 80%'
-      );
+      recommendations.push('Improve caching strategy to increase cache hit rate above 80%');
     }
 
     if (metrics.failedChunks.length > 0) {
       recommendations.push(
-        `Address ${metrics.failedChunks.length} failing chunks: ${metrics.failedChunks.join(', ')}`
+        `Address ${metrics.failedChunks.length} failing chunks: ${metrics.failedChunks.join(', ')}`,
       );
     }
 
     if (metrics.totalChunks > 20) {
-      recommendations.push(
-        'Consider consolidating smaller chunks to reduce network overhead'
-      );
+      recommendations.push('Consider consolidating smaller chunks to reduce network overhead');
     }
 
     if (recommendations.length === 0) {
@@ -259,7 +256,8 @@ export class BundleAnalyzer {
 // EXPORTS
 // ============================================================================
 
-export const createLazyComponent = LazyComponentLoader.createLazyComponent.bind(LazyComponentLoader);
+export const createLazyComponent =
+  LazyComponentLoader.createLazyComponent.bind(LazyComponentLoader);
 export const getBundleMetrics = LazyComponentLoader.getBundleMetrics.bind(LazyComponentLoader);
 export const clearBundleCache = LazyComponentLoader.clearCache.bind(LazyComponentLoader);
 export const bundleAnalyzer = BundleAnalyzer;
@@ -267,7 +265,7 @@ export const bundleAnalyzer = BundleAnalyzer;
 export const createOptimizedScreen = <T extends ComponentType<any>>(
   importFunction: () => Promise<{ default: T }>,
   screenName: string,
-  options?: LazyComponentProps
+  options?: LazyComponentProps,
 ) => {
   return createLazyComponent(importFunction, `Screen_${screenName}`, {
     timeout: 15000,
@@ -279,7 +277,7 @@ export const createOptimizedScreen = <T extends ComponentType<any>>(
 export const createOptimizedComponent = <T extends ComponentType<any>>(
   importFunction: () => Promise<{ default: T }>,
   componentName: string,
-  options?: LazyComponentProps
+  options?: LazyComponentProps,
 ) => {
   return createLazyComponent(importFunction, `Component_${componentName}`, {
     timeout: 8000,

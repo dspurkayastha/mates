@@ -4,13 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  Dimensions,
-} from 'react-native';
+import { View, ScrollView, KeyboardAvoidingView, Platform, Dimensions } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -20,9 +14,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { useColors, useTokens } from '../design-system/ThemeProvider';
+import { useColors, useTokens, withOpacity } from '../design-system/ThemeProvider';
 import { generateAccessibilityLabel } from '../utils/accessibility';
-import { 
+import {
   biometricAuthManager,
   isBiometricAuthAvailable,
   authenticateWithBiometrics,
@@ -36,7 +30,8 @@ import {
   BiometricPrompt,
   BiometricSetup,
 } from '../components/ui';
-import { supabase, SUPABASE_ENABLED } from '@/lib/supabase';
+import { SUPABASE_ENABLED } from '@/lib/supabase';
+import { signInWithPassword } from '@/features/auth/api';
 
 // ============================================================================
 // TYPES
@@ -88,7 +83,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         duration: tokens.Animation.duration.in,
         easing: Easing.bezier(0.2, 0.8, 0.2, 1),
       });
-      
+
       // Animate form
       setTimeout(() => {
         formOpacity.value = withTiming(1, { duration: 600 });
@@ -132,11 +127,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
     try {
       if (SUPABASE_ENABLED) {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: formData.email,
-          password: formData.password,
-        });
-        if (signInError) throw signInError;
+        await signInWithPassword(formData.email, formData.password);
       } else {
         await new Promise((resolve) => setTimeout(resolve, 1500));
       }
@@ -160,7 +151,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
       withTiming(1, {
         duration: tokens.Animation.duration.out,
         easing: Easing.bezier(0.2, 0.8, 0.2, 1),
-      })
+      }),
     );
 
     setShowBiometricPrompt(true);
@@ -240,13 +231,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               }}
               accessibilityElementsHidden
             >
-              <Icon
-                name="House"
-                size="2xl"
-                color="brand"
-              />
+              <Icon name="House" size="2xl" color="brand" />
             </View>
-            
+
             <Text
               variant="displayMedium"
               color="inverse"
@@ -256,21 +243,14 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             >
               Welcome Back
             </Text>
-            
-            <Text
-              variant="bodyLarge"
-              color="inverse"
-              align="center"
-              style={{ opacity: 0.9 }}
-            >
+
+            <Text variant="bodyLarge" color="inverse" align="center" style={{ opacity: 0.9 }}>
               Sign in to your Mates account
             </Text>
           </Animated.View>
 
           {/* Login Form */}
-          <Animated.View
-            style={[formAnimatedStyle]}
-          >
+          <Animated.View style={[formAnimatedStyle]}>
             <GlassCard
               variant="translucent"
               size="large"
@@ -292,11 +272,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                   }}
                   accessibilityRole="alert"
                 >
-                  <Text
-                    variant="bodySmall"
-                    color="error"
-                    align="center"
-                  >
+                  <Text variant="bodySmall" color="error" align="center">
                     {error}
                   </Text>
                 </View>
@@ -321,9 +297,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 label="Password"
                 placeholder="••••••••"
                 value={formData.password}
-                onChangeText={(password) =>
-                  setFormData((p) => ({ ...p, password }))
-                }
+                onChangeText={(password) => setFormData((p) => ({ ...p, password }))}
                 secureTextEntry
                 autoCapitalize="none"
                 textContentType="password"
@@ -388,9 +362,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                       size="large"
                       fullWidth
                       onPress={handleBiometricLogin}
-                      leftIcon={
-                        <Icon name="Fingerprint" size="sm" color="brand" />
-                      }
+                      leftIcon={<Icon name="Fingerprint" size="sm" color="brand" />}
                       accessibilityLabel="Sign in with biometric authentication"
                     >
                       Use Biometric
@@ -407,9 +379,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                   size="medium"
                   fullWidth
                   onPress={handleSetupBiometric}
-                  leftIcon={
-                    <Icon name="Shield" size="sm" color="brand" />
-                  }
+                  leftIcon={<Icon name="Shield" size="sm" color="brand" />}
                   style={{ marginTop: tokens.Spacing.md }}
                   accessibilityLabel="Set up biometric authentication"
                 >
@@ -469,7 +439,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              backgroundColor: withOpacity(colors.background.primary, 0.5),
               justifyContent: 'center',
               padding: tokens.Spacing.lg,
             }}

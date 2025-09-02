@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import * as SystemUI from 'expo-system-ui';
-import { useAuth } from '../utils/auth/useAuth';
+import { useAuth } from '../features/auth/useAuth';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -9,7 +9,7 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
-import { DeepLinkHandler } from '../utils/auth/DeepLinkHandler';
+import { DeepLinkHandler } from '../features/auth/DeepLinkHandler';
 import { ThemeProvider } from '../components/ui';
 import { View, Text } from 'react-native';
 
@@ -46,8 +46,10 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Something went wrong</Text>
-          <Text style={{ textAlign: 'center', color: '#666' }}>
+          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
+            Something went wrong
+          </Text>
+          <Text style={{ textAlign: 'center' }}>
             {this.state.error?.message || 'Unknown error occurred'}
           </Text>
         </View>

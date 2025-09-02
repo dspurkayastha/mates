@@ -28,7 +28,7 @@ export const GlassmorphismTokens = {
     thick: 0.6,
     ultraThick: 0.75,
   },
-  
+
   // Blur intensities (px values for expo-blur)
   blur: {
     subtle: 8,
@@ -37,7 +37,7 @@ export const GlassmorphismTokens = {
     heavy: 32,
     ultra: 50,
   },
-  
+
   // Tinted glass colors for iOS 26 style components
   tintColors: {
     primary: dynamicTintColor('rgba(74, 128, 240, 0.15)', 'rgba(74, 128, 240, 0.25)'),
@@ -50,7 +50,7 @@ export const GlassmorphismTokens = {
         ? PlatformColor('systemFill')
         : dynamicTintColor('rgba(0, 0, 0, 0.04)', 'rgba(255, 255, 255, 0.06)'),
   },
-  
+
   // Glass border colors
   borderColors: {
     light: {
@@ -64,7 +64,7 @@ export const GlassmorphismTokens = {
       strong: 'rgba(255, 255, 255, 0.18)',
     },
   },
-  
+
   // Glass shadow colors
   shadowColors: {
     light: {
@@ -116,7 +116,7 @@ const BaseColors = {
   // Primary Brand Colors
   primary: {
     50: '#EEF4FF',
-    100: '#E0EBFF', 
+    100: '#E0EBFF',
     200: '#C7DBFF',
     300: '#A5C4FF',
     400: '#82A3FF',
@@ -126,7 +126,7 @@ const BaseColors = {
     800: '#1E42AD',
     900: '#123096',
   },
-  
+
   // Neutral Colors - Carefully crafted for readability
   neutral: {
     0: '#FFFFFF',
@@ -142,7 +142,7 @@ const BaseColors = {
     900: '#171717',
     950: '#0A0A0A',
   },
-  
+
   // Semantic Colors
   success: {
     50: '#F0FDF4',
@@ -153,7 +153,7 @@ const BaseColors = {
     700: '#15803D',
     900: '#14532D',
   },
-  
+
   warning: {
     50: '#FFFBEB',
     100: '#FEF3C7',
@@ -163,7 +163,7 @@ const BaseColors = {
     700: '#B45309',
     900: '#78350F',
   },
-  
+
   error: {
     50: '#FEF2F2',
     100: '#FEE2E2',
@@ -173,7 +173,7 @@ const BaseColors = {
     700: '#B91C1C',
     900: '#7F1D1D',
   },
-  
+
   info: {
     50: '#EFF6FF',
     100: '#DBEAFE',
@@ -207,7 +207,7 @@ export const LightTheme = {
     elevated: BaseColors.neutral[0],
     overlay: 'rgba(0, 0, 0, 0.5)',
   },
-  
+
   // Text Colors
   text: {
     primary: BaseColors.neutral[900],
@@ -216,7 +216,7 @@ export const LightTheme = {
     inverse: BaseColors.neutral[0],
     brand: BaseColors.primary[600],
   },
-  
+
   // Border Colors
   border: {
     light: BaseColors.neutral[200],
@@ -224,7 +224,7 @@ export const LightTheme = {
     strong: BaseColors.neutral[400],
     brand: BaseColors.primary[300],
   },
-  
+
   // Interactive Colors
   interactive: {
     primary: BaseColors.primary[500],
@@ -235,7 +235,7 @@ export const LightTheme = {
     danger: BaseColors.error[500],
     success: BaseColors.success[500],
   },
-  
+
   // Status Colors
   status: {
     success: BaseColors.success[500],
@@ -258,7 +258,7 @@ export const DarkTheme = {
     elevated: BaseColors.neutral[800],
     overlay: 'rgba(0, 0, 0, 0.8)',
   },
-  
+
   // Text Colors
   text: {
     primary: BaseColors.neutral[50],
@@ -267,7 +267,7 @@ export const DarkTheme = {
     inverse: BaseColors.neutral[900],
     brand: BaseColors.primary[400],
   },
-  
+
   // Border Colors
   border: {
     light: BaseColors.neutral[800],
@@ -275,7 +275,7 @@ export const DarkTheme = {
     strong: BaseColors.neutral[600],
     brand: BaseColors.primary[600],
   },
-  
+
   // Interactive Colors
   interactive: {
     primary: BaseColors.primary[500],
@@ -286,7 +286,7 @@ export const DarkTheme = {
     danger: BaseColors.error[500],
     success: BaseColors.success[500],
   },
-  
+
   // Status Colors
   status: {
     success: BaseColors.success[400],
@@ -414,7 +414,7 @@ export const Typography = {
       letterSpacing: 0,
     },
   },
-  
+
   // Headlines - For section headers
   headline: {
     large: {
@@ -436,7 +436,7 @@ export const Typography = {
       letterSpacing: 0,
     },
   },
-  
+
   // Title - For card titles and important text
   title: {
     large: {
@@ -458,7 +458,7 @@ export const Typography = {
       letterSpacing: 0.1,
     },
   },
-  
+
   // Body - For main content
   body: {
     large: {
@@ -480,7 +480,7 @@ export const Typography = {
       letterSpacing: 0.4,
     },
   },
-  
+
   // Label - For buttons, form labels, captions
   label: {
     large: {

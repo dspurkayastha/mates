@@ -101,18 +101,14 @@ export const LineChart: React.FC<ChartProps & { data: ChartData }> = ({
   );
 };
 
-export const DonutChart: React.FC<ChartProps & { 
-  categories: ExpenseCategory[];
-  title: string;
-  subtitle?: string;
-  size?: number;
-}> = ({
-  categories,
-  title,
-  subtitle,
-  size = 200,
-  style,
-}) => {
+export const DonutChart: React.FC<
+  ChartProps & {
+    categories: ExpenseCategory[];
+    title: string;
+    subtitle?: string;
+    size?: number;
+  }
+> = ({ categories, title, subtitle, size = 200, style }) => {
   const colors = useColors();
   const tokens = useTokens();
 
@@ -141,7 +137,7 @@ export const DonutChart: React.FC<ChartProps & {
             Donut Chart Placeholder
           </Text>
         </View>
-        
+
         {/* Categories Legend */}
         <View style={{ marginTop: tokens.Spacing.md, gap: tokens.Spacing.sm }}>
           {categories.slice(0, 3).map((category) => (
@@ -178,17 +174,13 @@ export const DonutChart: React.FC<ChartProps & {
   );
 };
 
-export const BarChart: React.FC<ChartProps & { 
-  data: DataPoint[];
-  title: string;
-  subtitle?: string;
-}> = ({
-  data,
-  title,
-  subtitle,
-  height = 200,
-  style,
-}) => {
+export const BarChart: React.FC<
+  ChartProps & {
+    data: DataPoint[];
+    title: string;
+    subtitle?: string;
+  }
+> = ({ data, title, subtitle, height = 200, style }) => {
   const colors = useColors();
   const tokens = useTokens();
 
@@ -227,11 +219,7 @@ export const MetricsGrid: React.FC<{
   columns?: number;
   animated?: boolean;
   style?: ViewStyle;
-}> = ({
-  metrics,
-  columns = 2,
-  style,
-}) => {
+}> = ({ metrics, columns = 2, style }) => {
   const colors = useColors();
   const tokens = useTokens();
 

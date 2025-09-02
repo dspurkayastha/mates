@@ -3,7 +3,7 @@ import supabase, { SUPABASE_ENABLED } from '@/lib/supabase';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 const client = supabase as SupabaseClient;
-import { useAuth } from '@/utils/auth/useAuth';
+import { useAuth } from '@/features/auth/useAuth';
 
 export interface Poll {
   id: string;
@@ -40,11 +40,7 @@ export function usePoll(id: string) {
   return useQuery({
     queryKey: ['poll', id],
     queryFn: async () => {
-      const { data: poll, error } = await client
-        .from('polls')
-        .select('*')
-        .eq('id', id)
-        .single();
+      const { data: poll, error } = await client.from('polls').select('*').eq('id', id).single();
       if (error) throw error;
       const { data: votes, error: votesError } = await client
         .from('poll_votes')
@@ -63,11 +59,7 @@ export function usePoll(id: string) {
 export function useCreatePoll() {
   return useMutation({
     mutationFn: async (question: string) => {
-      const { data, error } = await client
-        .from('polls')
-        .insert({ question })
-        .select()
-        .single();
+      const { data, error } = await client.from('polls').insert({ question }).select().single();
       if (error) throw error;
       return data as Poll;
     },
@@ -91,4 +83,3 @@ export function useVotePoll() {
     },
   });
 }
-

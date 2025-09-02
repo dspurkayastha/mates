@@ -1,7 +1,16 @@
 import React from 'react';
 import { View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { Text, Icon, Button, Card, LoadingSkeleton, ScreenBackground, useTheme, useTokens } from '@/components/ui';
+import {
+  Text,
+  Icon,
+  Button,
+  Card,
+  LoadingSkeleton,
+  ScreenBackground,
+  useTheme,
+  useTokens,
+} from '@/components/ui';
 import { withOpacity } from '@/design-system/ThemeProvider';
 import { usePoll, useVotePoll } from '@/features/polls/hooks';
 
@@ -37,12 +46,7 @@ export default function PollDetailScreen() {
             marginBottom: tokens.Spacing.xl,
           }}
         >
-          <Icon
-            name="Vote"
-            size="xl"
-            color="brand"
-            style={{ marginRight: tokens.Spacing.sm }}
-          />
+          <Icon name="Vote" size="xl" color="brand" style={{ marginRight: tokens.Spacing.sm }} />
           <Text variant="headlineLarge" weight="bold">
             {poll.question}
           </Text>
@@ -69,7 +73,11 @@ export default function PollDetailScreen() {
           </View>
         ) : (
           <Card variant="elevated" style={{ padding: tokens.Spacing.lg }}>
-            <Text variant="titleMedium" weight="semibold" style={{ marginBottom: tokens.Spacing.md }}>
+            <Text
+              variant="titleMedium"
+              weight="semibold"
+              style={{ marginBottom: tokens.Spacing.md }}
+            >
               Results
             </Text>
             <View style={{ marginBottom: tokens.Spacing.md }}>
@@ -81,16 +89,17 @@ export default function PollDetailScreen() {
                   height: 8,
                   backgroundColor: withOpacity(theme.interactive.primary, 0.08),
                   borderRadius: tokens.BorderRadius.md,
-                  overflow: 'hidden',
                 }}
               >
-                <View
-                  style={{
-                    width: `${yesPct}%`,
-                    height: '100%',
-                    backgroundColor: theme.interactive.primary,
-                  }}
-                />
+                <View style={{ overflow: 'hidden', borderRadius: tokens.BorderRadius.md }}>
+                  <View
+                    style={{
+                      width: `${yesPct}%`,
+                      height: '100%',
+                      backgroundColor: theme.interactive.primary,
+                    }}
+                  />
+                </View>
               </View>
             </View>
             <View>
@@ -102,16 +111,17 @@ export default function PollDetailScreen() {
                   height: 8,
                   backgroundColor: withOpacity(theme.interactive.primary, 0.08),
                   borderRadius: tokens.BorderRadius.md,
-                  overflow: 'hidden',
                 }}
               >
-                <View
-                  style={{
-                    width: `${noPct}%`,
-                    height: '100%',
-                    backgroundColor: theme.interactive.primary,
-                  }}
-                />
+                <View style={{ overflow: 'hidden', borderRadius: tokens.BorderRadius.md }}>
+                  <View
+                    style={{
+                      width: `${noPct}%`,
+                      height: '100%',
+                      backgroundColor: theme.interactive.primary,
+                    }}
+                  />
+                </View>
               </View>
             </View>
           </Card>

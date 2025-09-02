@@ -8,11 +8,7 @@ import { reportErrorToRemote } from './report-error-to-remote';
 
 type ErrorBoundaryState = { hasError: boolean; error: unknown | null; sentLogs: boolean };
 
-const DeviceErrorBoundary = ({
-  sentLogs,
-}: {
-  sentLogs: boolean;
-}) => {
+const DeviceErrorBoundary = ({ sentLogs }: { sentLogs: boolean }) => {
   useEffect(() => {
     SplashScreen.hideAsync().catch(() => {});
   }, []);

@@ -12,16 +12,33 @@ import { useColors, useTokens, useTheme } from '../../design-system/ThemeProvide
 // TYPES
 // ============================================================================
 
-type TypographyVariant = 
-  | 'displayLarge' | 'displayMedium' | 'displaySmall'
-  | 'headlineLarge' | 'headlineMedium' | 'headlineSmall'
-  | 'titleLarge' | 'titleMedium' | 'titleSmall'
-  | 'bodyLarge' | 'bodyMedium' | 'bodySmall'
-  | 'labelLarge' | 'labelMedium' | 'labelSmall';
+type TypographyVariant =
+  | 'displayLarge'
+  | 'displayMedium'
+  | 'displaySmall'
+  | 'headlineLarge'
+  | 'headlineMedium'
+  | 'headlineSmall'
+  | 'titleLarge'
+  | 'titleMedium'
+  | 'titleSmall'
+  | 'bodyLarge'
+  | 'bodyMedium'
+  | 'bodySmall'
+  | 'labelLarge'
+  | 'labelMedium'
+  | 'labelSmall';
 
-type ColorVariant = 
-  | 'primary' | 'secondary' | 'tertiary' | 'inverse' | 'brand'
-  | 'success' | 'warning' | 'error' | 'info';
+type ColorVariant =
+  | 'primary'
+  | 'secondary'
+  | 'tertiary'
+  | 'inverse'
+  | 'brand'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'info';
 
 interface TextProps extends Omit<RNTextProps, 'style'> {
   variant?: TypographyVariant;
@@ -96,10 +113,7 @@ export const Text: React.FC<TextProps> = ({
   }, [variant, tokens]);
 
   const textColorValue = useMemo(() => {
-    if (
-      typeof color === 'string' &&
-      (color.startsWith('#') || color.startsWith('rgb'))
-    ) {
+    if (typeof color === 'string' && (color.startsWith('#') || color.startsWith('rgb'))) {
       return color;
     }
 
@@ -163,9 +177,7 @@ export const Text: React.FC<TextProps> = ({
     return {
       ...typographyStyle,
       fontSize: typographyStyle.fontSize * scale,
-      lineHeight: typographyStyle.lineHeight
-        ? typographyStyle.lineHeight * scale
-        : undefined,
+      lineHeight: typographyStyle.lineHeight ? typographyStyle.lineHeight * scale : undefined,
     };
   }, [typographyStyle, accessibility.preferredContentSizeCategory]);
 
@@ -177,14 +189,18 @@ export const Text: React.FC<TextProps> = ({
       textAlign: align,
       fontFamily: Platform.select({ ios: 'SF Pro', default: 'System' }),
     }),
-    [scaledTypographyStyle, fontWeightValue, textColorValue, align]
+    [scaledTypographyStyle, fontWeightValue, textColorValue, align],
   );
 
   // Determine accessibility role based on variant
   const getDefaultAccessibilityRole = () => {
     if (accessibilityRole) return accessibilityRole;
-    
-    if (variant.startsWith('display') || variant.startsWith('headline') || variant.startsWith('title')) {
+
+    if (
+      variant.startsWith('display') ||
+      variant.startsWith('headline') ||
+      variant.startsWith('title')
+    ) {
       return 'header';
     }
     return 'text';
@@ -193,7 +209,9 @@ export const Text: React.FC<TextProps> = ({
   return (
     <RNText
       style={[textStyle, style]}
-      accessibilityLabel={accessibilityLabel || (typeof children === 'string' ? children : undefined)}
+      accessibilityLabel={
+        accessibilityLabel || (typeof children === 'string' ? children : undefined)
+      }
       accessibilityHint={accessibilityHint}
       accessibilityRole={getDefaultAccessibilityRole()}
       testID={testID}

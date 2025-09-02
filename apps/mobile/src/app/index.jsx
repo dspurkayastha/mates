@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
 
-import { useAuth } from '@/utils/auth/useAuth';
+import { useAuth } from '@/features/auth/useAuth';
 
 /**
  * Root index route – decides whether to show onboarding or the main app.

@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Pressable,
-  PressableProps,
-  StyleSheet,
-  View,
-  ViewStyle,
-} from 'react-native';
+import { Pressable, PressableProps, StyleSheet, View, ViewStyle } from 'react-native';
 import type { GestureResponderEvent } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { usePressFeedback } from '../animation/usePressFeedback';
@@ -125,10 +119,10 @@ export const Card: React.FC<CardProps> = ({
     const defaultRole = interactive ? 'button' : 'text';
     const role = accessibilityRole ?? defaultRole;
     const defaultLabel = interactive
-      ? accessibilityLabel ?? 'Interactive card'
+      ? (accessibilityLabel ?? 'Interactive card')
       : accessibilityLabel;
     const defaultHint = interactive
-      ? accessibilityHint ?? 'Double tap to interact with this card'
+      ? (accessibilityHint ?? 'Double tap to interact with this card')
       : accessibilityHint;
     return {
       accessible: true,
@@ -140,8 +134,7 @@ export const Card: React.FC<CardProps> = ({
   };
 
   if (interactive) {
-    const { onPress, onPressIn, onPressOut, ...pressableProps } =
-      props as InteractiveCardProps;
+    const { onPress, onPressIn, onPressOut, ...pressableProps } = props as InteractiveCardProps;
     const accessibilityProps = getAccessibilityProps();
     return (
       <Animated.View style={[outerStyle, animatedStyle, style]}>

@@ -37,7 +37,7 @@ if (typeof window !== 'undefined') {
             level,
             args: args.map(serialize),
           },
-          '*'
+          '*',
         );
       } catch {
         /* ignore errors so logging never breaks the app */

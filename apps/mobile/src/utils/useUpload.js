@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { UploadClient } from '@uploadcare/upload-client'
+import { UploadClient } from '@uploadcare/upload-client';
 const client = new UploadClient({ publicKey: process.env.EXPO_PUBLIC_UPLOADCARE_PUBLIC_KEY });
 
 function useUpload() {
@@ -11,54 +11,57 @@ function useUpload() {
       if ('reactNativeAsset' in input && input.reactNativeAsset) {
         if (input.reactNativeAsset.file) {
           const formData = new FormData();
-          formData.append("file", input.reactNativeAsset.file);
-          response = await fetch("/_create/api/upload/", {
-            method: "POST",
-            body: formData
+          formData.append('file', input.reactNativeAsset.file);
+          response = await fetch('/_create/api/upload/', {
+            method: 'POST',
+            body: formData,
           });
         } else {
-          const response = await fetch("/_create/api/upload/presign/", {
+          const response = await fetch('/_create/api/upload/presign/', {
             method: 'POST',
-          })
+          });
           const { secureSignature, secureExpire } = await response.json();
           const result = await client.uploadFile(input.reactNativeAsset, {
-            fileName: input.reactNativeAsset.name ?? input.reactNativeAsset.uri.split("/").pop(),
+            fileName: input.reactNativeAsset.name ?? input.reactNativeAsset.uri.split('/').pop(),
             contentType: input.reactNativeAsset.mimeType,
             secureSignature,
-            secureExpire
+            secureExpire,
           });
-          return { url: `${process.env.EXPO_PUBLIC_BASE_CREATE_USER_CONTENT_URL}/${result.uuid}/`, mimeType: result.mimeType || null };
+          return {
+            url: `${process.env.EXPO_PUBLIC_BASE_CREATE_USER_CONTENT_URL}/${result.uuid}/`,
+            mimeType: result.mimeType || null,
+          };
         }
-      } else if ("url" in input) {
-        response = await fetch("/_create/api/upload/", {
-          method: "POST",
+      } else if ('url' in input) {
+        response = await fetch('/_create/api/upload/', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json"
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ url: input.url })
+          body: JSON.stringify({ url: input.url }),
         });
-      } else if ("base64" in input) {
-        response = await fetch("/_create/api/upload/", {
-          method: "POST",
+      } else if ('base64' in input) {
+        response = await fetch('/_create/api/upload/', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json"
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ base64: input.base64 })
+          body: JSON.stringify({ base64: input.base64 }),
         });
       } else {
-        response = await fetch("/_create/api/upload/", {
-          method: "POST",
+        response = await fetch('/_create/api/upload/', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/octet-stream"
+            'Content-Type': 'application/octet-stream',
           },
-          body: input.buffer
+          body: input.buffer,
         });
       }
       if (!response.ok) {
         if (response.status === 413) {
-          throw new Error("Upload failed: File too large.");
+          throw new Error('Upload failed: File too large.');
         }
-        throw new Error("Upload failed");
+        throw new Error('Upload failed');
       }
       const data = await response.json();
       return { url: data.url, mimeType: data.mimeType || null };
@@ -66,10 +69,10 @@ function useUpload() {
       if (uploadError instanceof Error) {
         return { error: uploadError.message };
       }
-      if (typeof uploadError === "string") {
+      if (typeof uploadError === 'string') {
         return { error: uploadError };
       }
-      return { error: "Upload failed" };
+      return { error: 'Upload failed' };
     } finally {
       setLoading(false);
     }

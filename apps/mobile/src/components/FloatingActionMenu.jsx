@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import {
-  Text,
-  GlassButton,
-  Icon,
-  useColors,
-  useTokens,
-} from '@/components/ui';
+import { Text, GlassButton, Icon, useColors, useTokens } from '@/components/ui';
 import * as Haptics from 'expo-haptics';
 import Animated, {
   useSharedValue,
@@ -21,21 +15,19 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
   const colors = useColors();
   const tokens = useTokens();
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   const animation = useSharedValue(0);
   const rotation = useSharedValue(0);
-  
+
   const toggleMenu = () => {
     const newState = !isExpanded;
     setIsExpanded(newState);
-    
+
     Haptics.impactAsync(
-      newState ? Haptics.ImpactFeedbackStyle.Medium : Haptics.ImpactFeedbackStyle.Light
+      newState ? Haptics.ImpactFeedbackStyle.Medium : Haptics.ImpactFeedbackStyle.Light,
     );
-    
-    const duration = newState
-      ? tokens.Animation.duration.in
-      : tokens.Animation.duration.out;
+
+    const duration = newState ? tokens.Animation.duration.in : tokens.Animation.duration.out;
     const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
 
     animation.value = withTiming(newState ? 1 : 0, {
@@ -54,103 +46,93 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
       transform: [{ rotate: `${rotation.value}deg` }],
     };
   });
-  
+
   const menuItem0Style = useAnimatedStyle(() => {
-    const translateY = interpolate(
-      animation.value,
-      [0, 1],
-      [0, -(60 * 1 + 10 * 0)]
-    );
+    const translateY = interpolate(animation.value, [0, 1], [0, -(60 * 1 + 10 * 0)]);
     const opacity = interpolate(animation.value, [0, 0.3, 1], [0, 0, 1]);
     const scale = interpolate(animation.value, [0, 1], [0.3, 1]);
-    
+
     return {
-      transform: [
-        { translateY },
-        { scale },
-      ],
+      transform: [{ translateY }, { scale }],
       opacity,
     };
   });
-  
+
   const menuItem1Style = useAnimatedStyle(() => {
-    const translateY = interpolate(
-      animation.value,
-      [0, 1],
-      [0, -(60 * 2 + 10 * 1)]
-    );
+    const translateY = interpolate(animation.value, [0, 1], [0, -(60 * 2 + 10 * 1)]);
     const opacity = interpolate(animation.value, [0, 0.3, 1], [0, 0, 1]);
     const scale = interpolate(animation.value, [0, 1], [0.3, 1]);
-    
+
     return {
-      transform: [
-        { translateY },
-        { scale },
-      ],
+      transform: [{ translateY }, { scale }],
       opacity,
     };
   });
-  
+
   const menuItem2Style = useAnimatedStyle(() => {
-    const translateY = interpolate(
-      animation.value,
-      [0, 1],
-      [0, -(60 * 3 + 10 * 2)]
-    );
+    const translateY = interpolate(animation.value, [0, 1], [0, -(60 * 3 + 10 * 2)]);
     const opacity = interpolate(animation.value, [0, 0.3, 1], [0, 0, 1]);
     const scale = interpolate(animation.value, [0, 1], [0.3, 1]);
-    
+
     return {
-      transform: [
-        { translateY },
-        { scale },
-      ],
+      transform: [{ translateY }, { scale }],
       opacity,
     };
   });
-  
+
   const menuItem3Style = useAnimatedStyle(() => {
-    const translateY = interpolate(
-      animation.value,
-      [0, 1],
-      [0, -(60 * 4 + 10 * 3)]
-    );
+    const translateY = interpolate(animation.value, [0, 1], [0, -(60 * 4 + 10 * 3)]);
     const opacity = interpolate(animation.value, [0, 0.3, 1], [0, 0, 1]);
     const scale = interpolate(animation.value, [0, 1], [0.3, 1]);
-    
+
     return {
-      transform: [
-        { translateY },
-        { scale },
-      ],
+      transform: [{ translateY }, { scale }],
       opacity,
     };
   });
-  
+
   const menuStyles = [menuItem0Style, menuItem1Style, menuItem2Style, menuItem3Style];
-  
+
   const menuItems = [
-    { icon: 'Vote', label: 'Poll', onPress: onCreatePoll, // TODO(theme): map to token
-    // eslint-disable-next-line local/no-hardcoded-colors
-    color: 'info' },
-    { icon: 'DollarSign', label: 'Expense', onPress: onAddExpense, // TODO(theme): map to token
-    // eslint-disable-next-line local/no-hardcoded-colors
-    color: 'primary' },
-    { icon: 'ShoppingCart', label: 'Grocery', onPress: onAddGrocery, // TODO(theme): map to token
-    // eslint-disable-next-line local/no-hardcoded-colors
-    color: 'success' },
-    { icon: 'SquareCheck', label: 'Chore', onPress: onAddChore, // TODO(theme): map to token
-    // eslint-disable-next-line local/no-hardcoded-colors
-    color: 'warning' },
+    {
+      icon: 'Vote',
+      label: 'Poll',
+      onPress: onCreatePoll, // TODO(theme): map to token
+      // eslint-disable-next-line local/no-hardcoded-colors
+      color: 'info',
+    },
+    {
+      icon: 'DollarSign',
+      label: 'Expense',
+      onPress: onAddExpense, // TODO(theme): map to token
+      // eslint-disable-next-line local/no-hardcoded-colors
+      color: 'primary',
+    },
+    {
+      icon: 'ShoppingCart',
+      label: 'Grocery',
+      onPress: onAddGrocery, // TODO(theme): map to token
+      // eslint-disable-next-line local/no-hardcoded-colors
+      color: 'success',
+    },
+    {
+      icon: 'SquareCheck',
+      label: 'Chore',
+      onPress: onAddChore, // TODO(theme): map to token
+      // eslint-disable-next-line local/no-hardcoded-colors
+      color: 'warning',
+    },
   ];
-  
+
   return (
-    <View style={{
-      position: 'absolute',
-      bottom: tokens.Spacing['4xl'],
-      right: tokens.Spacing.xl,
-      alignItems: 'center',
-    }}>
+    <View
+      style={{
+        position: 'absolute',
+        bottom: tokens.Spacing['4xl'],
+        right: tokens.Spacing.xl,
+        alignItems: 'center',
+      }}
+    >
       {/* Menu Items */}
       {menuItems.map((item, index) => (
         <Animated.View
@@ -162,21 +144,19 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
               bottom: 0,
               alignItems: 'center',
               flexDirection: 'row',
-            }
+            },
           ]}
         >
-          <View style={{
-            backgroundColor: colors.background.elevated,
-            paddingHorizontal: tokens.Spacing.md,
-            paddingVertical: tokens.Spacing.sm,
-            borderRadius: tokens.BorderRadius.lg,
-            marginRight: tokens.Spacing.sm,
-            shadowColor: colors.background.primary,
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 4,
-            elevation: 4,
-          }}>
+          <View
+            style={{
+              backgroundColor: colors.background.elevated,
+              paddingHorizontal: tokens.Spacing.md,
+              paddingVertical: tokens.Spacing.sm,
+              borderRadius: tokens.BorderRadius.lg,
+              marginRight: tokens.Spacing.sm,
+              ...tokens.Shadows.md,
+            }}
+          >
             <Text variant="labelMedium" weight="medium">
               {item.label}
             </Text>
@@ -214,11 +194,7 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
             padding: 0,
           }}
         >
-          <Icon 
-            name="Plus" 
-            size="lg" 
-            color="inverse"
-          />
+          <Icon name="Plus" size="lg" color="inverse" />
         </GlassButton>
       </Animated.View>
     </View>

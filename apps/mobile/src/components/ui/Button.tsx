@@ -167,9 +167,7 @@ export const Button: React.FC<ButtonProps> = ({
     opacity: disabled ? 0.5 : 1,
   };
 
-  const focusStyle = isFocused
-    ? { borderWidth: 2, borderColor: theme.border.brand }
-    : {};
+  const focusStyle = isFocused ? { borderWidth: 2, borderColor: theme.border.brand } : {};
 
   const widthStyle: ViewStyle = fullWidth ? { alignSelf: 'stretch' } : {};
 
@@ -195,9 +193,7 @@ export const Button: React.FC<ButtonProps> = ({
         style={[baseStyle, sizeStyle, focusStyle, style]}
         {...rest}
       >
-        {leftIcon && !loading && (
-          <View style={{ marginRight: tokens.Spacing.sm }}>{leftIcon}</View>
-        )}
+        {leftIcon && !loading && <View style={{ marginRight: tokens.Spacing.sm }}>{leftIcon}</View>}
         {loading ? (
           <ActivityIndicator color={textColor} />
         ) : (

@@ -155,11 +155,7 @@ export default function ExpensesScreen() {
         </View>
         {/* Summary Section */}
         <Card variant="elevated" style={{ marginBottom: tokens.Spacing.lg }}>
-          <Text
-            variant="titleLarge"
-            weight="semibold"
-            style={{ marginBottom: tokens.Spacing.md }}
-          >
+          <Text variant="titleLarge" weight="semibold" style={{ marginBottom: tokens.Spacing.md }}>
             August Summary
           </Text>
           <View

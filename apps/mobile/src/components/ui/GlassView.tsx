@@ -51,7 +51,6 @@ interface GlassViewProps {
 const styles = StyleSheet.create({
   blurView: {
     flex: 1,
-    backgroundColor: 'transparent',
   },
   shadowBase: {
     shadowOffset: { width: 0, height: 4 },

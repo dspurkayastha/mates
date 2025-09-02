@@ -11,7 +11,7 @@ export const SUPABASE_ENABLED = !!(supabaseUrl && supabaseAnonKey);
 if (!SUPABASE_ENABLED) {
   console.warn(
     '[Supabase] Missing EXPO_PUBLIC_SUPABASE_URL or EXPO_PUBLIC_SUPABASE_ANON_KEY. ' +
-      'Running in \"offline\" mode – cloud sync and auth are disabled.'
+      'Running in \"offline\" mode – cloud sync and auth are disabled.',
   );
 }
 

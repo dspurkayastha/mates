@@ -1,21 +1,12 @@
 import React from 'react';
-import {
-  Pressable,
-  PressableProps,
-  View,
-  StyleSheet,
-} from 'react-native';
+import { Pressable, PressableProps, View, StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import {
-  useTheme,
-  useTokens,
-  withOpacity,
-} from '../design-system/ThemeProvider';
+import { useTheme, useTokens, withOpacity } from '../design-system/ThemeProvider';
 import Text from './ui/Text';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive';
@@ -102,12 +93,7 @@ export default function Button({
     },
   };
 
-  const textVariant =
-    size === 'sm'
-      ? 'labelMedium'
-      : size === 'md'
-        ? 'labelLarge'
-        : 'titleSmall';
+  const textVariant = size === 'sm' ? 'labelMedium' : size === 'md' ? 'labelLarge' : 'titleSmall';
 
   const focusRing = isFocused
     ? {
@@ -119,9 +105,7 @@ export default function Button({
     : {};
 
   const baseStyle = {
-    backgroundColor: isPressed
-      ? pressedBackgrounds[variant]
-      : backgroundColors[variant],
+    backgroundColor: isPressed ? pressedBackgrounds[variant] : backgroundColors[variant],
     borderRadius: tokens.BorderRadius.md,
     minHeight: 44,
     alignItems: 'center',
@@ -136,7 +120,7 @@ export default function Button({
   };
 
   return (
-    <View style={[focusRing, style]}> 
+    <View style={[focusRing, style]}>
       <AnimatedPressable
         accessibilityRole={accessibilityRole}
         accessibilityState={{ disabled }}

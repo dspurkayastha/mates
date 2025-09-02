@@ -33,12 +33,17 @@ export default function ChoresScreen() {
   const { theme } = useTheme();
   const tokens = useTokens();
   const [activeTab, setActiveTab] = React.useState<'today' | 'week' | 'leaderboard'>('today');
-
   const { data: chores = [], isLoading } = useChores();
   const toggleChore = useToggleChore();
 
-  const todayChores = chores.filter((c) => isToday(new Date(c.dueTime)));
-  const weekChores = chores.filter((c) => isThisWeek(new Date(c.dueTime)));
+  const todayChores = React.useMemo(
+    () => chores.filter((c) => isToday(new Date(c.dueTime))),
+    [chores],
+  );
+  const weekChores = React.useMemo(
+    () => chores.filter((c) => isThisWeek(new Date(c.dueTime))),
+    [chores],
+  );
   const leaderboard = React.useMemo(() => {
     const counts: Record<string, number> = {};
     chores.forEach((c) => {
@@ -82,7 +87,7 @@ export default function ChoresScreen() {
         }}
       />
     ),
-    [handleToggleComplete]
+    [handleToggleComplete],
   );
 
   const renderLeader = React.useCallback(
@@ -109,20 +114,21 @@ export default function ChoresScreen() {
         accessory={{ type: 'badge', label: `${item.streak}d`, variant: 'warning' }}
       />
     ),
-    [theme.interactive.primary, tokens.Spacing]
+    [theme.interactive.primary, tokens],
   );
 
-  const data: any[] =
-    activeTab === 'today' ? todayChores : activeTab === 'week' ? weekChores : leaderboard;
-  const renderItem = activeTab === 'leaderboard' ? renderLeader : renderChore;
   const keyExtractor = React.useCallback((item: { id: string }) => item.id, []);
 
-  const sectionTitle =
-    activeTab === 'today'
-      ? "Today's Chores"
-      : activeTab === 'week'
-      ? "This Week's Chores"
-      : 'Chores Leaderboard';
+  const sectionTitle = React.useMemo(() => {
+    switch (activeTab) {
+      case 'today':
+        return "Today's Chores";
+      case 'week':
+        return "This Week's Chores";
+      default:
+        return 'Chores Leaderboard';
+    }
+  }, [activeTab]);
 
   const renderHeader = React.useCallback(
     () => (
@@ -145,11 +151,11 @@ export default function ChoresScreen() {
             Chores
           </Text>
         </View>
-          <SegmentedControl
-            segments={segments}
-            value={activeTab}
-            onChange={(v) => setActiveTab(v as 'today' | 'week' | 'leaderboard')}
-          />
+        <SegmentedControl
+          segments={segments}
+          value={activeTab}
+          onChange={(v) => setActiveTab(v as 'today' | 'week' | 'leaderboard')}
+        />
         <Text
           variant="titleLarge"
           weight="semibold"
@@ -159,7 +165,7 @@ export default function ChoresScreen() {
         </Text>
       </View>
     ),
-    [activeTab, sectionTitle, tokens]
+    [activeTab, sectionTitle, tokens],
   );
 
   const renderFooter = React.useCallback(
@@ -177,17 +183,17 @@ export default function ChoresScreen() {
         <View style={{ height: 80 }} />
       </View>
     ),
-    [handleAddChore, tokens.Spacing.lg]
+    [handleAddChore, tokens],
   );
+
+  const data: any[] =
+    activeTab === 'today' ? todayChores : activeTab === 'week' ? weekChores : leaderboard;
+  const renderItem = activeTab === 'leaderboard' ? renderLeader : renderChore;
 
   const content = isLoading ? (
     <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
       {[...Array(5)].map((_, i) => (
-        <LoadingSkeleton
-          key={i}
-          height={72}
-          style={{ marginBottom: tokens.Spacing.md }}
-        />
+        <LoadingSkeleton key={i} height={72} style={{ marginBottom: tokens.Spacing.md }} />
       ))}
     </ScrollView>
   ) : (

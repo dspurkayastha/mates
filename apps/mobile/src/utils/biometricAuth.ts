@@ -136,7 +136,7 @@ class BiometricAuthManager {
   getBiometricTypeNames(): string[] {
     if (!this.capabilities) return [];
 
-    return this.capabilities.supportedTypes.map(type => {
+    return this.capabilities.supportedTypes.map((type) => {
       switch (type) {
         case LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION:
           return Platform.OS === 'ios' ? 'Face ID' : 'Face Recognition';
@@ -197,7 +197,7 @@ class BiometricAuthManager {
         // Reset failure count on success
         await this.resetFailureCount();
         await this.updateLastUsed();
-        
+
         // Provide haptic feedback
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
@@ -224,7 +224,7 @@ class BiometricAuthManager {
 
         // Increment failure count
         await this.incrementFailureCount();
-        
+
         // Provide haptic feedback for failure
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
 
@@ -236,7 +236,7 @@ class BiometricAuthManager {
     } catch (error) {
       console.error('Biometric authentication error:', error);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      
+
       return {
         success: false,
         error: 'An unexpected error occurred during authentication',
@@ -378,10 +378,7 @@ class BiometricAuthManager {
    */
   private async saveSettings(): Promise<void> {
     try {
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.BIOMETRIC_SETTINGS,
-        JSON.stringify(this.settings)
-      );
+      await AsyncStorage.setItem(STORAGE_KEYS.BIOMETRIC_SETTINGS, JSON.stringify(this.settings));
     } catch (error) {
       console.error('Failed to save biometric settings:', error);
     }
@@ -494,7 +491,7 @@ export const biometricAuthManager = BiometricAuthManager.getInstance();
  * Quick authentication function for common use cases
  */
 export const authenticateWithBiometrics = async (
-  options: BiometricAuthOptions = {}
+  options: BiometricAuthOptions = {},
 ): Promise<BiometricAuthResult> => {
   return biometricAuthManager.authenticate(options);
 };

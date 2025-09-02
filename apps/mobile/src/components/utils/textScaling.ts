@@ -35,9 +35,9 @@ export const useTextScaling = (config: Partial<TextScalingConfig> = {}) => {
           AccessibilityInfo.isReduceMotionEnabled(),
           AccessibilityInfo.isScreenReaderEnabled(),
         ]);
-        
+
         setIsReduceMotionEnabled(isReduceMotionOn);
-        
+
         // Increase text scale if screen reader is enabled
         if (isScreenReaderEnabled) {
           setAccessibilityScale(finalConfig.accessibilityMultiplier);
@@ -52,7 +52,7 @@ export const useTextScaling = (config: Partial<TextScalingConfig> = {}) => {
     // Listen for accessibility changes
     const subscription = AccessibilityInfo.addEventListener(
       'reduceMotionChanged',
-      setIsReduceMotionEnabled
+      setIsReduceMotionEnabled,
     );
 
     return () => {
@@ -70,7 +70,7 @@ export const useTextScaling = (config: Partial<TextScalingConfig> = {}) => {
     };
 
     let responsiveScale = 1;
-    
+
     if (width <= breakpoints.small) {
       responsiveScale = 0.9;
     } else if (width <= breakpoints.medium) {
@@ -86,11 +86,8 @@ export const useTextScaling = (config: Partial<TextScalingConfig> = {}) => {
   const calculateScale = (baseScale: number = 1) => {
     const responsiveScale = getResponsiveScale();
     const combinedScale = baseScale * responsiveScale * accessibilityScale;
-    
-    return Math.max(
-      finalConfig.minScale,
-      Math.min(finalConfig.maxScale, combinedScale)
-    );
+
+    return Math.max(finalConfig.minScale, Math.min(finalConfig.maxScale, combinedScale));
   };
 
   // Get scaled font size

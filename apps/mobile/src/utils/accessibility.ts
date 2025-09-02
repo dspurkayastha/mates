@@ -31,7 +31,7 @@ class AccessibilityManager {
     try {
       // Check screen reader status
       this.state.isScreenReaderEnabled = await AccessibilityInfo.isScreenReaderEnabled();
-      
+
       // Check reduce motion (iOS only for now)
       if (Platform.OS === 'ios') {
         this.state.isReduceMotionEnabled = await AccessibilityInfo.isReduceMotionEnabled();
@@ -60,13 +60,13 @@ class AccessibilityManager {
   };
 
   private notifyListeners() {
-    this.listeners.forEach(listener => listener(this.state));
+    this.listeners.forEach((listener) => listener(this.state));
   }
 
   subscribe(listener: (state: AccessibilityState) => void) {
     this.listeners.push(listener);
     return () => {
-      this.listeners = this.listeners.filter(l => l !== listener);
+      this.listeners = this.listeners.filter((l) => l !== listener);
     };
   }
 
@@ -125,7 +125,7 @@ export const generateAccessibilityLabel = {
       if (errors.length === 0) return `${fieldName} is valid`;
       if (errors.length === 1) return `${fieldName} error: ${errors[0]}`;
       return `${fieldName} has ${errors.length} errors: ${errors.join(', ')}`;
-    }
+    },
   },
 
   list: {
@@ -136,7 +136,7 @@ export const generateAccessibilityLabel = {
     },
 
     empty: (context: string) => `${context} list is empty`,
-    
+
     loading: (context: string) => `Loading ${context} list`,
   },
 
@@ -149,10 +149,11 @@ export const generateAccessibilityLabel = {
   },
 
   date: (date: Date, format: 'short' | 'long' = 'short') => {
-    const options: Intl.DateTimeFormatOptions = format === 'long' 
-      ? { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
-      : { month: 'short', day: 'numeric', year: 'numeric' };
-    
+    const options: Intl.DateTimeFormatOptions =
+      format === 'long'
+        ? { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+        : { month: 'short', day: 'numeric', year: 'numeric' };
+
     return new Intl.DateTimeFormat('en-US', options).format(date);
   },
 };
@@ -197,27 +198,27 @@ export const accessibilityRoles = {
   // Navigation
   tabButton: 'tab' as const,
   navigationButton: 'button' as const,
-  
+
   // Content
   heading: 'header' as const,
   text: 'text' as const,
   summary: 'summary' as const,
-  
+
   // Interactive
   button: 'button' as const,
   link: 'link' as const,
   checkbox: 'checkbox' as const,
   radio: 'radio' as const,
   textInput: 'none' as const, // TextInput has built-in accessibility
-  
+
   // Lists
   list: 'list' as const,
   listItem: 'none' as const, // React Native doesn't support listitem
-  
+
   // Status
   alert: 'alert' as const,
   status: 'text' as const,
-  
+
   // Layout
   container: 'none' as const,
   image: 'image' as const,
@@ -267,9 +268,9 @@ export const focusManager = {
 export const touchTargets = {
   minimum: 44, // Minimum touch target size per accessibility guidelines
   recommended: 48, // Recommended touch target size
-  
+
   ensureMinimumSize: (size: number) => Math.max(size, touchTargets.minimum),
-  
+
   addPadding: (currentSize: number) => {
     const needed = touchTargets.minimum - currentSize;
     return needed > 0 ? needed / 2 : 0;

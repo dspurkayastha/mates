@@ -147,10 +147,10 @@ class UserTestingManager {
   async startTestSession(
     userId: string,
     testType: UserTestSession['testType'],
-    variant?: string
+    variant?: string,
   ): Promise<string> {
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     this.currentSession = {
       id: sessionId,
       userId,
@@ -177,7 +177,7 @@ class UserTestingManager {
     };
 
     this.isTracking = true;
-    
+
     // Record session start event
     console.log('User test session started:', {
       testType,
@@ -193,7 +193,7 @@ class UserTestingManager {
 
     this.currentSession.endTime = new Date();
     this.currentSession.completed = true;
-    this.currentSession.metrics.sessionDuration = 
+    this.currentSession.metrics.sessionDuration =
       this.currentSession.endTime.getTime() - this.currentSession.startTime.getTime();
 
     // Flush any remaining actions
@@ -202,10 +202,10 @@ class UserTestingManager {
 
     // Save session data
     await this.saveSession(this.currentSession);
-    
+
     // Save heatmap data
     await this.saveHeatmaps();
-    
+
     // Save user journey
     if (this.userJourney) {
       await this.saveUserJourney(this.userJourney);
@@ -228,7 +228,7 @@ class UserTestingManager {
     screenName: string,
     coordinates?: { x: number; y: number },
     elementId?: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, any>,
   ): void {
     if (!this.isTracking) return;
 
@@ -286,7 +286,7 @@ class UserTestingManager {
     };
 
     this.actionBuffer.push(errorAction);
-    
+
     if (this.currentSession) {
       this.currentSession.metrics.errors += 1;
     }
@@ -307,7 +307,7 @@ class UserTestingManager {
 
   async collectFeedback(feedback: Omit<FeedbackData, 'id' | 'timestamp'>): Promise<string> {
     const feedbackId = `feedback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const feedbackData: FeedbackData = {
       ...feedback,
       id: feedbackId,
@@ -323,7 +323,7 @@ class UserTestingManager {
     const existingFeedback = await this.loadFeedback();
     await AsyncStorage.setItem(
       this.STORAGE_KEYS.FEEDBACK,
-      JSON.stringify([...existingFeedback, feedbackData])
+      JSON.stringify([...existingFeedback, feedbackData]),
     );
 
     // Log feedback metric
@@ -370,7 +370,7 @@ class UserTestingManager {
 
   private updateHeatmap(screenName: string, coordinates: { x: number; y: number }): void {
     let heatmap = this.heatmapData.get(screenName);
-    
+
     if (!heatmap) {
       heatmap = {
         screenName,
@@ -407,7 +407,7 @@ class UserTestingManager {
 
     const now = new Date();
     const lastPath = this.userJourney.path[this.userJourney.path.length - 1];
-    
+
     // Update time spent on previous screen
     if (lastPath) {
       lastPath.timeSpent = now.getTime() - lastPath.timestamp.getTime();
@@ -460,7 +460,7 @@ class UserTestingManager {
       for (const [screenName, heatmap] of this.heatmapData.entries()) {
         await AsyncStorage.setItem(
           `${this.STORAGE_KEYS.HEATMAPS}_${screenName}`,
-          JSON.stringify(heatmap)
+          JSON.stringify(heatmap),
         );
       }
     } catch (error) {
@@ -474,7 +474,7 @@ class UserTestingManager {
       existing.push(journey);
       await AsyncStorage.setItem(
         `${this.STORAGE_KEYS.JOURNEYS}_${journey.userId}`,
-        JSON.stringify(existing)
+        JSON.stringify(existing),
       );
     } catch (error) {
       console.error('Failed to save user journey:', error);
@@ -537,7 +537,7 @@ class UserTestingManager {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32bit integer
     }
     return hash;
@@ -551,26 +551,27 @@ class UserTestingManager {
     const sessions = await this.getSessions();
     const feedback = await this.getFeedback();
 
-    const completedSessions = sessions.filter(s => s.completed);
+    const completedSessions = sessions.filter((s) => s.completed);
     const totalSessions = sessions.length;
-    const averageSessionDuration = completedSessions.reduce(
-      (sum, s) => sum + s.metrics.sessionDuration, 0
-    ) / completedSessions.length;
-    
-    const errorRate = completedSessions.reduce(
-      (sum, s) => sum + s.metrics.errors, 0
-    ) / completedSessions.reduce(
-      (sum, s) => sum + s.metrics.screenViews, 1
+    const averageSessionDuration =
+      completedSessions.reduce((sum, s) => sum + s.metrics.sessionDuration, 0) /
+      completedSessions.length;
+
+    const errorRate =
+      completedSessions.reduce((sum, s) => sum + s.metrics.errors, 0) /
+      completedSessions.reduce((sum, s) => sum + s.metrics.screenViews, 1);
+
+    const feedbackByType = feedback.reduce(
+      (acc, f) => {
+        acc[f.type] = (acc[f.type] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
     );
 
-    const feedbackByType = feedback.reduce((acc, f) => {
-      acc[f.type] = (acc[f.type] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
     const averageRating = feedback
-      .filter(f => f.rating !== undefined)
-      .reduce((sum, f, _, arr) => sum + (f.rating! / arr.length), 0);
+      .filter((f) => f.rating !== undefined)
+      .reduce((sum, f, _, arr) => sum + f.rating! / arr.length, 0);
 
     return {
       totalSessions,
@@ -587,12 +588,15 @@ class UserTestingManager {
 
   private getTopIssues(feedback: FeedbackData[]): Array<{ issue: string; count: number }> {
     const issues = feedback
-      .filter(f => f.type === 'bug_report' || f.type === 'usability')
-      .reduce((acc, f) => {
-        const key = f.category || 'general';
-        acc[key] = (acc[key] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      .filter((f) => f.type === 'bug_report' || f.type === 'usability')
+      .reduce(
+        (acc, f) => {
+          const key = f.category || 'general';
+          acc[key] = (acc[key] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      );
 
     return Object.entries(issues)
       .map(([issue, count]) => ({ issue, count }))
@@ -603,22 +607,22 @@ class UserTestingManager {
   private analyzeConversionFunnels(sessions: UserTestSession[]): any {
     // Analyze conversion funnels from user journeys
     const funnelSteps = ['onboarding', 'expense_add', 'expense_view', 'settings'];
-    const conversions = sessions.map(session => {
+    const conversions = sessions.map((session) => {
       const screenViews = session.actions
-        .filter(a => a.type === 'navigation')
-        .map(a => a.screenName);
-      
-      const stepCompletion = funnelSteps.map(step => 
-        screenViews.some(screen => screen.toLowerCase().includes(step))
+        .filter((a) => a.type === 'navigation')
+        .map((a) => a.screenName);
+
+      const stepCompletion = funnelSteps.map((step) =>
+        screenViews.some((screen) => screen.toLowerCase().includes(step)),
       );
-      
+
       return stepCompletion;
     });
 
     return funnelSteps.map((step, index) => ({
       step,
-      completions: conversions.filter(c => c[index]).length,
-      rate: conversions.filter(c => c[index]).length / conversions.length,
+      completions: conversions.filter((c) => c[index]).length,
+      rate: conversions.filter((c) => c[index]).length / conversions.length,
     }));
   }
 }
@@ -654,14 +658,14 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
       priority: rating <= 2 ? 'high' : rating <= 3 ? 'medium' : 'low',
     });
 
-    onFeedbackSubmitted?.(await userTestingManager.getFeedback().then(f => 
-      f.find(fb => fb.id === feedback)!
-    ));
+    onFeedbackSubmitted?.(
+      await userTestingManager.getFeedback().then((f) => f.find((fb) => fb.id === feedback)!),
+    );
 
     bottomSheetRef.current?.close();
     setRating(0);
     setComment('');
-    
+
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
@@ -739,7 +743,7 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
               >
                 How would you rate your experience?
               </Text>
-              
+
               <View
                 style={{
                   flexDirection: 'row',
@@ -754,17 +758,12 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
                     size="medium"
                     onPress={() => setRating(star)}
                     style={{
-                      backgroundColor: rating >= star 
-                        ? colors.status.warning 
-                        : colors.background.secondary,
+                      backgroundColor:
+                        rating >= star ? colors.status.warning : colors.background.secondary,
                     }}
                     accessibilityLabel={`Rate ${star} stars`}
                   >
-                    <Icon
-                      name="Star"
-                      size="lg"
-                      color={rating >= star ? 'inverse' : 'secondary'}
-                    />
+                    <Icon name="Star" size="lg" color={rating >= star ? 'inverse' : 'secondary'} />
                   </Button>
                 ))}
               </View>
@@ -773,14 +772,10 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({
 
           {/* Comment Section */}
           <View style={{ marginBottom: tokens.Spacing.lg }}>
-            <Text
-              variant="bodyMedium"
-              color="primary"
-              style={{ marginBottom: tokens.Spacing.sm }}
-            >
+            <Text variant="bodyMedium" color="primary" style={{ marginBottom: tokens.Spacing.sm }}>
               Additional comments (optional):
             </Text>
-            
+
             <View
               style={{
                 borderWidth: 1,
@@ -824,14 +819,14 @@ export const userTestingManager = UserTestingManager.getInstance();
 // Higher-order component for tracking screen views
 export const withUserTracking = <P extends object>(
   Component: React.ComponentType<P>,
-  screenName: string
+  screenName: string,
 ) => {
   return React.forwardRef<any, P>((props, ref) => {
     useEffect(() => {
       const startTime = Date.now();
-      
+
       userTestingManager.trackScreenView(screenName);
-      
+
       return () => {
         const timeSpent = Date.now() - startTime;
         userTestingManager.trackScreenView(screenName, timeSpent);
@@ -848,7 +843,7 @@ export const useUserTracking = (screenName: string) => {
     type: UserAction['type'],
     elementId?: string,
     coordinates?: { x: number; y: number },
-    metadata?: Record<string, any>
+    metadata?: Record<string, any>,
   ) => {
     userTestingManager.trackUserAction(type, screenName, coordinates, elementId, metadata);
   };

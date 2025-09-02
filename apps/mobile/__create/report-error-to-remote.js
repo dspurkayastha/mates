@@ -8,17 +8,17 @@ export const reportErrorToRemote = async ({ error }) => {
   ) {
     console.debug(
       'reportErrorToRemote: Missing environment variables for logging endpoint, project group ID, or API key.',
-      error
+      error,
     );
     return { success: false };
   }
-  
+
   // Safety check for error object
   if (!error) {
     console.debug('reportErrorToRemote: No error object provided');
     return { success: false };
   }
-  
+
   try {
     await fetch(process.env.EXPO_PUBLIC_LOGS_ENDPOINT, {
       method: 'POST',
