@@ -12,14 +12,14 @@ import {
   useTokens,
 } from '@/components/ui';
 import { withOpacity } from '@/design-system/ThemeProvider';
-import { usePoll, useVotePoll } from '@/features/polls/hooks';
+import { usePollResults, useVote } from '@/features/polls/hooks';
 
 export default function PollDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { theme } = useTheme();
   const tokens = useTokens();
-  const { data, isLoading } = usePoll(String(id));
-  const votePoll = useVotePoll();
+  const { data, isLoading } = usePollResults({ pollId: String(id) });
+  const vote = useVote({ pollId: String(id) });
 
   if (isLoading || !data) {
     return (
@@ -57,16 +57,16 @@ export default function PollDetailScreen() {
             <Button
               variant="primary"
               size="large"
-              onPress={() => votePoll.mutate({ pollId: poll.id, vote: true })}
-              disabled={votePoll.isPending}
+              onPress={() => vote.mutate(true)}
+              disabled={vote.isPending}
             >
               Yes
             </Button>
             <Button
               variant="secondary"
               size="large"
-              onPress={() => votePoll.mutate({ pollId: poll.id, vote: false })}
-              disabled={votePoll.isPending}
+              onPress={() => vote.mutate(false)}
+              disabled={vote.isPending}
             >
               No
             </Button>

@@ -3,3 +3,5 @@ dist
 ios
 android
 node_modules
+src/__create/**
+polyfills/**

@@ -1,10 +1,8 @@
-import React from 'react';
+import * as React from 'react';
 import { Text } from 'react-native';
-import { render } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 
-describe('smoke test', () => {
-  it('renders text', () => {
-    const { getByText } = render(<Text>Hello</Text>);
-    expect(getByText('Hello')).toBeTruthy();
-  });
+it('renders a basic component', () => {
+  render(<Text accessibilityLabel="greeting">Hello</Text>);
+  expect(screen.getByLabelText('greeting')).toHaveTextContent('Hello');
 });

@@ -22,9 +22,10 @@ jobs:
           cache: 'npm'
           cache-dependency-path: apps/mobile/package-lock.json
 
+      # TODO: remove --legacy-peer-deps once expo-three/@expo/browser-polyfill is compatible with RN 0.79.x or dependency is removed
       - name: Install dependencies
         working-directory: apps/mobile
-        run: npm ci
+        run: npm ci --no-audit --legacy-peer-deps
 
       - name: Format check
         working-directory: apps/mobile
