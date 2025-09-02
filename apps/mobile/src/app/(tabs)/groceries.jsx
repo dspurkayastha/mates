@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Alert, SafeAreaView, ScrollView } from 'react-native';
+import { View, Alert, ScrollView } from 'react-native';
 import {
   Text,
   Card,
@@ -8,6 +8,7 @@ import {
   Badge,
   Button,
   LoadingSkeleton,
+  ScreenBackground,
   useTheme,
   useTokens,
 } from '@/components/ui';
@@ -89,13 +90,13 @@ export default function GroceriesScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
+      <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
         <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
           {[...Array(5)].map((_, i) => (
             <LoadingSkeleton key={i} height={72} style={{ marginBottom: tokens.Spacing.md }} />
           ))}
         </ScrollView>
-      </SafeAreaView>
+      </ScreenBackground>
     );
   }
 
@@ -109,7 +110,7 @@ export default function GroceriesScreen() {
   const attentionCount = outItems.length + lowItems.length;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.primary }}>
+    <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
       <ScrollView contentContainerStyle={{ padding: tokens.Spacing.lg }}>
         {/* Header */}
         <View style={{
@@ -234,7 +235,7 @@ export default function GroceriesScreen() {
         {/* Spacer for bottom tabs */}
         <View style={{ height: 80 }} />
       </ScrollView>
-    </SafeAreaView>
+    </ScreenBackground>
   );
 }
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, View, ScrollView } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import {
   Text,
@@ -8,6 +8,7 @@ import {
   Button,
   SegmentedControl,
   LoadingSkeleton,
+  ScreenBackground,
   useTheme,
   useTokens,
 } from '@/components/ui';
@@ -206,8 +207,8 @@ export default function ChoresScreen() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background.primary }}>
+    <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
       {content}
-    </SafeAreaView>
+    </ScreenBackground>
   );
 }

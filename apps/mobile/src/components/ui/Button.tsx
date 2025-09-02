@@ -7,13 +7,8 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
+import { usePressFeedback } from '../animation/usePressFeedback';
 
 import Text from './Text';
 import { useTheme, useTokens } from '../../design-system/ThemeProvider';
@@ -70,41 +65,20 @@ export const Button: React.FC<ButtonProps> = ({
   testID,
   ...props
 }) => {
-  const { theme, accessibility } = useTheme();
+  const { theme } = useTheme();
   const tokens = useTokens();
 
-  const scale = useSharedValue(1);
+  const { animatedStyle, onPressIn, onPressOut } = usePressFeedback({
+    haptics: hapticFeedback,
+  });
   const [isFocused, setIsFocused] = useState(false);
 
-  const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
-
-  const handlePressIn = () => {
-    if (accessibility.isReduceMotionEnabled) return;
-    scale.value = withTiming(tokens.Animation.press.scale, {
-      duration: tokens.Animation.duration.in,
-      easing,
-    });
-  };
-
-  const handlePressOut = () => {
-    if (accessibility.isReduceMotionEnabled) return;
-    scale.value = withTiming(1, {
-      duration: tokens.Animation.duration.out,
-      easing,
-    });
-  };
+  const { onPressIn: pressInProp, onPressOut: pressOutProp, ...rest } = props;
 
   const handlePress = (e: any) => {
     if (disabled || loading) return;
-    if (hapticFeedback) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
     onPress?.(e);
   };
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
 
   const resolvedSize = useMemo(() => {
     switch (size) {
@@ -203,8 +177,14 @@ export const Button: React.FC<ButtonProps> = ({
     <Animated.View style={[widthStyle, animatedStyle]}>
       <Pressable
         onPress={handlePress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
+        onPressIn={(e) => {
+          onPressIn();
+          pressInProp?.(e);
+        }}
+        onPressOut={(e) => {
+          onPressOut();
+          pressOutProp?.(e);
+        }}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         disabled={disabled || loading}
@@ -213,7 +193,7 @@ export const Button: React.FC<ButtonProps> = ({
         accessibilityHint={accessibilityHint}
         testID={testID}
         style={[baseStyle, sizeStyle, focusStyle, style]}
-        {...props}
+        {...rest}
       >
         {leftIcon && !loading && (
           <View style={{ marginRight: tokens.Spacing.sm }}>{leftIcon}</View>

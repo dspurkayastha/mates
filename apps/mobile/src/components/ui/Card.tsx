@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics';
 import React from 'react';
 import {
   Pressable,
@@ -8,12 +7,8 @@ import {
   ViewStyle,
 } from 'react-native';
 import type { GestureResponderEvent } from 'react-native';
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
+import { usePressFeedback } from '../animation/usePressFeedback';
 
 import Text from './Text';
 import {
@@ -74,33 +69,13 @@ export const Card: React.FC<CardProps> = ({
 }) => {
   const { theme } = useTheme();
   const tokens = useTokens();
-  const scale = useSharedValue(1);
-
-  // Animation for interactive cards
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const handlePressIn = () => {
-    if (!interactive) return;
-    const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
-    scale.value = withTiming(tokens.Animation.press.scale, {
-      duration: tokens.Animation.duration.in,
-      easing,
-    });
-    if (hapticFeedback) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-  };
-
-  const handlePressOut = () => {
-    if (!interactive) return;
-    const easing = Easing.bezier(0.2, 0.8, 0.2, 1);
-    scale.value = withTiming(1, {
-      duration: tokens.Animation.duration.out,
-      easing,
-    });
-  };
+  const {
+    animatedStyle,
+    onPressIn: pressIn,
+    onPressOut: pressOut,
+  } = usePressFeedback({
+    haptics: interactive && hapticFeedback,
+  });
 
   const getOuterStyle = (): ViewStyle => {
     const base: ViewStyle = { borderRadius: tokens.BorderRadius.lg };
@@ -165,7 +140,8 @@ export const Card: React.FC<CardProps> = ({
   };
 
   if (interactive) {
-    const { onPress, onPressIn, onPressOut, ...pressableProps } = props as InteractiveCardProps;
+    const { onPress, onPressIn, onPressOut, ...pressableProps } =
+      props as InteractiveCardProps;
     const accessibilityProps = getAccessibilityProps();
     return (
       <Animated.View style={[outerStyle, animatedStyle, style]}>
@@ -173,11 +149,11 @@ export const Card: React.FC<CardProps> = ({
           style={innerStyles}
           onPress={onPress}
           onPressIn={(e: GestureResponderEvent) => {
-            handlePressIn();
+            pressIn();
             onPressIn?.(e);
           }}
           onPressOut={(e: GestureResponderEvent) => {
-            handlePressOut();
+            pressOut();
             onPressOut?.(e);
           }}
           {...accessibilityProps}

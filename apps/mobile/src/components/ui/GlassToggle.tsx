@@ -202,7 +202,9 @@ export const GlassToggle: React.FC<GlassToggleProps> = ({
   // Animated styles for thumb
   const animatedThumbStyle = useAnimatedStyle(
     () => {
-      const translateX = interpolate(progress.value, [0, 1], [minX, maxX]);
+      const translateX = minX === maxX
+        ? minX
+        : interpolate(progress.value, [0, 1], [minX, maxX]);
 
       const backgroundColor = interpolateColor(
         progress.value,
