@@ -24,14 +24,15 @@
 
 - [ ] Text/background contrast meets or exceeds 4.5:1
 - [ ] Accent surfaces use tinted backgrounds at 1–3% opacity
+- [ ] Supports high-contrast themes
 
 ## Motion
 
 - [ ] Press interactions scale to 0.98 and reset smoothly
 - [ ] Icon nudges 2px on press
 - [ ] Dialogs fade and scale when appearing/disappearing
+- [ ] Respects reduced-motion preferences
 
-## Breakpoints
+## Screen Background
 
-- [ ] Layout adapts at mobile, tablet, desktop, and wide breakpoints
-- [ ] No layout jank on orientation change
+- [ ] Every screen is wrapped with `ScreenBackground`
