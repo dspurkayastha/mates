@@ -191,12 +191,7 @@ export const Button: React.FC<ButtonProps> = ({
         accessibilityLabel={accessibilityLabel}
         accessibilityHint={accessibilityHint}
         testID={testID}
-        style={ensureMinTouchTarget([
-          baseStyle,
-          sizeStyle,
-          focusStyle,
-          style,
-        ])}
+        style={ensureMinTouchTarget([baseStyle, sizeStyle, focusStyle, style])}
         {...rest}
       >
         {leftIcon && !loading && <View style={{ marginRight: tokens.Spacing.sm }}>{leftIcon}</View>}

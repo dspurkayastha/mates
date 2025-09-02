@@ -30,14 +30,10 @@ jest.mock('@/design-system/ThemeProvider', () => {
 });
 
 test('no scale animation when reduce motion enabled', () => {
-  const { getByRole } = render(
-    <Button accessibilityLabel="ok">OK</Button>,
-  );
+  const { getByRole } = render(<Button accessibilityLabel="ok">OK</Button>);
   const button = getByRole('button');
   const parent = button.parent as any;
-  const styleArray = Array.isArray(parent.props.style)
-    ? parent.props.style
-    : [parent.props.style];
+  const styleArray = Array.isArray(parent.props.style) ? parent.props.style : [parent.props.style];
   const transformStyle = styleArray.find((s: any) => s && s.transform);
   expect(transformStyle?.transform ?? [{ scale: 1 }]).toEqual([{ scale: 1 }]);
 });

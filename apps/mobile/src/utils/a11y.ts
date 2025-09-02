@@ -4,9 +4,10 @@ import { StyleProp, ViewStyle } from 'react-native';
  * Ensure minimum touch target of 44x44pt without forcing layout changes.
  * Returns a style array combining the provided style with min dimensions.
  */
-export const ensureMinTouchTarget = (
-  style?: StyleProp<ViewStyle>,
-): StyleProp<ViewStyle> => [{ minWidth: 44, minHeight: 44 }, style];
+export const ensureMinTouchTarget = (style?: StyleProp<ViewStyle>): StyleProp<ViewStyle> => [
+  { minWidth: 44, minHeight: 44 },
+  style,
+];
 
 /**
  * Accessibility props for Pressable acting as a button.

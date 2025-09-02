@@ -7,9 +7,8 @@ test('SegmentedControl renders tabs with selected state', () => {
     { key: 'one', label: 'One' },
     { key: 'two', label: 'Two' },
   ];
-  render(
-    <SegmentedControl segments={segments} value="two" onChange={() => {}} />,
-  );
+  render(<SegmentedControl segments={segments} value="two" onChange={() => {}} />);
   const selected = screen.getByRole('tab', { name: 'Two' });
+  // @ts-expect-error - matcher provided by jest-native typings
   expect(selected).toHaveAccessibilityState({ selected: true });
 });

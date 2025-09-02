@@ -53,9 +53,7 @@ const SegmentedTabButton = ({
           alignItems: 'center',
           justifyContent: 'center',
           borderRadius: tokens.BorderRadius.lg,
-          backgroundColor: active
-            ? withOpacity(theme.interactive.primary, 0.08)
-            : 'transparent',
+          backgroundColor: active ? withOpacity(theme.interactive.primary, 0.08) : 'transparent',
         })}
       >
         <Text

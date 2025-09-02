@@ -4,8 +4,7 @@ import Button from '@/components/ui/Button';
 import Text from '@/components/ui/Text';
 
 test('icon-only buttons expose accessibilityLabel', () => {
-  render(
-    <Button accessibilityLabel="Settings" leftIcon={<Text>icon</Text>} />,
-  );
+  // @ts-expect-error - children are intentionally omitted for icon-only button
+  render(<Button accessibilityLabel="Settings" leftIcon={<Text>icon</Text>} />);
   expect(screen.getByRole('button', { name: 'Settings' })).toBeTruthy();
 });
