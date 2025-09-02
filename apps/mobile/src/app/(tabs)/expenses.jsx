@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, View, Alert } from 'react-native';
+import { ScrollView, View, Modal, TextInput } from 'react-native';
 import { format } from 'date-fns';
 import {
   ScreenBackground,
@@ -9,6 +9,7 @@ import {
   Button,
   Text,
   useTokens,
+  useTheme,
 } from '@/components/ui';
 import SegmentedControl from '@/components/ui/SegmentedControl';
 import {
@@ -19,10 +20,15 @@ import {
 } from '@/features/expenses/hooks';
 import ExpensesSummaryCard from '@/features/expenses/components/ExpensesSummaryCard';
 import { formatINR } from '@/utils/format';
+import { withOpacity } from '@/design-system/ThemeProvider';
 
 export default function ExpensesScreen() {
   const tokens = useTokens();
+  const { theme } = useTheme();
   const [filter, setFilter] = React.useState('all');
+  const [showLimitModal, setShowLimitModal] = React.useState(false);
+  const [limitInput, setLimitInput] = React.useState('');
+  const [limitError, setLimitError] = React.useState();
   const groupId = process.env.EXPO_PUBLIC_PROJECT_GROUP_ID;
   const { data: expenses = [], isLoading } = useExpenses({
     groupId,
@@ -44,10 +50,30 @@ export default function ExpensesScreen() {
   const upsertBudget = useUpsertBudget(groupId);
 
   const handleSetLimit = () => {
-    Alert.prompt('Set Limit', '', (val) => {
-      const parsed = Number(val);
-      if (!isNaN(parsed)) upsertBudget.mutate({ monthKey, limit: parsed });
-    });
+    setLimitInput(String(budget?.limit ?? ''));
+    setShowLimitModal(true);
+  };
+
+  const handleSaveLimit = () => {
+    const parsed = Number(limitInput);
+    if (isNaN(parsed)) {
+      setLimitError('Enter a number');
+      return;
+    }
+    upsertBudget.mutate(
+      { monthKey, limit: parsed },
+      {
+        onSuccess: () => {
+          setShowLimitModal(false);
+          setLimitError(undefined);
+        },
+      },
+    );
+  };
+
+  const closeLimitModal = () => {
+    setShowLimitModal(false);
+    setLimitError(undefined);
   };
 
   if (isLoading) {
@@ -107,7 +133,12 @@ export default function ExpensesScreen() {
             <Text variant="bodySmall" weight="semibold">
               Budget
             </Text>
-            <Button variant="secondary" size="sm" onPress={handleSetLimit} accessibilityLabel="Set Limit">
+            <Button
+              variant="secondary"
+              size="sm"
+              onPress={handleSetLimit}
+              accessibilityLabel="Set Limit"
+            >
               Set Limit
             </Button>
           </View>
@@ -130,6 +161,68 @@ export default function ExpensesScreen() {
           />
         ))}
       </ScrollView>
+      <Modal
+        transparent
+        visible={showLimitModal}
+        animationType="fade"
+        onRequestClose={closeLimitModal}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: withOpacity(theme.background.primary, 0.6),
+          }}
+        >
+          <Card variant="elevated" style={{ width: '80%', padding: tokens.Spacing.lg }}>
+            <Text
+              variant="titleSmall"
+              weight="semibold"
+              style={{ marginBottom: tokens.Spacing.md }}
+            >
+              Set Limit
+            </Text>
+            <TextInput
+              value={limitInput}
+              onChangeText={setLimitInput}
+              keyboardType="numeric"
+              style={{
+                borderWidth: 1,
+                borderColor: theme.border.light,
+                borderRadius: tokens.BorderRadius.lg,
+                padding: tokens.Spacing.md,
+                marginBottom: tokens.Spacing.sm,
+                color: theme.text.primary,
+              }}
+            />
+            {limitError && (
+              <Text variant="bodySmall" color="danger" style={{ marginBottom: tokens.Spacing.sm }}>
+                {limitError}
+              </Text>
+            )}
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onPress={closeLimitModal}
+                accessibilityLabel="Cancel"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onPress={handleSaveLimit}
+                accessibilityLabel="Save Limit"
+                style={{ marginLeft: tokens.Spacing.sm }}
+              >
+                Save
+              </Button>
+            </View>
+          </Card>
+        </View>
+      </Modal>
     </ScreenBackground>
   );
 }

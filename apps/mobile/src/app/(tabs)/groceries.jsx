@@ -41,7 +41,9 @@ export default function GroceriesScreen() {
   const colors = theme;
   const tokens = useTokens();
 
-  const { data: groceryItems = [], isLoading } = useGroceries({ groupId: process.env.EXPO_PUBLIC_PROJECT_GROUP_ID });
+  const { data: groceryItems = [], isLoading } = useGroceries({
+    groupId: process.env.EXPO_PUBLIC_PROJECT_GROUP_ID,
+  });
   const updateItemStatus = useUpdateItemStatus(process.env.EXPO_PUBLIC_PROJECT_GROUP_ID);
 
   const handleMarkBought = (id) => {

@@ -42,11 +42,21 @@ export interface HouseholdBalance {
   balance: number;
 }
 
-export function useExpenses({ groupId, filter }: { groupId: string; filter?: 'all' | 'settled' | 'unsettled' }) {
+export function useExpenses({
+  groupId,
+  filter,
+}: {
+  groupId: string;
+  filter?: 'all' | 'settled' | 'unsettled';
+}) {
   return useQuery<Expense[]>({
     queryKey: ['expenses', { groupId, filter }],
     queryFn: async () => {
-      let q = client.from('expenses').select('*').eq('group_id', groupId).order('created_at', { ascending: false });
+      let q = client
+        .from('expenses')
+        .select('*')
+        .eq('group_id', groupId)
+        .order('created_at', { ascending: false });
       if (filter === 'settled') q = q.eq('status', 'SETTLED');
       if (filter === 'unsettled') q = q.neq('status', 'SETTLED');
       const { data, error } = await q;
@@ -61,11 +71,18 @@ export function useCreateExpense() {
   const { auth } = useAuth();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (expense: Omit<Expense, 'id' | 'created_at' | 'status'> & { splits?: Split[] }) => {
+    mutationFn: async (
+      expense: Omit<Expense, 'id' | 'created_at' | 'status'> & { splits?: Split[] },
+    ) => {
       const { splits, ...rest } = expense;
       const { data, error } = await client
         .from('expenses')
-        .insert({ ...rest, status: 'PENDING', created_at: new Date().toISOString(), paid_by: auth?.id })
+        .insert({
+          ...rest,
+          status: 'PENDING',
+          created_at: new Date().toISOString(),
+          paid_by: auth?.id,
+        })
         .select()
         .single();
       if (error) throw error;
@@ -87,7 +104,10 @@ export function useSettleExpense() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (expenseId: string) => {
-      const { error } = await client.from('expenses').update({ status: 'SETTLED' }).eq('id', expenseId);
+      const { error } = await client
+        .from('expenses')
+        .update({ status: 'SETTLED' })
+        .eq('id', expenseId);
       if (error) throw error;
       const { error: settleError } = await client
         .from('settlements')
@@ -131,7 +151,9 @@ export function useUpsertBudget(groupId: string) {
       return data as Budget;
     },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['budget', { groupId, monthKey: variables.monthKey }] });
+      queryClient.invalidateQueries({
+        queryKey: ['budget', { groupId, monthKey: variables.monthKey }],
+      });
     },
   });
 }
@@ -140,11 +162,13 @@ export function useHouseholdBalances(groupId: string) {
   return useQuery<HouseholdBalance[]>({
     queryKey: ['householdBalances', { groupId }],
     queryFn: async () => {
-      const { data, error } = await client.from('household_balances').select('*').eq('group_id', groupId);
+      const { data, error } = await client
+        .from('household_balances')
+        .select('*')
+        .eq('group_id', groupId);
       if (error) throw error;
       return data as HouseholdBalance[];
     },
     enabled: SUPABASE_ENABLED && !!groupId,
   });
 }
-

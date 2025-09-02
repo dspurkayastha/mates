@@ -42,7 +42,11 @@ export function usePollResults({ pollId }: { pollId: string }) {
   return useQuery({
     queryKey: ['polls', 'results', pollId],
     queryFn: async () => {
-      const { data: poll, error } = await client.from('polls').select('*').eq('id', pollId).single();
+      const { data: poll, error } = await client
+        .from('polls')
+        .select('*')
+        .eq('id', pollId)
+        .single();
       if (error) throw error;
       const { data: votes, error: votesError } = await client
         .from('poll_votes')
@@ -72,7 +76,9 @@ export function useCreatePoll() {
       return data as Poll;
     },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['polls', 'active', { groupId: variables.groupId }] });
+      queryClient.invalidateQueries({
+        queryKey: ['polls', 'active', { groupId: variables.groupId }],
+      });
     },
   });
 }
@@ -93,4 +99,3 @@ export function useVote({ pollId }: { pollId: string }) {
     },
   });
 }
-

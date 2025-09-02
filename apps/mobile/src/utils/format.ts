@@ -1,4 +1,4 @@
-export const formatINR = (n:number) =>
+export const formatINR = (n: number) =>
   new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',

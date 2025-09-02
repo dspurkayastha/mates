@@ -10,8 +10,8 @@ jest.mock('expo-blur', () => ({ BlurView: require('react-native').View }));
 jest.mock('react-native-svg', () => {
   const React = require('react');
   const { View } = require('react-native');
-  const Svg = (props:any) => React.createElement(View, props);
-  const component = () => (props:any) => React.createElement(View, props);
+  const Svg = (props: any) => React.createElement(View, props);
+  const component = () => (props: any) => React.createElement(View, props);
   return {
     __esModule: true,
     default: Svg,

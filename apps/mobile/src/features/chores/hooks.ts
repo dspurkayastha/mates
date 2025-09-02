@@ -23,10 +23,16 @@ export function useChores({ groupId, range }: { groupId: string; range?: 'today'
   return useQuery<Chore[]>({
     queryKey: ['chores', { groupId, range }],
     queryFn: async () => {
-      let q = client.from('chores').select('*').eq('group_id', groupId).order('due_at', { ascending: true });
+      let q = client
+        .from('chores')
+        .select('*')
+        .eq('group_id', groupId)
+        .order('due_at', { ascending: true });
       const today = new Date();
       if (range === 'today') {
-        q = q.gte('due_at', today.toISOString().split('T')[0]).lt('due_at', new Date(today.getTime() + 86400000).toISOString().split('T')[0]);
+        q = q
+          .gte('due_at', today.toISOString().split('T')[0])
+          .lt('due_at', new Date(today.getTime() + 86400000).toISOString().split('T')[0]);
       }
       const { data, error } = await q;
       if (error) throw error;
@@ -42,7 +48,12 @@ export function useCreateChore(groupId: string) {
     mutationFn: async (chore: { title: string; due_at: string; assignee?: string }) => {
       const { data, error } = await client
         .from('chores')
-        .insert({ group_id: groupId, title: chore.title, due_at: chore.due_at, assignee: chore.assignee })
+        .insert({
+          group_id: groupId,
+          title: chore.title,
+          due_at: chore.due_at,
+          assignee: chore.assignee,
+        })
         .select()
         .single();
       if (error) throw error;
@@ -58,7 +69,13 @@ export function useAssignChore(groupId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, assignee }: { id: string; assignee: string }) => {
-      const { data, error } = await client.from('chores').update({ assignee }).eq('id', id).eq('group_id', groupId).select().single();
+      const { data, error } = await client
+        .from('chores')
+        .update({ assignee })
+        .eq('id', id)
+        .eq('group_id', groupId)
+        .select()
+        .single();
       if (error) throw error;
       return data as Chore;
     },
@@ -113,4 +130,3 @@ export function useLeaderboard({ groupId }: { groupId: string }) {
     enabled: SUPABASE_ENABLED && !!groupId,
   });
 }
-

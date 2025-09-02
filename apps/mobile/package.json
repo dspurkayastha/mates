@@ -10,7 +10,7 @@
     "web": "expo start --web",
     "typecheck": "tsc -p . --noEmit",
     "lint": "eslint .",
-    "lint:colors": "eslint 'src/**/*.{js,jsx,ts,tsx}' --rule 'local/no-hardcoded-colors:error'",
+    "lint:colors": "eslint 'src/**/*.{js,jsx,ts,tsx}' --ignore-pattern 'src/__create/**' --ignore-pattern 'polyfills/**' --rule 'local/no-hardcoded-colors:error'",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "jest",

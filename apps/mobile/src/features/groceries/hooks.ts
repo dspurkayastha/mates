@@ -17,11 +17,21 @@ export interface GroceryItem {
   bought_at?: string | null;
 }
 
-export function useGroceries({ groupId, status }: { groupId: string; status?: GroceryItem['status'] }) {
+export function useGroceries({
+  groupId,
+  status,
+}: {
+  groupId: string;
+  status?: GroceryItem['status'];
+}) {
   return useQuery<GroceryItem[]>({
     queryKey: ['groceries', { groupId, status }],
     queryFn: async () => {
-      let q = client.from('groceries').select('*').eq('group_id', groupId).order('created_at', { ascending: false });
+      let q = client
+        .from('groceries')
+        .select('*')
+        .eq('group_id', groupId)
+        .order('created_at', { ascending: false });
       if (status) q = q.eq('status', status);
       const { data, error } = await q;
       if (error) throw error;
@@ -63,7 +73,13 @@ export function useUpdateItemStatus(groupId: string) {
     mutationFn: async ({ id, status }: { id: string; status: GroceryItem['status'] }) => {
       const updates: Partial<GroceryItem> = { status };
       if (status === 'BOUGHT') updates.bought_at = new Date().toISOString();
-      const { data, error } = await client.from('groceries').update(updates).eq('id', id).eq('group_id', groupId).select().single();
+      const { data, error } = await client
+        .from('groceries')
+        .update(updates)
+        .eq('id', id)
+        .eq('group_id', groupId)
+        .select()
+        .single();
       if (error) throw error;
       return data as GroceryItem;
     },
@@ -88,7 +104,11 @@ export function useDeleteItem(groupId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await client.from('groceries').delete().eq('id', id).eq('group_id', groupId);
+      const { error } = await client
+        .from('groceries')
+        .delete()
+        .eq('id', id)
+        .eq('group_id', groupId);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -96,4 +116,3 @@ export function useDeleteItem(groupId: string) {
     },
   });
 }
-

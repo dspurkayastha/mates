@@ -16,6 +16,58 @@ interface SegmentedControlProps {
   onChange: (key: string) => void;
 }
 
+const SegmentedTabButton = ({
+  label,
+  active,
+  isLast,
+  onPress,
+}: {
+  label: string;
+  active: boolean;
+  isLast: boolean;
+  onPress: () => void;
+}) => {
+  const { theme } = useTheme();
+  const tokens = useTokens();
+  const { animatedStyle, onPressIn, onPressOut } = usePressFeedback({ haptics: false });
+  return (
+    <Animated.View
+      style={[
+        {
+          flex: 1,
+          marginRight: isLast ? 0 : tokens.Spacing.xs,
+          borderRadius: tokens.BorderRadius.lg,
+        },
+        animatedStyle,
+      ]}
+    >
+      <Pressable
+        onPress={onPress}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
+        accessibilityRole="button"
+        accessibilityState={{ selected: active }}
+        accessibilityLabel={label}
+        style={{
+          paddingVertical: tokens.Spacing.sm,
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: tokens.BorderRadius.lg,
+          backgroundColor: active ? withOpacity(theme.interactive.primary, 0.08) : 'transparent',
+        }}
+      >
+        <Text
+          variant="labelLarge"
+          weight={active ? 'semibold' : 'normal'}
+          color={active ? 'brand' : 'primary'}
+        >
+          {label}
+        </Text>
+      </Pressable>
+    </Animated.View>
+  );
+};
+
 const SegmentedControl: React.FC<SegmentedControlProps> = ({ segments, value, onChange }) => {
   const { theme } = useTheme();
   const tokens = useTokens();
@@ -29,39 +81,15 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({ segments, value, on
         marginBottom: tokens.Spacing.lg,
       }}
     >
-      {segments.map((seg, idx) => {
-        const active = seg.key === value;
-        const { animatedStyle, onPressIn, onPressOut } = usePressFeedback({ haptics: false });
-        return (
-          <Animated.View
-            key={seg.key}
-            style={[
-              { flex: 1, marginRight: idx === segments.length - 1 ? 0 : tokens.Spacing.xs, borderRadius: tokens.BorderRadius.lg },
-              animatedStyle,
-            ]}
-          >
-            <Pressable
-              onPress={() => onChange(seg.key)}
-              onPressIn={onPressIn}
-              onPressOut={onPressOut}
-              accessibilityRole="button"
-              accessibilityState={{ selected: active }}
-              accessibilityLabel={seg.label}
-              style={{
-                paddingVertical: tokens.Spacing.sm,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: tokens.BorderRadius.lg,
-                backgroundColor: active ? withOpacity(theme.interactive.primary, 0.08) : 'transparent',
-              }}
-            >
-              <Text variant="labelLarge" weight={active ? 'semibold' : 'normal'} color={active ? 'brand' : 'primary'}>
-                {seg.label}
-              </Text>
-            </Pressable>
-          </Animated.View>
-        );
-      })}
+      {segments.map((seg, idx) => (
+        <SegmentedTabButton
+          key={seg.key}
+          label={seg.label}
+          active={seg.key === value}
+          isLast={idx === segments.length - 1}
+          onPress={() => onChange(seg.key)}
+        />
+      ))}
     </View>
   );
 };
