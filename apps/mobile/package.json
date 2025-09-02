@@ -16,10 +16,12 @@
     "test": "jest",
     "test:ci": "jest --runInBand",
     "orphans": "node tools/find-orphans.js",
-    "ci:check": "npm run format:check && npm run lint:colors && npm run typecheck && npm test && npm run orphans",
+    "doctor:deps": "node tools/deps-doctor.js",
+    "ci:check": "npm run doctor:deps && npm run format:check && npm run lint:colors && npm run typecheck && npm test && npm run orphans",
     "codemod:colors:dry": "jscodeshift -d -p -t ../../tools/codemods/replace-hardcoded-colors.js src",
     "codemod:colors": "jscodeshift -t ../../tools/codemods/replace-hardcoded-colors.js src",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "prestart": "node tools/deps-doctor.js || true"
   },
   "dependencies": {
     "@expo-google-fonts/dev": "^0.4.7",

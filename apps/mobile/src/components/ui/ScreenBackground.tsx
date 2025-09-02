@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
+import { BlurView } from '@/components/ui/SafeBlur';
 import Svg, { Path } from 'react-native-svg';
 import { useColors, useTheme, withOpacity } from '@/design-system/ThemeProvider';
 

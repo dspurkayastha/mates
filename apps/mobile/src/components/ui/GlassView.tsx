@@ -6,7 +6,7 @@
 
 import React, { useMemo } from 'react';
 import { View, ViewStyle, Platform, StyleSheet, StyleProp, AccessibilityRole } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { BlurView } from '@/components/ui/SafeBlur';
 import { useColors, useTokens, withOpacity } from '../../design-system/ThemeProvider';
 
 // ============================================================================
