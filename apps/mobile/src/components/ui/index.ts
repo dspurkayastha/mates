@@ -10,7 +10,6 @@ export { default as ListItem } from './ListItem';
 export { default as Card, CardHeader, CardContent, CardFooter } from './Card';
 export { default as LoadingSkeleton } from './LoadingSkeleton';
 export { default as EmptyState } from './EmptyState';
-export { LineChart, DonutChart, BarChart, MetricsGrid } from './DataVisualization';
 export {
   default as Icon,
   HomeIcon,
@@ -58,6 +57,7 @@ export { ThemeProvider, useTheme, useColors, useTokens } from '../../design-syst
 
 export { default as SegmentedControl } from './SegmentedControl';
 export { default as NavTile } from './NavTile';
+export { default as ErrorBanner } from './ErrorBanner';
 
 // Export types for TypeScript users
 export type { Theme, ColorScheme } from '../../design-system/ThemeProvider';

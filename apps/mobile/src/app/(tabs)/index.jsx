@@ -222,13 +222,14 @@ export default function HomeScreen() {
               onPress={handleSettingsPress}
             />
             <NavTile
-              title="Coming Soon"
-              subtitle="More features"
-              icon="Plus"
+              title="Analytics"
+              subtitle="Trends"
+              icon="Chart"
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                console.log('Coming soon features');
+                router.push('/analytics');
               }}
+              accessibilityLabel="Open Analytics"
             />
           </View>
         </View>

@@ -8,6 +8,7 @@ import {
   ShoppingCartIcon,
   CheckSquareIcon,
   UserIcon,
+  Icon,
   useTheme,
   useTokens,
 } from '@/components/ui';
@@ -113,6 +114,16 @@ export default function TabsLayout() {
           title: 'Chores',
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused} IconComponent={CheckSquareIcon} hasNotification={true} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="analytics"
+        options={{
+          title: 'Analytics',
+          tabBarLabel: 'Analytics',
+          tabBarIcon: ({ focused }) => (
+            <Icon name="Chart" size="md" color={focused ? 'brand' : 'secondary'} />
           ),
         }}
       />

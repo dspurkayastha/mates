@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Text, GlassButton, Icon, useColors, useTokens } from '@/components/ui';
 import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -14,6 +15,7 @@ import Animated, {
 const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePoll }) => {
   const colors = useColors();
   const tokens = useTokens();
+  const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const animation = useSharedValue(0);
@@ -91,9 +93,35 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
     };
   });
 
-  const menuStyles = [menuItem0Style, menuItem1Style, menuItem2Style, menuItem3Style];
+  const menuItem4Style = useAnimatedStyle(() => {
+    const translateY = interpolate(animation.value, [0, 1], [0, -(60 * 5 + 10 * 4)]);
+    const opacity = interpolate(animation.value, [0, 0.3, 1], [0, 0, 1]);
+    const scale = interpolate(animation.value, [0, 1], [0.3, 1]);
+
+    return {
+      transform: [{ translateY }, { scale }],
+      opacity,
+    };
+  });
+
+  const menuStyles = [
+    menuItem0Style,
+    menuItem1Style,
+    menuItem2Style,
+    menuItem3Style,
+    menuItem4Style,
+  ];
 
   const menuItems = [
+    {
+      id: 'analytics',
+      icon: 'Chart',
+      label: 'Analytics',
+      accessibilityLabel: 'Open Analytics',
+      onPress: () => router.push('/analytics'),
+      // eslint-disable-next-line local/no-hardcoded-colors
+      color: 'brand',
+    },
     {
       icon: 'Vote',
       label: 'Poll',
@@ -136,7 +164,7 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
       {/* Menu Items */}
       {menuItems.map((item, index) => (
         <Animated.View
-          key={item.label}
+          key={item.id || item.label}
           style={[
             menuStyles[index],
             {
@@ -169,6 +197,8 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
               toggleMenu();
               setTimeout(() => item.onPress(), 100);
             }}
+            accessibilityLabel={item.accessibilityLabel || item.label}
+            accessibilityRole="button"
             style={{
               width: 50,
               height: 50,
