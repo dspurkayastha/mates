@@ -1,7 +1,7 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
-const { reportErrorToRemote } = require('./report-error-to-remote');
+const { reportErrorToRemote } = require('@/lib/logging');
 
 const VIRTUAL_ROOT = path.join(__dirname, '../.metro-virtual');
 const VIRTUAL_ROOT_UNRESOLVED = path.join(VIRTUAL_ROOT, 'unresolved');

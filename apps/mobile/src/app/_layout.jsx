@@ -1,10 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as SystemUI from 'expo-system-ui';
 import { useAuth } from '../features/auth/useAuth';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { QueryClient, onlineManager } from '@tanstack/react-query';
+import {
+  QueryClient,
+  QueryClientProvider,
+  onlineManager,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,17 +19,6 @@ import { ThemeProvider } from '../components/ui';
 import { View, Text } from 'react-native';
 
 SplashScreen.preventAutoHideAsync();
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      gcTime: 1000 * 60 * 60 * 24,
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
 
 const persister = createAsyncStoragePersister({ storage: AsyncStorage });
 
@@ -61,7 +55,26 @@ class ErrorBoundary extends React.Component {
 }
 
 export default function RootLayout() {
+  const queryClientRef = useRef(null);
+  if (!queryClientRef.current) {
+    queryClientRef.current = new QueryClient({
+      defaultOptions: {
+        queries: { retry: 1, refetchOnWindowFocus: false },
+        mutations: { retry: 0 },
+      },
+    });
+  }
+
+  return (
+    <QueryClientProvider client={queryClientRef.current}>
+      <RootApp />
+    </QueryClientProvider>
+  );
+}
+
+function RootApp() {
   const { initiate, isReady } = useAuth();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     initiate();
