@@ -3,8 +3,9 @@
   "compilerOptions": {
     "strict": true,
     "types": ["jest"],
+    "baseUrl": "src",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["*"]
     }
   },
   "include": ["./src", "./__tests__", "./app.config.ts", "./index.ts", "./index.js"],
