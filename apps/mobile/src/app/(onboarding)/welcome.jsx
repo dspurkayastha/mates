@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Alert, SafeAreaView, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAuth } from '../../utils/auth/useAuth';
+import { useAuth } from '@/features/auth/useAuth';
 import {
   Text,
   GlassCard,
