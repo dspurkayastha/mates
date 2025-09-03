@@ -10,6 +10,7 @@ const { getDefaultConfig } = require('expo/metro-config');
 const path = require('node:path');
 const fs = require('node:fs');
 const { FileStore } = require('metro-cache');
+
 const {
   handleResolveRequestError,
   VIRTUAL_ROOT,
