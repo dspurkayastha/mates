@@ -66,7 +66,8 @@ export default function HomeScreen() {
   const { theme } = useTheme();
   const tokens = useTokens();
   const router = useRouter();
-  const { data: activePoll } = useLatestPoll();
+  const groupId = process.env.EXPO_PUBLIC_PROJECT_GROUP_ID;
+  const { data: activePoll } = useLatestPoll(groupId);
   const stops = usePalette('brandWatercolor');
   useSceneBackground({
     key: 'home',
@@ -181,26 +182,32 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <Pressable
-          onPress={() => router.push(activePoll ? `/polls/${activePoll.id}` : '/polls/create')}
-          style={{
-            backgroundColor: withOpacity(theme.interactive.primary, 0.05),
-            borderColor: theme.border.light,
-            borderWidth: StyleSheet.hairlineWidth,
-            borderRadius: tokens.BorderRadius.lg,
-            padding: tokens.Spacing.lg,
-            marginBottom: tokens.Spacing.xl,
-          }}
-          accessibilityRole="button"
-          accessibilityLabel={activePoll ? 'View poll results' : 'Create a poll'}
-        >
-          <Text variant="titleMedium" weight="semibold" style={{ marginBottom: tokens.Spacing.xs }}>
-            {activePoll ? activePoll.question : 'Start a poll with your roommates'}
-          </Text>
-          <Text variant="bodySmall" color="secondary">
-            {activePoll ? 'Tap to view results' : 'Tap to create a poll'}
-          </Text>
-        </Pressable>
+        {!!activePoll && (
+          <Pressable
+            onPress={() => router.push(`/polls/${activePoll.id}`)}
+            style={{
+              backgroundColor: withOpacity(theme.interactive.primary, 0.05),
+              borderColor: theme.border.light,
+              borderWidth: StyleSheet.hairlineWidth,
+              borderRadius: tokens.BorderRadius.lg,
+              padding: tokens.Spacing.lg,
+              marginBottom: tokens.Spacing.xl,
+            }}
+            accessibilityRole="button"
+            accessibilityLabel="View poll results"
+          >
+            <Text
+              variant="titleMedium"
+              weight="semibold"
+              style={{ marginBottom: tokens.Spacing.xs }}
+            >
+              {activePoll.question}
+            </Text>
+            <Text variant="bodySmall" color="secondary">
+              Tap to view results
+            </Text>
+          </Pressable>
+        )}
 
         {/* Quick Navigation Grid */}
         <View style={{ marginBottom: tokens.Spacing.xl }}>

@@ -20,6 +20,26 @@ export interface PollVote {
   vote: boolean;
 }
 
+export function useLatestPoll(groupId?: string) {
+  return useQuery<Poll | null>({
+    queryKey: ['polls', 'latest', groupId ?? 'none'],
+    queryFn: async () => {
+      if (!groupId) return null;
+      const { data, error } = await client
+        .from('polls')
+        .select('*')
+        .eq('group_id', groupId)
+        .order('created_at', { ascending: false })
+        .limit(1);
+      if (error) throw error;
+      return data?.[0] ?? null;
+    },
+    enabled: SUPABASE_ENABLED && !!groupId,
+    staleTime: 30_000,
+    initialData: null,
+  });
+}
+
 export function useActivePoll({ groupId }: { groupId: string }) {
   return useQuery<Poll | null>({
     queryKey: ['polls', 'active', { groupId }],
