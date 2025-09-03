@@ -1,5 +1,9 @@
 # Mobile App
 
+## Development
+
+Do not import app code (TS, '@/…') in Metro config; it runs in Node and cannot resolve TS/aliases.
+
 ## Debugging
 
 Enable targeted logs: `EXPO_PUBLIC_DEBUG=deeplink,auth`

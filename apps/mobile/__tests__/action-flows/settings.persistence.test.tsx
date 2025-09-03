@@ -49,7 +49,11 @@ describe('settings persistence', () => {
     await waitFor(() => expect(AsyncStorage.setItem).toHaveBeenCalled());
     (AsyncStorage.setItem as jest.Mock).mockClear();
 
-    fireEvent.press(getByLabelText('Dark mode'));
+    const darkModeToggle = getByLabelText('Dark mode');
+    if (darkModeToggle.props.accessibilityState.checked) {
+      fireEvent.press(darkModeToggle);
+    }
+    fireEvent.press(darkModeToggle);
     fireEvent.press(getByLabelText('Haptics'));
     fireEvent.press(getByLabelText('Biometric authentication'));
 
