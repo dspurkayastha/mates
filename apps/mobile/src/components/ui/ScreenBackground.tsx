@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from '@/components/ui/SafeBlur';
+import SafeBlur from '@/components/ui/SafeBlur';
 import Svg, { Path } from 'react-native-svg';
 import { useColors, useTheme, withOpacity } from '@/design-system/ThemeProvider';
 
@@ -129,7 +129,7 @@ export const ScreenBackground: React.FC<ScreenBackgroundProps> = ({
       );
       if (shape.blur) {
         return (
-          <BlurView
+          <SafeBlur
             key={idx}
             intensity={shape.blur}
             style={{
@@ -141,7 +141,7 @@ export const ScreenBackground: React.FC<ScreenBackgroundProps> = ({
             }}
           >
             {base}
-          </BlurView>
+          </SafeBlur>
         );
       }
       return base;

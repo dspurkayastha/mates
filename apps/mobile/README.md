@@ -13,4 +13,4 @@ Install `react-native-svg` using `npx expo install react-native-svg` to ensure t
 - Lockfile sync: prefer `npm ci --no-audit --legacy-peer-deps`. If the lockfile drifts, run `npm install --no-audit --legacy-peer-deps` once and commit `package-lock.json`.
 - Peer dependencies are pinned; avoid bumping versions in CI.
 - Gated logs: set `EXPO_PUBLIC_DEBUG=deeplink,auth` to enable debug channels.
-- SafeBlur: uses a fallback `<View>` in dev when `expo-blur` is missing, but throws in production/CI. Install with `npx expo install expo-blur` and keep lockfile synced with `npm ci --no-audit --legacy-peer-deps`.
+- Blur is optional at runtime via SafeBlur; if `expo-blur` is missing in dev or test, we render a plain `View`. Do not add `expo-blur` to `app.json` plugins.

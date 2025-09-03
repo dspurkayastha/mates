@@ -6,7 +6,7 @@
 
 import React, { useMemo } from 'react';
 import { View, ViewStyle, Platform, StyleSheet, StyleProp, AccessibilityRole } from 'react-native';
-import { BlurView } from '@/components/ui/SafeBlur';
+import SafeBlur from '@/components/ui/SafeBlur';
 import { useColors, useTokens, withOpacity } from '../../design-system/ThemeProvider';
 
 // ============================================================================
@@ -191,7 +191,7 @@ export const GlassView: React.FC<GlassViewProps> = ({
   // Fallback background for web and older platforms
   const fallbackBackground = withOpacity(isDark ? '#000000' : '#FFFFFF', getOpacity);
 
-  // Use BlurView on supported platforms, fallback to semi-transparent View
+  // Use SafeBlur on supported platforms, fallback to semi-transparent View
   if (Platform.OS === 'ios' || Platform.OS === 'android') {
     return (
       <View
@@ -201,9 +201,9 @@ export const GlassView: React.FC<GlassViewProps> = ({
         accessibilityRole={accessibilityRole}
         testID={testID}
       >
-        <BlurView intensity={getBlurIntensity} tint={tint as any} style={styles.blurView}>
+        <SafeBlur intensity={getBlurIntensity} tint={tint as any} style={styles.blurView}>
           {children}
-        </BlurView>
+        </SafeBlur>
       </View>
     );
   }

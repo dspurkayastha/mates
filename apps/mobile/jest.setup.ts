@@ -39,11 +39,7 @@ require('react-native').AccessibilityInfo = mockAccessibilityInfo;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 jest.mock('expo-linear-gradient', () => require('react-native').View);
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-jest.mock('@/components/ui/SafeBlur', () => ({
-  __esModule: true,
-  BlurView: require('react-native').View,
-  default: require('react-native').View,
-}));
+jest.mock('expo-blur', () => ({ BlurView: require('react-native').View }));
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),

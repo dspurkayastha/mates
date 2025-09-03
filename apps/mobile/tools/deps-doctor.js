@@ -11,9 +11,6 @@ const missing = [];
 for (const mod of modules) {
   try {
     require.resolve(mod);
-    if (mod === 'expo-blur') {
-      require.resolve('expo-blur/build/BlurView');
-    }
   } catch {
     missing.push(mod);
   }
