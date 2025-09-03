@@ -19,6 +19,9 @@ import { usePalette } from '@/components/ui/background/palettes';
 import { useSceneBackground } from '@/components/ui/background/useSceneBackground';
 import { withOpacity } from '@/design-system/ThemeProvider';
 import { useLatestPoll } from '@/features/polls/hooks';
+import ExpenseForm from '@/features/expenses/components/ExpenseForm';
+import GroceryForm from '@/features/groceries/components/GroceryForm';
+import ChoreForm from '@/features/chores/components/ChoreForm';
 
 const SummaryCard = ({ title, icon, onPress, items }) => {
   const { theme } = useTheme();
@@ -348,11 +351,7 @@ export default function HomeScreen() {
         onClose={() => setExpenseVisible(false)}
         accessibilityLabel="Add Expense"
       >
-        <View style={{ padding: tokens.Spacing.lg }}>
-          <Text variant="titleMedium" weight="semibold">
-            Add Expense
-          </Text>
-        </View>
+        <ExpenseForm onSuccess={() => setExpenseVisible(false)} />
       </GlassModal>
 
       <GlassModal
@@ -360,11 +359,7 @@ export default function HomeScreen() {
         onClose={() => setGroceryVisible(false)}
         accessibilityLabel="Add Grocery"
       >
-        <View style={{ padding: tokens.Spacing.lg }}>
-          <Text variant="titleMedium" weight="semibold">
-            Add Grocery Item
-          </Text>
-        </View>
+        <GroceryForm onSuccess={() => setGroceryVisible(false)} />
       </GlassModal>
 
       <GlassModal
@@ -372,11 +367,7 @@ export default function HomeScreen() {
         onClose={() => setChoreVisible(false)}
         accessibilityLabel="Add Chore"
       >
-        <View style={{ padding: tokens.Spacing.lg }}>
-          <Text variant="titleMedium" weight="semibold">
-            Add Chore
-          </Text>
-        </View>
+        <ChoreForm onSuccess={() => setChoreVisible(false)} />
       </GlassModal>
 
       {/* Modern Action Sheet - TODO: Implement when needed */}

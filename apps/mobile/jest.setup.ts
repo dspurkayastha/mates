@@ -13,7 +13,10 @@ jest.mock('react-native-reanimated', () => ({
   View: require('react-native').View,
   useSharedValue: () => ({ value: 1 }),
   withTiming: (value: any) => value,
+  withSequence: (...args: any[]) => args[args.length - 1],
   useAnimatedStyle: (fn: any) => fn(),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interpolate: (value: any, _input: any, output: any) => output[output.length - 1],
   Easing: {
     linear: (t: any) => t,
     out: (fn: any) => fn,
@@ -111,3 +114,65 @@ try {
     Stack: { Screen: require('react-native').View },
   }));
 } catch {}
+
+// Mock safe area context with zero insets
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+jest.mock('react-native-safe-area-context', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    SafeAreaProvider: ({ children }: any) => React.createElement(View, null, children),
+    SafeAreaView: ({ children }: any) => React.createElement(View, null, children),
+    useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 }),
+    SafeAreaConsumer: ({ children }: any) => children({ top: 0, right: 0, bottom: 0, left: 0 }),
+  };
+});
+
+// Mock lucide-react-native icons
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+jest.mock('lucide-react-native', () => {
+  const { View } = require('react-native');
+  const proxy = new Proxy(
+    {},
+    {
+      get: () => View,
+    },
+  );
+  return new Proxy(
+    { __esModule: true, icons: proxy },
+    {
+      get: (target, prop) => (prop in target ? (target as any)[prop] : View),
+    },
+  );
+});
+
+// Mock expo-haptics to no-ops
+jest.mock('expo-haptics', () => ({
+  impactAsync: jest.fn(),
+  notificationAsync: jest.fn(),
+  selectionAsync: jest.fn(),
+  ImpactFeedbackStyle: {
+    Light: 'light',
+    Medium: 'medium',
+    Heavy: 'heavy',
+  },
+  NotificationFeedbackType: {
+    Success: 'success',
+    Warning: 'warning',
+    Error: 'error',
+  },
+}));
+
+// Mock background orchestrator to a plain View
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+jest.mock('@/components/ui/background/BackgroundOrchestrator', () => require('react-native').View);
+
+// Silence not wrapped in act warnings
+const originalError = console.error;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+console.error = (...args: any[]) => {
+  if (typeof args[0] === 'string' && args[0].includes('not wrapped in act')) {
+    return;
+  }
+  originalError(...args);
+};

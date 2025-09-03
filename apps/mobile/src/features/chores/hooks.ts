@@ -60,7 +60,7 @@ export function useCreateChore(groupId: string) {
       return data as Chore;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chores'] });
+      queryClient.invalidateQueries({ queryKey: ['chores', { groupId }] });
     },
   });
 }
@@ -80,7 +80,7 @@ export function useAssignChore(groupId: string) {
       return data as Chore;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chores'] });
+      queryClient.invalidateQueries({ queryKey: ['chores', { groupId }] });
     },
   });
 }
@@ -104,7 +104,7 @@ export function useCompleteChore(groupId: string) {
       return data as Chore;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chores'] });
+      queryClient.invalidateQueries({ queryKey: ['chores', { groupId }] });
       queryClient.invalidateQueries({ queryKey: ['leaderboard', { groupId }] });
     },
   });

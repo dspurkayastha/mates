@@ -62,7 +62,7 @@ export function useCreateItem(groupId: string) {
       return data as GroceryItem;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['groceries'] });
+      queryClient.invalidateQueries({ queryKey: ['groceries', { groupId }] });
     },
   });
 }
@@ -84,7 +84,7 @@ export function useUpdateItemStatus(groupId: string) {
       return data as GroceryItem;
     },
     onMutate: async ({ id, status }) => {
-      await queryClient.cancelQueries({ queryKey: ['groceries'] });
+      await queryClient.cancelQueries({ queryKey: ['groceries', { groupId }] });
       const previous = queryClient.getQueryData<GroceryItem[]>(['groceries', { groupId }]);
       queryClient.setQueryData<GroceryItem[]>(['groceries', { groupId }], (old = []) =>
         old.map((i) => (i.id === id ? { ...i, status } : i)),
@@ -95,7 +95,7 @@ export function useUpdateItemStatus(groupId: string) {
       if (ctx?.previous) queryClient.setQueryData(['groceries', { groupId }], ctx.previous);
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['groceries'] });
+      queryClient.invalidateQueries({ queryKey: ['groceries', { groupId }] });
     },
   });
 }
@@ -112,7 +112,7 @@ export function useDeleteItem(groupId: string) {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['groceries'] });
+      queryClient.invalidateQueries({ queryKey: ['groceries', { groupId }] });
     },
   });
 }

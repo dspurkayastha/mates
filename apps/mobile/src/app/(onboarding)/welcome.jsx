@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Alert, SafeAreaView, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/features/auth/useAuth';
@@ -15,7 +15,7 @@ import * as Haptics from 'expo-haptics';
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, setAuth } = useAuth();
   const colors = useColors();
   const tokens = useTokens();
 
@@ -23,6 +23,14 @@ export default function WelcomeScreen() {
   const [houseName, setHouseName] = useState('');
   const [nickname, setNickname] = useState('');
   const [isCreatingGroup, setIsCreatingGroup] = useState(false);
+
+  const navigatedRef = useRef(false);
+  useEffect(() => {
+    if (isAuthenticated && !navigatedRef.current) {
+      navigatedRef.current = true;
+      router.replace('/(tabs)');
+    }
+  }, [isAuthenticated, router]);
 
   const handleJoinGroup = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -140,6 +148,22 @@ export default function WelcomeScreen() {
                 onPress={handleSignUp}
               >
                 Sign Up
+              </GlassButton>
+
+              <GlassButton
+                variant="secondary"
+                buttonStyle="tinted"
+                size="large"
+                fullWidth
+                onPress={() => {
+                  // TODO: replace with real authentication
+                  setAuth({ id: 'demo' });
+                  router.replace('/(tabs)');
+                }}
+                style={{ marginTop: tokens.Spacing.md }}
+                accessibilityLabel="Continue without authentication"
+              >
+                Continue
               </GlassButton>
             </View>
           </GlassCard>

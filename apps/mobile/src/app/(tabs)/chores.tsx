@@ -9,11 +9,13 @@ import {
   SegmentedControl,
   LoadingSkeleton,
   ScreenBackground,
+  GlassModal,
   useTheme,
   useTokens,
 } from '@/components/ui';
 import * as Haptics from 'expo-haptics';
 import { useChores, useCompleteChore, Chore } from '@/features/chores/hooks';
+import ChoreForm from '@/features/chores/components/ChoreForm';
 import { isToday, isThisWeek } from 'date-fns';
 
 interface Leader {
@@ -33,6 +35,7 @@ export default function ChoresScreen() {
   const { theme } = useTheme();
   const tokens = useTokens();
   const [activeTab, setActiveTab] = React.useState<'today' | 'week' | 'leaderboard'>('today');
+  const [formVisible, setFormVisible] = React.useState(false);
   const groupId = process.env.EXPO_PUBLIC_PROJECT_GROUP_ID!;
   const { data: chores = [], isLoading } = useChores({ groupId });
   const completeChore = useCompleteChore(groupId);
@@ -72,7 +75,7 @@ export default function ChoresScreen() {
 
   const handleAddChore = React.useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    console.log('Add new chore');
+    setFormVisible(true);
   }, []);
 
   const renderChore = React.useCallback(
@@ -177,6 +180,7 @@ export default function ChoresScreen() {
           fullWidth
           onPress={handleAddChore}
           leftIcon={<Icon name="Plus" size="sm" color="inverse" />}
+          accessibilityLabel="Add Chore"
         >
           Add Chore
         </Button>
@@ -215,6 +219,13 @@ export default function ChoresScreen() {
   return (
     <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
       {content}
+      <GlassModal
+        visible={formVisible}
+        onClose={() => setFormVisible(false)}
+        accessibilityLabel="Add Chore"
+      >
+        <ChoreForm onSuccess={() => setFormVisible(false)} />
+      </GlassModal>
     </ScreenBackground>
   );
 }
