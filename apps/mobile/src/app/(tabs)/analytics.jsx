@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, ScrollView } from 'react-native';
 import {
   ScreenBackground,
@@ -30,27 +30,31 @@ import {
 export default function AnalyticsScreen() {
   const tokens = useTokens();
   const stops = usePalette('seafoamWash');
-  useSceneBackground({
-    key: 'analytics',
-    gradient: { type: 'radial', stops },
-    shapes: [
-      { kind: 'blob', x: 60, y: 140, w: 260, h: 200, radius: 100, opacity: 0.05, colorIndex: 1 },
-      {
-        kind: 'arc',
-        x: -40,
-        y: 220,
-        r: 320,
-        start: 10,
-        end: 70,
-        thickness: 16,
-        opacity: 0.032,
-        colorIndex: 2,
-      },
-    ],
-    noise: true,
-    intensity: 'balanced',
-    seed: 202,
-  });
+  const backgroundTheme = useMemo(
+    () => ({
+      key: 'analytics',
+      gradient: { type: 'radial', stops },
+      shapes: [
+        { kind: 'blob', x: 60, y: 140, w: 260, h: 200, radius: 100, opacity: 0.05, colorIndex: 1 },
+        {
+          kind: 'arc',
+          x: -40,
+          y: 220,
+          r: 320,
+          start: 10,
+          end: 70,
+          thickness: 16,
+          opacity: 0.032,
+          colorIndex: 2,
+        },
+      ],
+      noise: true,
+      intensity: 'balanced',
+      seed: 202,
+    }),
+    [stops],
+  );
+  useSceneBackground(backgroundTheme);
   const groupId = process.env.EXPO_PUBLIC_PROJECT_GROUP_ID;
   const {
     data: expenses = [],

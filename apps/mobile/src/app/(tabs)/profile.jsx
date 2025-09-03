@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
-import { View, ScrollView, Image, Alert, Modal } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Alert, Image, Modal, ScrollView, View } from 'react-native';
+
+import { FormField, FormScreen, TextArea, TextInput as FormTextInput } from '@/components/form';
 import {
-  Text,
-  ListItem,
-  Icon,
   Button,
   Card,
+  Icon,
+  ListItem,
   ScreenBackground,
+  Text,
   useTheme,
   useTokens,
 } from '@/components/ui';
-import { withOpacity } from '@/design-system/ThemeProvider';
-import { useSceneBackground } from '@/components/ui/background/useSceneBackground';
 import { usePalette } from '@/components/ui/background/palettes';
-import { FormField, TextInput as FormTextInput, TextArea, FormScreen } from '@/components/form';
-import { useRouter } from 'expo-router';
+import { useSceneBackground } from '@/components/ui/background/useSceneBackground';
+import { withOpacity } from '@/design-system/ThemeProvider';
 import { useAuth } from '@/features/auth/useAuth';
-import * as Haptics from 'expo-haptics';
 
 // -----------------------------------------------------------------------------
 // Action Chip
@@ -103,7 +104,7 @@ export default function ProfileScreen() {
   const { theme } = useTheme();
   const tokens = useTokens();
   const router = useRouter();
-  const { signOut } = useAuth();
+  const { signOut, isAuthenticated } = useAuth();
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState('');
   const [editBio, setEditBio] = useState('');
@@ -160,27 +161,39 @@ export default function ProfileScreen() {
   };
 
   const stops = usePalette('neutralHint');
-  useSceneBackground({
-    key: 'profile',
-    gradient: { type: 'linear', stops },
-    shapes: [
-      { kind: 'circle', x: 40, y: 80, r: 80, opacity: 0.05, colorIndex: 1 },
-      {
-        kind: 'arc',
-        x: 20,
-        y: 200,
-        r: 160,
-        start: 20,
-        end: 60,
-        thickness: 12,
-        opacity: 0.024,
-        colorIndex: 1,
-      },
-    ],
-    intensity: 'subtle',
-    noise: false,
-    seed: 303,
-  });
+  const backgroundTheme = useMemo(
+    () => ({
+      key: 'profile',
+      gradient: { type: 'linear', stops },
+      shapes: [
+        { kind: 'circle', x: 40, y: 80, r: 80, opacity: 0.05, colorIndex: 1 },
+        {
+          kind: 'arc',
+          x: 20,
+          y: 200,
+          r: 160,
+          start: 20,
+          end: 60,
+          thickness: 12,
+          opacity: 0.024,
+          colorIndex: 1,
+        },
+      ],
+      intensity: 'subtle',
+      noise: false,
+      seed: 303,
+    }),
+    [stops],
+  );
+  useSceneBackground(backgroundTheme);
+
+  const navigatedRef = useRef(false);
+  useEffect(() => {
+    if (!isAuthenticated && !navigatedRef.current) {
+      navigatedRef.current = true;
+      router.replace?.('/(onboarding)/welcome');
+    }
+  }, [isAuthenticated, router]);
 
   const iconContainer = (name, bgColor, iconColor) => (
     <View

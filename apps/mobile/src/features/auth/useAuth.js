@@ -2,6 +2,8 @@ import { useCallback, useEffect } from 'react';
 import { useAuthStore } from './store';
 import { supabase, SUPABASE_ENABLED } from '@/lib/supabase';
 import { useRouter } from 'expo-router';
+import { useQueryClient } from '@tanstack/react-query';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /**
  * This hook provides authentication functionality.
@@ -12,6 +14,7 @@ import { useRouter } from 'expo-router';
 export const useAuth = () => {
   const { isReady, auth, setAuth } = useAuthStore();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const initiate = useCallback(() => {
     // Fetch existing session (if any) from Supabase (persisted in AsyncStorage)
@@ -56,11 +59,16 @@ export const useAuth = () => {
     router.push('/login');
   }, [router]);
 
-  const signOut = useCallback(() => {
-    supabase.auth.signOut().finally(() => {
+  const signOut = useCallback(async () => {
+    try {
+      await supabase.auth.signOut();
+    } finally {
+      await queryClient.clear();
+      await AsyncStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
       setAuth(null);
-    });
-  }, []);
+      router.replace('/(onboarding)/welcome');
+    }
+  }, [queryClient, router, setAuth]);
 
   return {
     isReady,

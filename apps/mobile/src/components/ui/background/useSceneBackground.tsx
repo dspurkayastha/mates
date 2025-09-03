@@ -102,8 +102,29 @@ export const SceneBackgroundProvider: React.FC<{ children: React.ReactNode }> = 
   const [theme, setTheme] = useState<SceneTheme | null>(null);
   const [version, setVersion] = useState(0);
   const sceneTransition = useSharedValue(0);
+  const prevHashRef = useRef<number | null>(null);
+
+  const hashTheme = useCallback((t: SceneTheme) => {
+    const shapeSig = (t.shapes || [])
+      .map((s) => {
+        if (s.kind === 'circle') {
+          return `c${s.x},${s.y},${s.r},${s.opacity},${s.colorIndex}`;
+        }
+        if (s.kind === 'arc') {
+          return `a${s.x},${s.y},${s.r},${s.start},${s.end},${s.thickness},${s.opacity},${s.colorIndex}`;
+        }
+        return `b${s.x},${s.y},${s.w},${s.h},${s.radius},${s.opacity},${s.colorIndex}`;
+      })
+      .join('|');
+    const stops = t.gradient.stops.join(',');
+    const key = `${t.key}|${stops}|${shapeSig}|${t.noise ? 1 : 0}|${t.intensity ?? ''}`;
+    return stableHash(key);
+  }, []);
 
   const register = useCallback((t: SceneTheme) => {
+    const nextHash = hashTheme(t);
+    if (prevHashRef.current === nextHash) return;
+    prevHashRef.current = nextHash;
     const seed = t.seed ?? stableHash(t.key);
     const rand = xorshift(seed);
     const intensity = intensityScale[t.intensity ?? 'balanced'];
@@ -136,7 +157,7 @@ export const useSceneBackground = (theme: SceneTheme) => {
   useFocusEffect(
     useCallback(() => {
       ctx.register(theme);
-    }, [ctx, theme]),
+    }, [ctx, theme.key]),
   );
   return ctx.sceneTransition;
 };
