@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Text, GlassButton, Icon, useColors, useTokens } from '@/components/ui';
+import { ensureMinTouchTarget } from '@/utils/a11y';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -208,12 +209,12 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
             }}
             accessibilityLabel={item.accessibilityLabel || item.label}
             accessibilityRole="button"
-            style={{
+            style={ensureMinTouchTarget({
               width: 50,
               height: 50,
               borderRadius: 25,
               padding: 0,
-            }}
+            })}
           >
             <Icon name={item.icon} size="md" color="inverse" />
           </GlassButton>
@@ -227,12 +228,13 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
           size="large"
           onPress={toggleMenu}
           accessibilityLabel={isExpanded ? 'Close actions' : 'Open actions'}
-          style={{
+          accessibilityRole="button"
+          style={ensureMinTouchTarget({
             width: 64,
             height: 64,
             borderRadius: 32,
             padding: 0,
-          }}
+          })}
         >
           <Icon name="Plus" size="lg" color="inverse" />
         </GlassButton>

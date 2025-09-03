@@ -11,7 +11,10 @@ import {
   Card,
 } from '@/components/ui';
 import { withOpacity } from '@/design-system/ThemeProvider';
-import { useSceneBackground } from '@/components/ui/background/useSceneBackground';
+import {
+  useSceneBackground,
+  useWatercolorDefaults,
+} from '@/components/ui/background/useSceneBackground';
 import { usePalette } from '@/components/ui/background/palettes';
 import * as Clipboard from 'expo-clipboard';
 import { useAuth } from '@/features/auth/useAuth';
@@ -34,19 +37,22 @@ export default function SettingsScreen() {
   const [signOutVisible, setSignOutVisible] = useState(false);
   const debug = process.env.EXPO_PUBLIC_DEBUG?.includes('dev');
   const stops = usePalette('sunriseWash');
+  const { swirl, opacity } = useWatercolorDefaults(isDark ? 'dark' : 'light');
   const backgroundTheme = useMemo(
     () => ({
       key: 'settings',
       gradient: { type: 'linear', stops },
       shapes: [
-        { kind: 'circle', x: -40, y: -60, r: 120, opacity: 0.05, colorIndex: 1 },
-        { kind: 'circle', x: 140, y: 220, r: 100, opacity: 0.04, colorIndex: 2 },
+        { kind: 'circle', x: -40, y: -60, r: 120, opacity: Math.min(0.05, opacity), colorIndex: 1 },
+        { kind: 'circle', x: 140, y: 220, r: 100, opacity: Math.min(0.04, opacity), colorIndex: 2 },
       ],
       intensity: 'subtle',
       noise: false,
+      swirl,
+      vignette: true,
       seed: 404,
     }),
-    [stops],
+    [stops, swirl, opacity],
   );
   useSceneBackground(backgroundTheme);
 

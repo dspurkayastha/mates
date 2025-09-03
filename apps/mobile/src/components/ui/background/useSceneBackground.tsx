@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useState, useRef, useCallback } from 'react';
+import React, { createContext, useContext, useState, useRef, useCallback, useMemo } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSharedValue } from 'react-native-reanimated';
 import type { SharedValue } from 'react-native-reanimated';
 import { deriveWaterPath } from './shapes';
+import { useTheme } from '@/components/ui';
 
 export type SceneTheme = {
   key: string;
@@ -57,6 +58,7 @@ export type SceneTheme = {
     overshoot?: number;
     staggerMs?: number;
   };
+  vignette?: boolean;
   seed?: number;
 };
 
@@ -65,10 +67,6 @@ const intensityScale = {
   balanced: 1,
   bold: 1.2,
 } as const;
-
-function clampOpacity(v: number) {
-  return Math.min(0.12, Math.max(0.02, v));
-}
 
 function stableHash(str: string) {
   let h = 0;
@@ -103,6 +101,8 @@ export const SceneBackgroundProvider: React.FC<{ children: React.ReactNode }> = 
   const [version, setVersion] = useState(0);
   const sceneTransition = useSharedValue(0);
   const prevHashRef = useRef<number | null>(null);
+  const { isDark } = useTheme();
+  const opacityCap = useMemo(() => (isDark ? 0.12 : 0.08), [isDark]);
 
   const hashTheme = useCallback((t: SceneTheme) => {
     const shapeSig = (t.shapes || [])
@@ -117,32 +117,42 @@ export const SceneBackgroundProvider: React.FC<{ children: React.ReactNode }> = 
       })
       .join('|');
     const stops = t.gradient.stops.join(',');
-    const key = `${t.key}|${stops}|${shapeSig}|${t.noise ? 1 : 0}|${t.intensity ?? ''}`;
+    const driftSig = t.drift ? `${t.drift.amplitude ?? ''},${t.drift.periodMs ?? ''}` : '';
+    const swirlSig = t.swirl
+      ? `${t.swirl.durationInMs ?? ''},${t.swirl.durationOutMs ?? ''},${t.swirl.overshoot ?? ''},${t.swirl.staggerMs ?? ''}`
+      : '';
+    const key = `${t.key}|${stops}|${shapeSig}|${t.noise ? 1 : 0}|${t.intensity ?? ''}|${
+      t.vignette ? 1 : 0
+    }|${driftSig}|${swirlSig}`;
     return stableHash(key);
   }, []);
 
-  const register = useCallback((t: SceneTheme) => {
-    const nextHash = hashTheme(t);
-    if (prevHashRef.current === nextHash) return;
-    prevHashRef.current = nextHash;
-    const seed = t.seed ?? stableHash(t.key);
-    const rand = xorshift(seed);
-    const intensity = intensityScale[t.intensity ?? 'balanced'];
-    const shapes = (t.shapes || []).map((s, idx) => {
-      const jitter = deriveWaterPath(s.kind, seed + idx, rand);
-      if ('opacity' in s) {
-        s.opacity = clampOpacity((s.opacity ?? 0.05) * intensity);
-      }
-      return {
-        ...s,
-        x: s.x + jitter.x,
-        y: s.y + jitter.y,
-        rotate: (s.rotate ?? 0) + jitter.rotate,
-      } as typeof s;
-    });
-    setTheme({ ...t, shapes });
-    setVersion((v) => v + 1);
-  }, []);
+  const register = useCallback(
+    (t: SceneTheme) => {
+      const nextHash = hashTheme(t);
+      if (prevHashRef.current === nextHash) return;
+      prevHashRef.current = nextHash;
+      const seed = t.seed ?? stableHash(t.key);
+      const rand = xorshift(seed);
+      const intensity = intensityScale[t.intensity ?? 'balanced'];
+      const shapes = (t.shapes || []).map((s, idx) => {
+        const jitter = deriveWaterPath(s.kind, seed + idx, rand);
+        if ('opacity' in s) {
+          const base = (s.opacity ?? 0.05) * intensity;
+          s.opacity = Math.min(opacityCap, Math.max(0.02, base));
+        }
+        return {
+          ...s,
+          x: s.x + jitter.x,
+          y: s.y + jitter.y,
+          rotate: (s.rotate ?? 0) + jitter.rotate,
+        } as typeof s;
+      });
+      setTheme({ ...t, shapes });
+      setVersion((v) => v + 1);
+    },
+    [hashTheme, opacityCap],
+  );
 
   return (
     <SceneBackgroundContext.Provider value={{ theme, version, register, sceneTransition }}>
@@ -167,3 +177,17 @@ export const useSceneBackgroundContext = () => {
   if (!ctx) throw new Error('SceneBackgroundContext not found');
   return ctx;
 };
+
+export const useWatercolorDefaults = (mode: 'light' | 'dark') =>
+  useMemo(
+    () => ({
+      swirl: {
+        overshoot: 0.04,
+        staggerMs: 40,
+        durationInMs: 220,
+        durationOutMs: 240,
+      },
+      opacity: mode === 'dark' ? 0.12 : 0.08,
+    }),
+    [mode],
+  );

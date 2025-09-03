@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { useAuth } from '@/features/auth/useAuth';
 
 const client = supabase as SupabaseClient;
+// TODO: if backend filtering by groupId isn’t implemented yet.
 
 export interface Poll {
   id: string;
@@ -21,8 +22,10 @@ export interface PollVote {
 }
 
 export function useLatestPoll(groupId?: string) {
+  const { auth } = useAuth();
+  const userId = auth?.id;
   return useQuery<Poll | null>({
-    queryKey: ['polls', 'latest', groupId ?? 'none'],
+    queryKey: ['polls', 'latest', { groupId: groupId ?? 'none', userId }],
     queryFn: async () => {
       if (!groupId) return null;
       const { data, error } = await client
@@ -41,8 +44,10 @@ export function useLatestPoll(groupId?: string) {
 }
 
 export function useActivePoll({ groupId }: { groupId: string }) {
+  const { auth } = useAuth();
+  const userId = auth?.id;
   return useQuery<Poll | null>({
-    queryKey: ['polls', 'active', { groupId }],
+    queryKey: ['polls', 'active', { groupId, userId }],
     queryFn: async () => {
       const { data, error } = await client
         .from('polls')
@@ -59,8 +64,9 @@ export function useActivePoll({ groupId }: { groupId: string }) {
 
 export function usePollResults({ pollId }: { pollId: string }) {
   const { auth } = useAuth();
+  const userId = auth?.id;
   return useQuery({
-    queryKey: ['polls', 'results', pollId],
+    queryKey: ['polls', 'results', { pollId, userId }],
     queryFn: async () => {
       const { data: poll, error } = await client
         .from('polls')

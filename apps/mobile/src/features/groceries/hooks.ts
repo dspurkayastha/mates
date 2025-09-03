@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { useAuth } from '@/features/auth/useAuth';
 
 const client = supabase as SupabaseClient;
+// TODO: if backend filtering by groupId isn’t implemented yet.
 
 export interface GroceryItem {
   id: string;
@@ -24,8 +25,10 @@ export function useGroceries({
   groupId: string;
   status?: GroceryItem['status'];
 }) {
+  const { auth } = useAuth();
+  const userId = auth?.id;
   return useQuery<GroceryItem[]>({
-    queryKey: ['groceries', { groupId, status }],
+    queryKey: ['groceries', { groupId, userId, status }],
     queryFn: async () => {
       let q = client
         .from('groceries')
@@ -69,6 +72,8 @@ export function useCreateItem(groupId: string) {
 
 export function useUpdateItemStatus(groupId: string) {
   const queryClient = useQueryClient();
+  const { auth } = useAuth();
+  const userId = auth?.id;
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: GroceryItem['status'] }) => {
       const updates: Partial<GroceryItem> = { status };
@@ -102,6 +107,8 @@ export function useUpdateItemStatus(groupId: string) {
 
 export function useDeleteItem(groupId: string) {
   const queryClient = useQueryClient();
+  const { auth } = useAuth();
+  const userId = auth?.id;
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await client

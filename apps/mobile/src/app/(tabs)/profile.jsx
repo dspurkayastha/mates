@@ -15,7 +15,10 @@ import {
   useTokens,
 } from '@/components/ui';
 import { usePalette } from '@/components/ui/background/palettes';
-import { useSceneBackground } from '@/components/ui/background/useSceneBackground';
+import {
+  useSceneBackground,
+  useWatercolorDefaults,
+} from '@/components/ui/background/useSceneBackground';
 import { withOpacity } from '@/design-system/ThemeProvider';
 import { useAuth } from '@/features/auth/useAuth';
 
@@ -42,7 +45,7 @@ const ActionChip = ({ label, onPress }) => {
 // -----------------------------------------------------------------------------
 
 const ProfileHeader = ({ name, email, avatar, actions }) => {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const tokens = useTokens();
 
   const avatarSize = 72;
@@ -101,7 +104,7 @@ const ProfileHeader = ({ name, email, avatar, actions }) => {
 // -----------------------------------------------------------------------------
 
 export default function ProfileScreen() {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const tokens = useTokens();
   const router = useRouter();
   const { signOut, isAuthenticated } = useAuth();
@@ -161,12 +164,13 @@ export default function ProfileScreen() {
   };
 
   const stops = usePalette('neutralHint');
+  const { swirl, opacity } = useWatercolorDefaults(isDark ? 'dark' : 'light');
   const backgroundTheme = useMemo(
     () => ({
       key: 'profile',
       gradient: { type: 'linear', stops },
       shapes: [
-        { kind: 'circle', x: 40, y: 80, r: 80, opacity: 0.05, colorIndex: 1 },
+        { kind: 'circle', x: 40, y: 80, r: 80, opacity: Math.min(0.05, opacity), colorIndex: 1 },
         {
           kind: 'arc',
           x: 20,
@@ -175,15 +179,17 @@ export default function ProfileScreen() {
           start: 20,
           end: 60,
           thickness: 12,
-          opacity: 0.024,
+          opacity: Math.min(0.024, opacity),
           colorIndex: 1,
         },
       ],
       intensity: 'subtle',
       noise: false,
+      swirl,
+      vignette: true,
       seed: 303,
     }),
-    [stops],
+    [stops, swirl, opacity],
   );
   useSceneBackground(backgroundTheme);
 

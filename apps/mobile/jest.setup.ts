@@ -84,6 +84,15 @@ jest.mock('@/components/ui/background/useSceneBackground', () => {
       register: jest.fn(),
       sceneTransition: { value: 0 },
     }),
+    useWatercolorDefaults: () => ({
+      swirl: {
+        overshoot: 0.04,
+        staggerMs: 40,
+        durationInMs: 220,
+        durationOutMs: 240,
+      },
+      opacity: 0.08,
+    }),
   };
 });
 jest.mock('react-native-svg', () => {

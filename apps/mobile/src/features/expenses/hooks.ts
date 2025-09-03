@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { useAuth } from '@/features/auth/useAuth';
 
 const client = supabase as SupabaseClient;
+// TODO: if backend filtering by groupId isn’t implemented yet.
 
 export interface Expense {
   id: string;
@@ -49,8 +50,10 @@ export function useExpenses({
   groupId: string;
   filter?: 'all' | 'settled' | 'unsettled';
 }) {
+  const { auth } = useAuth();
+  const userId = auth?.id;
   return useQuery<Expense[]>({
-    queryKey: ['expenses', { groupId, filter }],
+    queryKey: ['expenses', { groupId, userId, filter }],
     queryFn: async () => {
       let q = client
         .from('expenses')
@@ -125,8 +128,10 @@ export function useSettleExpense(groupId: string) {
 }
 
 export function useBudget(groupId: string, monthKey: string) {
+  const { auth } = useAuth();
+  const userId = auth?.id;
   return useQuery<Budget | null>({
-    queryKey: ['budget', { groupId, monthKey }],
+    queryKey: ['budget', { groupId, userId, monthKey }],
     queryFn: async () => {
       const { data, error } = await client
         .from('budgets')
@@ -162,8 +167,10 @@ export function useUpsertBudget(groupId: string) {
 }
 
 export function useHouseholdBalances(groupId: string) {
+  const { auth } = useAuth();
+  const userId = auth?.id;
   return useQuery<HouseholdBalance[]>({
-    queryKey: ['householdBalances', { groupId }],
+    queryKey: ['householdBalances', { groupId, userId }],
     queryFn: async () => {
       const { data, error } = await client
         .from('household_balances')
