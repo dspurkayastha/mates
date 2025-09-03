@@ -1,5 +1,11 @@
 import React, { ReactElement } from 'react';
-import { render as rtlRender, RenderOptions } from '@testing-library/react-native';
+import {
+  render as rtlRender,
+  RenderOptions,
+  fireEvent,
+  waitFor,
+  screen,
+} from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider } from '@/design-system/ThemeProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -42,4 +48,4 @@ export function render(
   });
 }
 
-export * from '@testing-library/react-native';
+export { fireEvent, waitFor, screen };

@@ -16,12 +16,18 @@ import { usePalette } from '@/components/ui/background/palettes';
 import * as Clipboard from 'expo-clipboard';
 import { useAuth } from '@/features/auth/useAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/components/ui/Notifications';
+import { ensureMinTouchTarget } from '@/utils/a11y';
+import { STORAGE_KEYS, clearAppStorage } from '@/utils/storage';
 import { biometricAuthManager } from '@/utils/biometricAuth';
 
 export default function SettingsScreen() {
   const tokens = useTokens();
   const { theme, isDark, toggleTheme } = useTheme();
   const { signOut } = useAuth();
+  const queryClient = useQueryClient();
+  const toast = useToast();
   const [notifications, setNotifications] = useState(true);
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
   const [biometricsEnabled, setBiometricsEnabled] = useState(false);
@@ -45,7 +51,7 @@ export default function SettingsScreen() {
   useSceneBackground(backgroundTheme);
 
   useEffect(() => {
-    AsyncStorage.getItem('@mates_haptics').then((v) => {
+    AsyncStorage.getItem(STORAGE_KEYS.haptics).then((v) => {
       if (v !== null) setHapticsEnabled(v === 'true');
     });
     setBiometricsEnabled(biometricAuthManager.isBiometricAuthEnabled());
@@ -54,7 +60,7 @@ export default function SettingsScreen() {
   const toggleHaptics = async () => {
     const next = !hapticsEnabled;
     setHapticsEnabled(next);
-    await AsyncStorage.setItem('@mates_haptics', String(next));
+    await AsyncStorage.setItem(STORAGE_KEYS.haptics, String(next));
   };
 
   const toggleBiometrics = async () => {
@@ -94,7 +100,31 @@ export default function SettingsScreen() {
             title="Dark Mode"
             accessory={{
               type: 'custom',
-              node: <GlassToggle value={isDark} onValueChange={toggleTheme} />,
+              node: (
+                <GlassToggle
+                  value={isDark}
+                  onValueChange={toggleTheme}
+                  accessibilityLabel="Dark mode"
+                  style={ensureMinTouchTarget()}
+                />
+              ),
+            }}
+          />
+          <ListItem
+            title="App Tint"
+            accessory={{
+              type: 'custom',
+              node: (
+                <View
+                  style={{
+                    width: tokens.Spacing.lg,
+                    height: tokens.Spacing.lg,
+                    borderRadius: tokens.BorderRadius.md,
+                    backgroundColor: theme.interactive.primary,
+                  }}
+                  accessibilityLabel="App tint preview"
+                />
+              ),
             }}
           />
         </Card>
@@ -111,7 +141,14 @@ export default function SettingsScreen() {
             title="Enable Notifications"
             accessory={{
               type: 'custom',
-              node: <GlassToggle value={notifications} onValueChange={setNotifications} />,
+              node: (
+                <GlassToggle
+                  value={notifications}
+                  onValueChange={setNotifications}
+                  accessibilityLabel="Notifications"
+                  style={ensureMinTouchTarget()}
+                />
+              ),
             }}
           />
         </Card>
@@ -128,14 +165,36 @@ export default function SettingsScreen() {
             title="Haptics"
             accessory={{
               type: 'custom',
-              node: <GlassToggle value={hapticsEnabled} onValueChange={toggleHaptics} />,
+              node: (
+                <GlassToggle
+                  value={hapticsEnabled}
+                  onValueChange={toggleHaptics}
+                  accessibilityLabel="Haptics"
+                  style={ensureMinTouchTarget()}
+                />
+              ),
             }}
           />
           <ListItem
             title="Biometric Auth"
             accessory={{
               type: 'custom',
-              node: <GlassToggle value={biometricsEnabled} onValueChange={toggleBiometrics} />,
+              node: (
+                <GlassToggle
+                  value={biometricsEnabled}
+                  onValueChange={toggleBiometrics}
+                  accessibilityLabel="Biometric authentication"
+                  style={ensureMinTouchTarget()}
+                />
+              ),
+            }}
+          />
+          <ListItem
+            title="Reset Cache"
+            onPress={async () => {
+              await queryClient.clear();
+              await clearAppStorage();
+              toast.success('Cache cleared');
             }}
           />
         </Card>
