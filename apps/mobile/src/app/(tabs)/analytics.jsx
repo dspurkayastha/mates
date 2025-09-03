@@ -9,8 +9,12 @@ import {
   EmptyState,
   ErrorBanner,
   useTokens,
+  useTheme,
 } from '@/components/ui';
-import { useSceneBackground } from '@/components/ui/background/useSceneBackground';
+import {
+  useSceneBackground,
+  useWatercolorDefaults,
+} from '@/components/ui/background/useSceneBackground';
 import { usePalette } from '@/components/ui/background/palettes';
 import { useExpenses } from '@/features/expenses/hooks';
 import { useGroceries } from '@/features/groceries/hooks';
@@ -29,13 +33,24 @@ import {
 
 export default function AnalyticsScreen() {
   const tokens = useTokens();
+  const { isDark } = useTheme();
   const stops = usePalette('seafoamWash');
+  const { swirl, opacity } = useWatercolorDefaults(isDark ? 'dark' : 'light');
   const backgroundTheme = useMemo(
     () => ({
       key: 'analytics',
       gradient: { type: 'radial', stops },
       shapes: [
-        { kind: 'blob', x: 60, y: 140, w: 260, h: 200, radius: 100, opacity: 0.05, colorIndex: 1 },
+        {
+          kind: 'blob',
+          x: 60,
+          y: 140,
+          w: 260,
+          h: 200,
+          radius: 100,
+          opacity: Math.min(0.05, opacity),
+          colorIndex: 1,
+        },
         {
           kind: 'arc',
           x: -40,
@@ -44,15 +59,17 @@ export default function AnalyticsScreen() {
           start: 10,
           end: 70,
           thickness: 16,
-          opacity: 0.032,
+          opacity: Math.min(0.032, opacity),
           colorIndex: 2,
         },
       ],
       noise: true,
       intensity: 'balanced',
+      swirl,
+      vignette: true,
       seed: 202,
     }),
-    [stops],
+    [stops, swirl, opacity],
   );
   useSceneBackground(backgroundTheme);
   const groupId = process.env.EXPO_PUBLIC_PROJECT_GROUP_ID;

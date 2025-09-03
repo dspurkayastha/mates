@@ -16,7 +16,10 @@ import {
   useTokens,
 } from '@/components/ui';
 import { usePalette } from '@/components/ui/background/palettes';
-import { useSceneBackground } from '@/components/ui/background/useSceneBackground';
+import {
+  useSceneBackground,
+  useWatercolorDefaults,
+} from '@/components/ui/background/useSceneBackground';
 import { withOpacity } from '@/design-system/ThemeProvider';
 import { useLatestPoll } from '@/features/polls/hooks';
 import ExpenseForm from '@/features/expenses/components/ExpenseForm';
@@ -68,19 +71,29 @@ const SummaryCard = ({ title, icon, onPress, items }) => {
 
 export default function HomeScreen() {
   const [houseName] = useState('Our House'); // This would come from API/store in a real app
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const tokens = useTokens();
   const router = useRouter();
   const groupId = process.env.EXPO_PUBLIC_PROJECT_GROUP_ID;
   const { data: activePoll } = useLatestPoll(groupId);
   const stops = usePalette('brandWatercolor');
+  const { swirl, opacity } = useWatercolorDefaults(isDark ? 'dark' : 'light');
   const backgroundTheme = useMemo(
     () => ({
       key: 'home',
       gradient: { type: 'linear', angle: 36, stops },
       shapes: [
-        { kind: 'circle', x: -60, y: -90, r: 260, opacity: 0.06, colorIndex: 1 },
-        { kind: 'blob', x: 120, y: 180, w: 200, h: 160, radius: 56, opacity: 0.04, colorIndex: 2 },
+        { kind: 'circle', x: -60, y: -90, r: 260, opacity: Math.min(0.06, opacity), colorIndex: 1 },
+        {
+          kind: 'blob',
+          x: 120,
+          y: 180,
+          w: 200,
+          h: 160,
+          radius: 56,
+          opacity: Math.min(0.04, opacity),
+          colorIndex: 2,
+        },
         {
           kind: 'arc',
           x: 0,
@@ -89,17 +102,18 @@ export default function HomeScreen() {
           start: 10,
           end: 40,
           thickness: 18,
-          opacity: 0.024,
+          opacity: Math.min(0.024, opacity),
           colorIndex: 1,
         },
       ],
       noise: true,
       intensity: 'subtle',
       drift: { amplitude: 6, periodMs: 12000 },
-      swirl: { durationInMs: 220, durationOutMs: 240, overshoot: 0.04, staggerMs: 40 },
+      swirl,
+      vignette: true,
       seed: 101,
     }),
-    [stops],
+    [stops, swirl, opacity],
   );
   useSceneBackground(backgroundTheme);
 

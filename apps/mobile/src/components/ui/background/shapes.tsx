@@ -7,6 +7,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import type { SharedValue } from 'react-native-reanimated';
+import { useTheme } from '@/components/ui';
 
 export type CircleShape = {
   kind: 'circle';
@@ -65,6 +66,9 @@ export const ShapeComponent: React.FC<ShapeProps> = ({
   index,
 }) => {
   const driftProgress = useSharedValue(0);
+  const { isDark } = useTheme();
+  const maxOpacity = isDark ? 0.12 : 0.08;
+  const clampOpacity = (v: number) => Math.min(maxOpacity, Math.max(0.02, v));
 
   useEffect(() => {
     if (drift && (drift.amplitude || 0) > 0 && (drift.periodMs || 0) > 0) {
@@ -199,10 +203,6 @@ function describeArc(x: number, y: number, radius: number, startAngle: number, e
   const end = polarToCartesian(x, y, radius, startAngle);
   const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
   return ['M', start.x, start.y, 'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y].join(' ');
-}
-
-function clampOpacity(v: number) {
-  return Math.min(0.14, Math.max(0.02, v));
 }
 
 function polarToCartesian(

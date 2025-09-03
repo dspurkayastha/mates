@@ -8,7 +8,7 @@ const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 // Determine if credentials are present
 export const SUPABASE_ENABLED = !!(supabaseUrl && supabaseAnonKey);
 
-if (!SUPABASE_ENABLED) {
+if (!SUPABASE_ENABLED && __DEV__) {
   console.warn(
     '[Supabase] Missing EXPO_PUBLIC_SUPABASE_URL or EXPO_PUBLIC_SUPABASE_ANON_KEY. ' +
       'Running in \"offline\" mode – cloud sync and auth are disabled.',

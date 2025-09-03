@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { useAuth } from '@/features/auth/useAuth';
 
 const client = supabase as SupabaseClient;
+// TODO: if backend filtering by groupId isn’t implemented yet.
 
 export interface Chore {
   id: string;
@@ -20,8 +21,10 @@ export interface LeaderboardEntry {
 }
 
 export function useChores({ groupId, range }: { groupId: string; range?: 'today' | 'week' }) {
+  const { auth } = useAuth();
+  const userId = auth?.id;
   return useQuery<Chore[]>({
-    queryKey: ['chores', { groupId, range }],
+    queryKey: ['chores', { groupId, userId, range }],
     queryFn: async () => {
       let q = client
         .from('chores')
@@ -67,6 +70,8 @@ export function useCreateChore(groupId: string) {
 
 export function useAssignChore(groupId: string) {
   const queryClient = useQueryClient();
+  const { auth } = useAuth();
+  const userId = auth?.id;
   return useMutation({
     mutationFn: async ({ id, assignee }: { id: string; assignee: string }) => {
       const { data, error } = await client
@@ -88,6 +93,7 @@ export function useAssignChore(groupId: string) {
 export function useCompleteChore(groupId: string) {
   const queryClient = useQueryClient();
   const { auth } = useAuth();
+  const userId = auth?.id;
   return useMutation({
     mutationFn: async ({ id, complete }: { id: string; complete: boolean }) => {
       const { data, error } = await client
@@ -111,8 +117,10 @@ export function useCompleteChore(groupId: string) {
 }
 
 export function useLeaderboard({ groupId }: { groupId: string }) {
+  const { auth } = useAuth();
+  const userId = auth?.id;
   return useQuery<LeaderboardEntry[]>({
-    queryKey: ['leaderboard', { groupId }],
+    queryKey: ['leaderboard', { groupId, userId }],
     queryFn: async () => {
       const { data, error } = await client
         .from('chores')

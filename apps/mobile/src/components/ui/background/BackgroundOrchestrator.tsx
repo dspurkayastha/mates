@@ -60,8 +60,8 @@ export default function BackgroundOrchestrator() {
 
   const prevStops = prevTheme.current?.gradient.stops || [];
   const currStops = currentTheme.current?.gradient.stops || [];
-  const vignetteStart = withOpacity(colors.background.primary, isDark ? 0.1 : 0.02);
-  const vignetteEnd = withOpacity(colors.interactive.primary, isDark ? 0.18 : 0.08);
+  const vignetteStart = withOpacity(colors.background.primary, 0);
+  const vignetteEnd = withOpacity(colors.background.primary, isDark ? 0.12 : 0.06);
 
   const gradientProps = (t: typeof theme | null) => ({
     start: t?.gradient.type === 'radial' ? { x: 0.5, y: 0 } : { x: 0, y: 0 },
@@ -84,7 +84,9 @@ export default function BackgroundOrchestrator() {
           {...gradientProps(currentTheme.current)}
         />
       )}
-      <VignetteOverlay start={vignetteStart} end={vignetteEnd} />
+      {currentTheme.current?.vignette && (
+        <VignetteOverlay start={vignetteStart} end={vignetteEnd} />
+      )}
       {currentTheme.current?.intensity === 'bold' && (
         <DotGridOverlay color={withOpacity(colors.interactive.primary, 0.01)} />
       )}

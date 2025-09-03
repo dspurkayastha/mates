@@ -7,6 +7,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { Text, Icon, useTheme, useTokens } from './ui';
+import { ensureMinTouchTarget } from '@/utils/a11y';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -59,12 +60,16 @@ const TopBar: React.FC<TopBarProps> = ({ title, onBackPress, rightAction }) => {
           onPressOut={handlePressOut}
           accessibilityRole="button"
           accessibilityLabel="Back"
-          style={[styles.action, { width: target, height: target }, animatedStyle]}
+          style={ensureMinTouchTarget([
+            styles.action,
+            { width: target, height: target },
+            animatedStyle,
+          ])}
         >
           <Icon name="ArrowLeft" size="md" color="primary" />
         </AnimatedPressable>
       ) : (
-        <View style={[styles.action, { width: target, height: target }]} />
+        <View style={ensureMinTouchTarget([styles.action, { width: target, height: target }])} />
       )}
 
       <Text variant="titleLarge" weight="bold" style={{ flex: 1, textAlign: 'center' }}>
@@ -72,9 +77,11 @@ const TopBar: React.FC<TopBarProps> = ({ title, onBackPress, rightAction }) => {
       </Text>
 
       {rightAction ? (
-        <View style={[styles.action, { width: target, height: target }]}>{rightAction}</View>
+        <View style={ensureMinTouchTarget([styles.action, { width: target, height: target }])}>
+          {rightAction}
+        </View>
       ) : (
-        <View style={[styles.action, { width: target, height: target }]} />
+        <View style={ensureMinTouchTarget([styles.action, { width: target, height: target }])} />
       )}
     </View>
   );
