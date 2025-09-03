@@ -10,7 +10,7 @@ const { getDefaultConfig } = require('expo/metro-config');
 const path = require('node:path');
 const fs = require('node:fs');
 const { FileStore } = require('metro-cache');
-const { reportErrorToRemote } = require('@/lib/logging');
+
 const {
   handleResolveRequestError,
   VIRTUAL_ROOT,
@@ -244,10 +244,11 @@ if (process.env.NODE_ENV === 'production') {
 // ERROR REPORTING (PRESERVED FROM ORIGINAL)
 // ============================================================================
 
+const originalReporterUpdate = config.reporter?.update?.bind(config.reporter);
 config.reporter = {
   ...config.reporter,
   update: (event) => {
-    config.reporter?.update(event);
+    originalReporterUpdate?.(event);
     const reportableErrors = [
       'error',
       'bundling_error',
@@ -257,9 +258,7 @@ config.reporter = {
     ];
     for (const errorType of reportableErrors) {
       if (event.type === errorType && event.error) {
-        reportErrorToRemote({ error: event.error }).catch((reportError) => {
-          // no-op
-        });
+        console.error(event.error);
       }
     }
     return event;

@@ -1,7 +1,6 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
-const { reportErrorToRemote } = require('@/lib/logging');
 
 const VIRTUAL_ROOT = path.join(__dirname, '../.metro-virtual');
 const VIRTUAL_ROOT_UNRESOLVED = path.join(VIRTUAL_ROOT, 'unresolved');
@@ -10,20 +9,18 @@ const handleResolveRequestError = ({ error, context, moduleName, platform }) => 
   const errorMessage = `Unable to resolve module '${moduleName}' from '${context.originModulePath}'`;
   const syntheticError = new Error(errorMessage);
   syntheticError.stack = error.stack;
-  reportErrorToRemote({ error: syntheticError }).catch((reportError) => {
-    // no-op
-  });
+  console.error(syntheticError);
   if (process.env.NODE_ENV === 'production') throw error;
   if (platform !== 'web') throw error;
 
-  // Build a deterministic virtual file path for this failed request
+  // Build a deterministic virtual file path for this failed request.
   const key = `${moduleName}|${context.originModulePath}|${platform}`;
   const hash = crypto.createHash('sha256').update(key).digest('hex').slice(0, 16);
 
   fs.mkdirSync(VIRTUAL_ROOT_UNRESOLVED, { recursive: true });
   const vfile = path.join(VIRTUAL_ROOT_UNRESOLVED, `throw-${hash}.js`);
 
-  // Serialize a safe payload for the client
+  // Serialize a safe payload for the client.
   const payload = {
     moduleName,
     from: context.originModulePath,
