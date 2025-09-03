@@ -4,7 +4,7 @@ import * as Updates from 'expo-updates';
 import { SplashScreen } from 'expo-router/build/exports';
 import { DevSettings, LogBox, Platform, View } from 'react-native';
 import { serializeError } from 'serialize-error';
-import { reportErrorToRemote } from './report-error-to-remote';
+import { reportErrorToRemote } from '@/lib/logging';
 
 type ErrorBoundaryState = { hasError: boolean; error: unknown | null; sentLogs: boolean };
 
