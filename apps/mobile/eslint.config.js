@@ -49,6 +49,10 @@ export default [
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
       'local/no-hardcoded-colors': 'error',
+      'no-restricted-imports': [
+        'error',
+        { patterns: ['**/node_modules/**/build/*', '**/build/*'] },
+      ],
     },
   },
   {

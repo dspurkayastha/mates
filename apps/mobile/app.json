@@ -40,7 +40,6 @@
         }
       ],
       "expo-audio",
-      "expo-blur",
       [
         "expo-build-properties",
         {

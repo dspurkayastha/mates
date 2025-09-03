@@ -1,27 +1,20 @@
 import React from 'react';
 import { View } from 'react-native';
 
-let RealBlur: React.ComponentType<any> | null = null;
+// Default to View; swap to BlurView if available
+let Impl: React.ComponentType<any> = View;
 
 try {
-  require.resolve('expo-blur');
-  RealBlur = require('expo-blur/build/BlurView').BlurView;
-} catch {}
-
-function MissingModuleError() {
-  return new Error("expo-blur is missing. Install it with 'npx expo install expo-blur'.");
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const mod = require('expo-blur');
+  Impl = mod?.BlurView ?? View;
+} catch {
+  if (__DEV__ || process.env.JEST_WORKER_ID) {
+    console.warn('expo-blur not installed; falling back to <View>.');
+  }
 }
 
-export const BlurView: React.FC<any> = (props) => {
-  if (RealBlur) {
-    const Comp = RealBlur as React.ComponentType<any>;
-    return <Comp {...props} />;
-  }
-  if (__DEV__) {
-    console.warn('expo-blur not installed; falling back to <View>.');
-    return <View {...props} />;
-  }
-  throw MissingModuleError();
-};
+const SafeBlur: React.FC<any> = (props) => <Impl {...props} />;
 
-export default BlurView;
+export const BlurView = SafeBlur;
+export default SafeBlur;
