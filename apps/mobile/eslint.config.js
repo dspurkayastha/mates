@@ -20,7 +20,6 @@ export default [
       'web-build',
       'polyfills/**',
       '__create/**',
-      'metro.config.js',
       'index.web.tsx',
       'webpack.config.js',
       'src/utils/textScaling.ts',
@@ -59,6 +58,22 @@ export default [
     files: ['**/__tests__/**'],
     rules: {
       'local/no-hardcoded-colors': 'warn',
+    },
+  },
+  {
+    files: ['metro.config.js'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/*', 'src/*'],
+              message: 'Do not import app code in metro.config.js',
+            },
+          ],
+        },
+      ],
     },
   },
 ];
