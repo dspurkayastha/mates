@@ -9,11 +9,13 @@ import {
   Button,
   LoadingSkeleton,
   ScreenBackground,
+  GlassModal,
   useTheme,
   useTokens,
 } from '@/components/ui';
 import * as Haptics from 'expo-haptics';
 import { useGroceries, useUpdateItemStatus } from '@/features/groceries/hooks';
+import GroceryForm from '@/features/groceries/components/GroceryForm';
 
 // Section header component
 const SectionHeader = ({ title, count, variant = 'neutral' }) => {
@@ -40,6 +42,7 @@ export default function GroceriesScreen() {
   const { theme } = useTheme();
   const colors = theme;
   const tokens = useTokens();
+  const [formVisible, setFormVisible] = React.useState(false);
 
   const { data: groceryItems = [], isLoading } = useGroceries({
     groupId: process.env.EXPO_PUBLIC_PROJECT_GROUP_ID,
@@ -72,7 +75,7 @@ export default function GroceriesScreen() {
 
   const handleAddItem = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Alert.alert('Add Item', 'This would open the add grocery item form');
+    setFormVisible(true);
   };
 
   const getStatusVariant = (status) => {
@@ -239,6 +242,7 @@ export default function GroceriesScreen() {
           onPress={handleAddItem}
           leftIcon={<Icon name="Plus" size="md" color="inverse" />}
           style={{ marginVertical: tokens.Spacing.lg }}
+          accessibilityLabel="Add Item"
         >
           Add Item
         </Button>
@@ -246,6 +250,13 @@ export default function GroceriesScreen() {
         {/* Spacer for bottom tabs */}
         <View style={{ height: 80 }} />
       </ScrollView>
+      <GlassModal
+        visible={formVisible}
+        onClose={() => setFormVisible(false)}
+        accessibilityLabel="Add Grocery"
+      >
+        <GroceryForm onSuccess={() => setFormVisible(false)} />
+      </GlassModal>
     </ScreenBackground>
   );
 }

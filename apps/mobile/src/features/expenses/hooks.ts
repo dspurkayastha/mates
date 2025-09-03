@@ -67,39 +67,42 @@ export function useExpenses({
   });
 }
 
-export function useCreateExpense() {
+export function useCreateExpense(groupId: string) {
   const { auth } = useAuth();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (
-      expense: Omit<Expense, 'id' | 'created_at' | 'status'> & { splits?: Split[] },
+      expense: Omit<
+        Expense,
+        'id' | 'created_at' | 'status' | 'group_id' | 'paid_by' | 'shared_with'
+      > & {
+        category?: string;
+        notes?: string;
+        created_at?: string;
+        shared_with?: string[];
+      },
     ) => {
-      const { splits, ...rest } = expense;
       const { data, error } = await client
         .from('expenses')
         .insert({
-          ...rest,
+          ...expense,
+          group_id: groupId,
           status: 'PENDING',
-          created_at: new Date().toISOString(),
+          created_at: expense.created_at ?? new Date().toISOString(),
           paid_by: auth?.id,
         })
         .select()
         .single();
       if (error) throw error;
-      if (splits && splits.length) {
-        const rows = splits.map((s) => ({ ...s, expense_id: data.id }));
-        const { error: splitError } = await client.from('expense_splits').insert(rows);
-        if (splitError) throw splitError;
-      }
       return data as Expense;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      queryClient.invalidateQueries({ queryKey: ['expenses', { groupId }] });
     },
   });
 }
 
-export function useSettleExpense() {
+export function useSettleExpense(groupId: string) {
   const { auth } = useAuth();
   const queryClient = useQueryClient();
   return useMutation({
@@ -115,8 +118,8 @@ export function useSettleExpense() {
       if (settleError) throw settleError;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expenses'] });
-      queryClient.invalidateQueries({ queryKey: ['householdBalances'] });
+      queryClient.invalidateQueries({ queryKey: ['expenses', { groupId }] });
+      queryClient.invalidateQueries({ queryKey: ['householdBalances', { groupId }] });
     },
   });
 }

@@ -8,6 +8,8 @@ import {
   Card,
   Button,
   Text,
+  Icon,
+  GlassModal,
   useTokens,
   useTheme,
 } from '@/components/ui';
@@ -21,6 +23,7 @@ import {
 import ExpensesSummaryCard from '@/features/expenses/components/ExpensesSummaryCard';
 import { formatINR } from '@/utils/format';
 import { withOpacity } from '@/design-system/ThemeProvider';
+import ExpenseForm from '@/features/expenses/components/ExpenseForm';
 
 export default function ExpensesScreen() {
   const tokens = useTokens();
@@ -29,6 +32,7 @@ export default function ExpensesScreen() {
   const [showLimitModal, setShowLimitModal] = React.useState(false);
   const [limitInput, setLimitInput] = React.useState('');
   const [limitError, setLimitError] = React.useState();
+  const [formVisible, setFormVisible] = React.useState(false);
   const groupId = process.env.EXPO_PUBLIC_PROJECT_GROUP_ID;
   const { data: expenses = [], isLoading } = useExpenses({
     groupId,
@@ -160,7 +164,25 @@ export default function ExpensesScreen() {
             }}
           />
         ))}
+        <Button
+          variant="primary"
+          size="lg"
+          fullWidth
+          onPress={() => setFormVisible(true)}
+          leftIcon={<Icon name="Plus" size="md" color="inverse" />}
+          accessibilityLabel="Add Expense"
+          style={{ marginVertical: tokens.Spacing.lg }}
+        >
+          Add Expense
+        </Button>
       </ScrollView>
+      <GlassModal
+        visible={formVisible}
+        onClose={() => setFormVisible(false)}
+        accessibilityLabel="Add Expense"
+      >
+        <ExpenseForm onSuccess={() => setFormVisible(false)} />
+      </GlassModal>
       <Modal
         transparent
         visible={showLimitModal}
