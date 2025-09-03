@@ -25,24 +25,22 @@ class AccessibilityManager {
     preferredContentSizeCategory: 'medium',
   };
 
-  private listeners: Array<(state: AccessibilityState) => void> = [];
+  private listeners: ((state: AccessibilityState) => void)[] = [];
 
   async initialize() {
     try {
-      // Check screen reader status
-      this.state.isScreenReaderEnabled = await AccessibilityInfo.isScreenReaderEnabled();
-
-      // Check reduce motion (iOS only for now)
-      if (Platform.OS === 'ios') {
+      if (typeof AccessibilityInfo?.isScreenReaderEnabled === 'function') {
+        this.state.isScreenReaderEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+      }
+      if (Platform.OS === 'ios' && typeof AccessibilityInfo?.isReduceMotionEnabled === 'function') {
         this.state.isReduceMotionEnabled = await AccessibilityInfo.isReduceMotionEnabled();
       }
-
-      // Listen for changes
-      AccessibilityInfo.addEventListener('screenReaderChanged', this.handleScreenReaderChange);
-      if (Platform.OS === 'ios') {
-        AccessibilityInfo.addEventListener('reduceMotionChanged', this.handleReduceMotionChange);
+      if (typeof AccessibilityInfo?.addEventListener === 'function') {
+        AccessibilityInfo.addEventListener('screenReaderChanged', this.handleScreenReaderChange);
+        if (Platform.OS === 'ios') {
+          AccessibilityInfo.addEventListener('reduceMotionChanged', this.handleReduceMotionChange);
+        }
       }
-
       this.notifyListeners();
     } catch (error) {
       console.warn('Failed to initialize accessibility state:', error);
@@ -76,14 +74,19 @@ class AccessibilityManager {
 
   // Announce message to screen reader
   announceForAccessibility(message: string) {
-    if (this.state.isScreenReaderEnabled) {
+    if (
+      this.state.isScreenReaderEnabled &&
+      typeof AccessibilityInfo?.announceForAccessibility === 'function'
+    ) {
       AccessibilityInfo.announceForAccessibility(message);
     }
   }
 
   // Set accessibility focus
   setAccessibilityFocus(reactTag: number) {
-    AccessibilityInfo.setAccessibilityFocus(reactTag);
+    if (typeof AccessibilityInfo?.setAccessibilityFocus === 'function') {
+      AccessibilityInfo.setAccessibilityFocus(reactTag);
+    }
   }
 }
 

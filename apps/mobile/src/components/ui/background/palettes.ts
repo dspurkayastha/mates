@@ -11,7 +11,7 @@ export type PaletteName =
 type ThemeColors = ReturnType<typeof useColors>;
 const { BaseColors } = Tokens;
 
-export const getPalette = (colors: ThemeColors, name: PaletteName): string[] => {
+const getPalette = (colors: ThemeColors, name: PaletteName): string[] => {
   switch (name) {
     case 'seafoamWash':
       return [
@@ -56,10 +56,10 @@ export const getPalette = (colors: ThemeColors, name: PaletteName): string[] => 
   }
 };
 
-export const usePalette = (name: PaletteName): string[] => {
+export function usePalette(name: PaletteName): string[] {
   const colors = useColors();
   return getPalette(colors, name);
-};
+}
 
 export const getIntensityMultiplier = (intensity: 'subtle' | 'balanced' | 'bold' = 'balanced') => {
   const mult = { subtle: 0.8, balanced: 1, bold: 1.2 }[intensity];

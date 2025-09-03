@@ -106,8 +106,9 @@ export const Icon: React.FC<IconProps> = ({
   const IconComponent = icons[name] as LucideIcon;
 
   if (!IconComponent) {
-    console.warn(`Icon "${name}" not found in Lucide icons`);
-    // Return fallback icon
+    if (__DEV__) {
+      console.warn(`Icon "${name}" not found in Lucide icons`);
+    }
     const FallbackIcon = icons.Circle as LucideIcon;
     return (
       <FallbackIcon

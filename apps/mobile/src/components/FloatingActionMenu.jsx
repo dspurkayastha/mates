@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { Text, GlassButton, Icon, useColors, useTokens } from '@/components/ui';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -16,6 +17,7 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
   const colors = useColors();
   const tokens = useTokens();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const animation = useSharedValue(0);
@@ -115,7 +117,7 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
   const menuItems = [
     {
       id: 'analytics',
-      icon: 'Chart',
+      icon: 'BarChart3',
       label: 'Analytics',
       accessibilityLabel: 'Open Analytics',
       onPress: () => router.push('/analytics'),
@@ -125,6 +127,7 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
     {
       icon: 'Vote',
       label: 'Poll',
+      accessibilityLabel: 'Create Poll',
       onPress: onCreatePoll, // TODO(theme): map to token
       // eslint-disable-next-line local/no-hardcoded-colors
       color: 'info',
@@ -132,6 +135,7 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
     {
       icon: 'DollarSign',
       label: 'Expense',
+      accessibilityLabel: 'Add Expense',
       onPress: onAddExpense, // TODO(theme): map to token
       // eslint-disable-next-line local/no-hardcoded-colors
       color: 'primary',
@@ -139,6 +143,7 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
     {
       icon: 'ShoppingCart',
       label: 'Grocery',
+      accessibilityLabel: 'Add Grocery',
       onPress: onAddGrocery, // TODO(theme): map to token
       // eslint-disable-next-line local/no-hardcoded-colors
       color: 'success',
@@ -146,6 +151,7 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
     {
       icon: 'SquareCheck',
       label: 'Chore',
+      accessibilityLabel: 'Add Chore',
       onPress: onAddChore, // TODO(theme): map to token
       // eslint-disable-next-line local/no-hardcoded-colors
       color: 'warning',
@@ -154,11 +160,14 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
 
   return (
     <View
+      pointerEvents="box-none"
       style={{
         position: 'absolute',
-        bottom: tokens.Spacing['4xl'],
+        bottom: insets.bottom + tokens.Spacing.lg,
         right: tokens.Spacing.xl,
         alignItems: 'center',
+        zIndex: 100,
+        elevation: 10,
       }}
     >
       {/* Menu Items */}
@@ -217,6 +226,7 @@ const FloatingActionMenu = ({ onAddExpense, onAddGrocery, onAddChore, onCreatePo
           buttonStyle="tinted"
           size="large"
           onPress={toggleMenu}
+          accessibilityLabel={isExpanded ? 'Close actions' : 'Open actions'}
           style={{
             width: 64,
             height: 64,

@@ -1,21 +1,23 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Dimensions, Alert, Pressable } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
+import React, { useMemo, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+
+import FloatingActionMenu from '@/components/FloatingActionMenu';
 import {
-  Text,
+  Card,
+  GlassModal,
   Icon,
   ListItem,
-  Card,
   NavTile,
   ScreenBackground,
+  Text,
   useTheme,
   useTokens,
 } from '@/components/ui';
-import { withOpacity } from '@/design-system/ThemeProvider';
-import { useSceneBackground } from '@/components/ui/background/useSceneBackground';
 import { usePalette } from '@/components/ui/background/palettes';
-import { useRouter } from 'expo-router';
-import * as Haptics from 'expo-haptics';
-import FloatingActionMenu from '@/components/FloatingActionMenu';
+import { useSceneBackground } from '@/components/ui/background/useSceneBackground';
+import { withOpacity } from '@/design-system/ThemeProvider';
 import { useLatestPoll } from '@/features/polls/hooks';
 
 const SummaryCard = ({ title, icon, onPress, items }) => {
@@ -69,35 +71,34 @@ export default function HomeScreen() {
   const groupId = process.env.EXPO_PUBLIC_PROJECT_GROUP_ID;
   const { data: activePoll } = useLatestPoll(groupId);
   const stops = usePalette('brandWatercolor');
-  useSceneBackground({
-    key: 'home',
-    gradient: { type: 'linear', angle: 36, stops },
-    shapes: [
-      { kind: 'circle', x: -60, y: -90, r: 260, opacity: 0.06, colorIndex: 1 },
-      { kind: 'blob', x: 120, y: 180, w: 200, h: 160, radius: 56, opacity: 0.04, colorIndex: 2 },
-      {
-        kind: 'arc',
-        x: 0,
-        y: 260,
-        r: 320,
-        start: 10,
-        end: 40,
-        thickness: 18,
-        opacity: 0.024,
-        colorIndex: 1,
-      },
-    ],
-    noise: true,
-    intensity: 'subtle',
-    drift: { amplitude: 6, periodMs: 12000 },
-    swirl: { durationInMs: 220, durationOutMs: 240, overshoot: 0.04, staggerMs: 40 },
-    seed: 101,
-  });
-
-  const handleFabPress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    console.log('FAB pressed - showing action sheet');
-  };
+  const backgroundTheme = useMemo(
+    () => ({
+      key: 'home',
+      gradient: { type: 'linear', angle: 36, stops },
+      shapes: [
+        { kind: 'circle', x: -60, y: -90, r: 260, opacity: 0.06, colorIndex: 1 },
+        { kind: 'blob', x: 120, y: 180, w: 200, h: 160, radius: 56, opacity: 0.04, colorIndex: 2 },
+        {
+          kind: 'arc',
+          x: 0,
+          y: 260,
+          r: 320,
+          start: 10,
+          end: 40,
+          thickness: 18,
+          opacity: 0.024,
+          colorIndex: 1,
+        },
+      ],
+      noise: true,
+      intensity: 'subtle',
+      drift: { amplitude: 6, periodMs: 12000 },
+      swirl: { durationInMs: 220, durationOutMs: 240, overshoot: 0.04, staggerMs: 40 },
+      seed: 101,
+    }),
+    [stops],
+  );
+  useSceneBackground(backgroundTheme);
 
   // Navigation handlers with haptic feedback
   const handleExpensesPress = () => {
@@ -141,19 +142,23 @@ export default function HomeScreen() {
   };
 
   // Quick action handlers
+  const [expenseVisible, setExpenseVisible] = useState(false);
+  const [groceryVisible, setGroceryVisible] = useState(false);
+  const [choreVisible, setChoreVisible] = useState(false);
+
   const handleAddExpense = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    Alert.alert('Add Expense', 'This would open the add expense form');
+    setExpenseVisible(true);
   };
 
   const handleAddGrocery = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    Alert.alert('Add Grocery Item', 'This would open the add grocery item form');
+    setGroceryVisible(true);
   };
 
   const handleAddChore = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    Alert.alert('Add Chore', 'This would open the add chore form');
+    setChoreVisible(true);
   };
 
   const handleCreatePoll = () => {
@@ -258,7 +263,7 @@ export default function HomeScreen() {
             <NavTile
               title="Analytics"
               subtitle="Trends"
-              icon="Chart"
+              icon="BarChart3"
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 router.push('/analytics');
@@ -337,6 +342,42 @@ export default function HomeScreen() {
         onAddChore={handleAddChore}
         onCreatePoll={handleCreatePoll}
       />
+
+      <GlassModal
+        visible={expenseVisible}
+        onClose={() => setExpenseVisible(false)}
+        accessibilityLabel="Add Expense"
+      >
+        <View style={{ padding: tokens.Spacing.lg }}>
+          <Text variant="titleMedium" weight="semibold">
+            Add Expense
+          </Text>
+        </View>
+      </GlassModal>
+
+      <GlassModal
+        visible={groceryVisible}
+        onClose={() => setGroceryVisible(false)}
+        accessibilityLabel="Add Grocery"
+      >
+        <View style={{ padding: tokens.Spacing.lg }}>
+          <Text variant="titleMedium" weight="semibold">
+            Add Grocery Item
+          </Text>
+        </View>
+      </GlassModal>
+
+      <GlassModal
+        visible={choreVisible}
+        onClose={() => setChoreVisible(false)}
+        accessibilityLabel="Add Chore"
+      >
+        <View style={{ padding: tokens.Spacing.lg }}>
+          <Text variant="titleMedium" weight="semibold">
+            Add Chore
+          </Text>
+        </View>
+      </GlassModal>
 
       {/* Modern Action Sheet - TODO: Implement when needed */}
     </ScreenBackground>

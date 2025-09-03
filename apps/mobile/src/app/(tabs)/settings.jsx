@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, ScrollView, Modal } from 'react-native';
 import {
   Text,
@@ -15,27 +15,58 @@ import { useSceneBackground } from '@/components/ui/background/useSceneBackgroun
 import { usePalette } from '@/components/ui/background/palettes';
 import * as Clipboard from 'expo-clipboard';
 import { useAuth } from '@/features/auth/useAuth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { biometricAuthManager } from '@/utils/biometricAuth';
 
 export default function SettingsScreen() {
   const tokens = useTokens();
-  const { theme } = useTheme();
+  const { theme, isDark, toggleTheme } = useTheme();
   const { signOut } = useAuth();
   const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+  const [hapticsEnabled, setHapticsEnabled] = useState(true);
+  const [biometricsEnabled, setBiometricsEnabled] = useState(false);
   const [signOutVisible, setSignOutVisible] = useState(false);
   const debug = process.env.EXPO_PUBLIC_DEBUG?.includes('dev');
   const stops = usePalette('sunriseWash');
-  useSceneBackground({
-    key: 'settings',
-    gradient: { type: 'linear', stops },
-    shapes: [
-      { kind: 'circle', x: -40, y: -60, r: 120, opacity: 0.05, colorIndex: 1 },
-      { kind: 'circle', x: 140, y: 220, r: 100, opacity: 0.04, colorIndex: 2 },
-    ],
-    intensity: 'subtle',
-    noise: false,
-    seed: 404,
-  });
+  const backgroundTheme = useMemo(
+    () => ({
+      key: 'settings',
+      gradient: { type: 'linear', stops },
+      shapes: [
+        { kind: 'circle', x: -40, y: -60, r: 120, opacity: 0.05, colorIndex: 1 },
+        { kind: 'circle', x: 140, y: 220, r: 100, opacity: 0.04, colorIndex: 2 },
+      ],
+      intensity: 'subtle',
+      noise: false,
+      seed: 404,
+    }),
+    [stops],
+  );
+  useSceneBackground(backgroundTheme);
+
+  useEffect(() => {
+    AsyncStorage.getItem('@mates_haptics').then((v) => {
+      if (v !== null) setHapticsEnabled(v === 'true');
+    });
+    setBiometricsEnabled(biometricAuthManager.isBiometricAuthEnabled());
+  }, []);
+
+  const toggleHaptics = async () => {
+    const next = !hapticsEnabled;
+    setHapticsEnabled(next);
+    await AsyncStorage.setItem('@mates_haptics', String(next));
+  };
+
+  const toggleBiometrics = async () => {
+    const next = !biometricsEnabled;
+    if (next) {
+      const res = await biometricAuthManager.enableBiometricAuth();
+      if (!res.success) return;
+    } else {
+      await biometricAuthManager.disableBiometricAuth();
+    }
+    setBiometricsEnabled(next);
+  };
 
   return (
     <ScreenBackground palette="brand" variant="subtle" gradientShape="linear">
@@ -63,7 +94,7 @@ export default function SettingsScreen() {
             title="Dark Mode"
             accessory={{
               type: 'custom',
-              node: <GlassToggle value={darkMode} onValueChange={setDarkMode} />,
+              node: <GlassToggle value={isDark} onValueChange={toggleTheme} />,
             }}
           />
         </Card>
@@ -81,6 +112,30 @@ export default function SettingsScreen() {
             accessory={{
               type: 'custom',
               node: <GlassToggle value={notifications} onValueChange={setNotifications} />,
+            }}
+          />
+        </Card>
+
+        <Text variant="titleLarge" weight="semibold" style={{ marginBottom: tokens.Spacing.md }}>
+          Preferences
+        </Text>
+        <Card
+          variant="outlined"
+          contentStyle={{ padding: 0 }}
+          style={{ marginBottom: tokens.Spacing.xl }}
+        >
+          <ListItem
+            title="Haptics"
+            accessory={{
+              type: 'custom',
+              node: <GlassToggle value={hapticsEnabled} onValueChange={toggleHaptics} />,
+            }}
+          />
+          <ListItem
+            title="Biometric Auth"
+            accessory={{
+              type: 'custom',
+              node: <GlassToggle value={biometricsEnabled} onValueChange={toggleBiometrics} />,
             }}
           />
         </Card>

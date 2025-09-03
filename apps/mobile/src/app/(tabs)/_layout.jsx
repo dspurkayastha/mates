@@ -142,7 +142,7 @@ export default function TabsLayout() {
               title: 'Analytics',
               tabBarLabel: 'Analytics',
               tabBarIcon: ({ focused }) => (
-                <Icon name="Chart" size="md" color={focused ? 'brand' : 'secondary'} />
+                <Icon name="BarChart3" size="md" color={focused ? 'brand' : 'secondary'} />
               ),
             }}
           />
