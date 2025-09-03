@@ -196,7 +196,11 @@ export default function HomeScreen() {
             accessibilityRole="button"
             accessibilityLabel="View poll results"
           >
-            <Text variant="titleMedium" weight="semibold" style={{ marginBottom: tokens.Spacing.xs }}>
+            <Text
+              variant="titleMedium"
+              weight="semibold"
+              style={{ marginBottom: tokens.Spacing.xs }}
+            >
               {activePoll.question}
             </Text>
             <Text variant="bodySmall" color="secondary">
