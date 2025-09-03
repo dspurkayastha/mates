@@ -5,10 +5,25 @@ export interface BiometricAuthResult {
   error?: string;
 }
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STORAGE_KEYS } from './storage';
+
+let enabled = false;
+void AsyncStorage.getItem(STORAGE_KEYS.biometrics).then((v) => {
+  enabled = v === 'true';
+});
+
 export const biometricAuthManager = {
-  isBiometricAuthEnabled: () => false,
-  enableBiometricAuth: async (): Promise<BiometricAuthResult> => ({ success: false }),
-  disableBiometricAuth: async () => {},
+  isBiometricAuthEnabled: () => enabled,
+  enableBiometricAuth: async (): Promise<BiometricAuthResult> => {
+    enabled = true;
+    await AsyncStorage.setItem(STORAGE_KEYS.biometrics, 'true');
+    return { success: true };
+  },
+  disableBiometricAuth: async () => {
+    enabled = false;
+    await AsyncStorage.setItem(STORAGE_KEYS.biometrics, 'false');
+  },
   initialize: async (): Promise<BiometricCapabilities> => ({}),
   authenticate: async (_opts?: BiometricAuthOptions): Promise<BiometricAuthResult> => ({
     success: false,
